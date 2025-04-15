@@ -8,14 +8,14 @@ The Provider Terminal allows Service providers to interact with the ChocAn Manag
 Through the terminal, Providers are able to charge ChocAn for services provided
 to qualifying ChocAn Members.
 ```
-- **Login:** Provider enters their 9-digit provider number.
-- **Member Validation:**
+#### **Login:** Provider enters their 9-digit provider number.
+#### **Member Validation:**
     1.  Provider 'swipes' member card 
 	    - Enter 9-Digit member number
     2. System validates number and status (active/suspended).
 	    - Active : Bills Paid, all is normal
 	    - Member Suspended : Bills unpaid, Suspended until Payment
-- **Service Billing:**
+#### **Service Billing:**
     1. **Re-Validate** member number.
     2. Input **date of service** (MM-DD-YYYY).
     3. Input **6-digit service code**
@@ -51,8 +51,6 @@ given to us by our clients.
 
 #### **Weekly Accounting Process (Midnight Friday or on-demand)**
 ##### Member Report & Provider Report
-
-**Store Records as Files**
 ```
 /Member_Reports/MemberName_MM-DD-YYYY.txt
 /Provider_Reports/ProviderName_MM-DD-YYYY.txt
