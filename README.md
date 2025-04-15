@@ -80,19 +80,22 @@ Reports are saved as files rather than actual email.
 	        - Member Number
             - Service Code
             - Fee
-		- **Provider Only**
-			- Total Number of Consultations (3)
-			- Total Fee ($99,999.99 MAX)
 
-##### EFT Data File
-- For each provider to be paid:
-    - Provider name
-    - Provider number
-    - Total fee
-
-##### Manager Summary Report
-
+### Manager Summary Report
+```
+Provider Reports are processed to give the manager a summary for all accounts payable.
+```
 - All providers to be paid that week:
-    - Provider Name
-    - Number of Consultations
-    - Total fee
+    - Provider Name(25)
+    - Number of Consultations (3)
+    - Total Fee ($99,999.99 MAX)
+- Print:
+    - Total Number of Providers who provided Service
+    - Total Number of Consultations
+    - Overall Fee Total
+
+### EFT Data File
+- For each provider to be paid:
+    - Provider Name(25)
+    - Provider Number(9)
+    - Total Fee($99,999.99 MAX)
