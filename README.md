@@ -32,9 +32,9 @@ to qualifying ChocAn Members.
 
 #### Provider Directory
 On request, generate a file with:
-    - Alphabetical list of service names
-    - Corresponding 6-digit service codes
-    - Associated service fees
+- Alphabetical list of service names
+- Corresponding 6-digit service codes
+- Associated service fees
 
 ---
 ### Manager / Admin Terminal
