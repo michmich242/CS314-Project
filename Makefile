@@ -28,8 +28,10 @@ $(PROV).o: $(PROV).cpp $(PROV).h $(SQL).h
 clean cls:
 	rm -rf *.o $(MAIN) $(SQL) $(MAN) $(PROV)
 
-# When using make git, it will prompt you for a commit message,
-# type it and then write and quit, you still must call git push afterwards.
+# The "git:" part allows you to just type "make git" instead of
+# typing git add and git commit individually
+# Note: You'll still have to type the commit message
+# Note: You'll still have to type "git push" to make changes to the repo
 git:
 	git add *.cpp *.h ?akefile
 	git commit
