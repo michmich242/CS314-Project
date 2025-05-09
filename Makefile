@@ -6,6 +6,9 @@ COMP = g++
 # we can add to these as well if we want to do so.
 CFLAGS = -g -Wall
 
+# Linker flags
+LDFLAGS = -lpqxx -lpq
+
 all: $(MAIN)
 
 $(MAIN): $(MAIN).o $(PROV).o $(MAN).o $(SQL).o
@@ -33,7 +36,7 @@ clean cls:
 # Note: You'll still have to type the commit message
 # Note: You'll still have to type "git push" to make changes to the repo
 git:
-	git add *.cpp *.h ?akefile
+	git add *.cpp *.h ?akefile .gitignore
 	git commit
 
 # Note: we must figure out a method for unit testing, this may be separate cpp files that
