@@ -30,3 +30,9 @@ start_manager()
 {
 	return true;
 }
+
+bool
+start_provider()
+{
+	return true;
+}
