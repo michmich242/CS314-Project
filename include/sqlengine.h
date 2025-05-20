@@ -34,6 +34,7 @@ class SQLEngine {
 	bool add_provider(const Provider &provider);
 	bool update_provider(const Provider &provider);
 	bool delete_provider(const std::string &id);
+	bool validate_provider(int num);
 
 	// Service List and Records
 	bool save_service_record(const ServiceRecord &record);
