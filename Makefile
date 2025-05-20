@@ -1,7 +1,35 @@
 COMP = g++
 
 # we can add to these as well if we want to do so.
-CFLAGS = -g -Wall
+
+
+
+#---------------- FOR MAC --------------
+
+# To install brew on the terminal:
+# /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+
+#brew install postgresql
+#brew install libpqxx
+
+
+CFLAGS = -g -Wall -I $(shell brew --prefix)/include -std=c++17
+
+
+#----------------- FOR WINDOWS --------------
+
+# Go on Google and search up MSYS2 UCRT64 and install it, or you can install MINGW64 which installs all compiling managers (Clang64, UCRT64, MINGW64)
+
+# pacman -S mingw-w64-ucrt-x86_64-libpqxx mingw-w64-ucrt-x86_64-postgresql
+
+#CFLAGS = -g -Wall -I C:\msys64\ucrt64\include -std=c++17
+
+
+#---------------------------------------------------
+
+
+
+
 
 # Linker flags
 LDFLAGS = -lpqxx -lpq
