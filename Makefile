@@ -1,7 +1,34 @@
 COMP = g++
 
-# we can add to these as well if we want to do so.
 
+
+
+UNAME_S := $(shell uname -s)
+
+ifeq ($(UNAME_S),Darwin)
+    PLATFORM := macOS
+else ifeq ($(UNAME_S),Linux)
+    PLATFORM := Linux
+else ifneq (,$(findstring MINGW,$(UNAME_S)))
+    PLATFORM := Windows
+else ifneq (,$(findstring MSYS,$(UNAME_S)))
+    PLATFORM := Windows
+endif
+
+
+ifeq ($(PLATFORM),macOS)
+	CFLAGS = -g -Wall -I /opt/homebrew/include
+else ifeq ($(PLATFORM),Windows)
+	CFLAGS = -g -Wall -I ./includes_library/pqxx/include 
+else
+	CFLAGS = -g -Wall -lpqxx -lpq
+endif
+
+
+$(info Detected platform: $(PLATFORM))
+
+
+$(shell mkdir -p bin)
 
 
 #---------------- FOR MAC --------------
@@ -13,7 +40,7 @@ COMP = g++
 #brew install libpqxx
 
 
-CFLAGS = -g -Wall -I $(shell brew --prefix)/include -std=c++17
+#CFLAGS = -g -Wall -I $(shell brew --prefix)/include -std=c++17
 
 
 #----------------- FOR WINDOWS --------------
