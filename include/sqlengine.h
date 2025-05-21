@@ -12,47 +12,48 @@
 // Struct to pass back provider summaries
 // Passed back in a vector
 struct ProviderSummary {
-  std::string provider_id;
-  std::string provider_name;
-  int num_consultations;
-  float total_fee;
+	std::string provider_id;
+	std::string provider_name;
+	int num_consultations;
+	float total_fee;
 };
 
 struct ManagerSummary {
-  std::vector<ProviderSummary> providers;
-  int total_consultations;
-  float total_fees;
+	std::vector<ProviderSummary> providers;
+	int total_consultations;
+	float total_fees;
 };
 
 class SQLEngine {
-public:
-  SQLEngine(const std::string &db_path = ".dbinfo");
-  bool is_connected() const;
+  public:
 
-  // Member interactions
-  bool add_member(const Member &member);
-  bool update_member(const Member &member);
-  bool delete_member(const std::string &id);
-  bool validate_member(const std::string &id);
-  bool get_member_status(const std::string &id);
+	SQLEngine(const std::string &db_path = ".dbinfo");
+	bool is_connected() const;
 
-  // Provider Interactions
-  bool add_provider(const Provider &provider);
-  bool update_provider(const Provider &provider);
-  bool delete_provider(const std::string &id);
-  bool validate_provider(const std::string &id);
+	// Member interactions
+	bool add_member(const Member &member);
+	bool update_member(const Member &member);
+	bool delete_member(const std::string &id);
+	bool validate_member(const std::string &id);
 
-  // Service List and Records
-  bool save_service_record(const ServiceRecord &record);
-  Service get_service(const std::string &code);
-  std::vector<Service> get_all_services();
+	// Provider Interactions
+	bool add_provider(const Provider &provider);
+	bool update_provider(const Provider &provider);
+	bool delete_provider(const std::string &id);
+	bool validate_provider(const std::string &id);
 
-  // Weekly Reporting
-  std::vector<ServiceRecord> generate_member_service_reports();
-  std::vector<ServiceRecord> generate_provider_service_reports();
-  std::vector<ProviderSummary> generate_provider_summary_report();
-  ManagerSummary generate_manager_summary_reports();
+	// Service List and Records
+	bool save_service_record(const ServiceRecord &record);
+	Service get_service(const std::string &code);
+	std::vector<Service> get_all_services();
 
-private:
-  std::unique_ptr<pqxx::connection> conn;
+	// Weekly Reporting
+	std::vector<ServiceRecord> generate_member_service_reports();
+	std::vector<ServiceRecord> generate_provider_service_reports();
+	std::vector<ProviderSummary> generate_provider_summary_report();
+	ManagerSummary generate_manager_summary_reports();
+
+  private:
+
+	std::unique_ptr<pqxx::connection> conn;
 };
