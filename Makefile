@@ -17,9 +17,9 @@ endif
 
 
 ifeq ($(PLATFORM),macOS)
-	CFLAGS = -g -Wall -I /opt/homebrew/include
+	CFLAGS = -g -Wall -I /opt/homebrew/include -std=c++17
 else ifeq ($(PLATFORM),Windows)
-	CFLAGS = -g -Wall -I ./includes_library/pqxx/include 
+	CFLAGS = -g -Wall -I ./includes_library/pqxx/include -std=c++17
 else
 	CFLAGS = -g -Wall -lpqxx -lpq
 endif
