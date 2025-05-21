@@ -1,13 +1,13 @@
 // SQL API for ChocAn Database
 //
-#pragma once
+
+#include "manager.h"
 #include <fstream>
 #include <iostream>
 #include <map>
 #include <memory>
 #include <pqxx/pqxx>
 #include <sstream>
-#include <string>
 
 // Struct to pass back provider summaries
 // Passed back in a vector
