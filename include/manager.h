@@ -1,159 +1,179 @@
 
 #pragma once
-#include <string.h>
+#include "manager.h"
+#include "provider.h"
+#include "sqlengine.h"
 #include <iostream>
+#include <string.h>
 
 
 class SQLEngine;
 
+class Member {
+  public:
 
-class Member{
-    public:
-        Member();
-        ~Member();
-        Member(const std::string & passed_member_name,
-                const std::string & passed_address,
-                const std::string & passed_city,
-                const std::string & passed_zip,
-                const bool & status);
+	Member();
+	~Member();
+	Member(const std::string &passed_member_name, const std::string &passed_address, const std::string &passed_city, const std::string &passed_zip, const bool &status);
 
-        bool add_member_DB();
-        bool update_member_DB();
-        bool delete_member_DB();
-        void Display_Member_Info();
+	bool add_member_DB();
+	bool update_member_DB();
+	bool delete_member_DB();
+	void Display_Member_Info();
 
-        std::string & get_mem_name();
-        std::string & set_mem_name(const std::string & to_set);
+	std::string &get_name();
+	std::string &set_name(const std::string &to_set);
 
-        std::string & get_member_ID();
-        std::string & set_member_ID(const std::string & to_set);
+	std::string &get_ID();
+	std::string &set_ID(const std::string &to_set);
 
-        std::string & get_member_address();
-        std::string & set_member_address(const std::string & to_set);
+	std::string &get_address();
+	std::string &set_address(const std::string &to_set);
 
-        std::string & get_member_city();
-        std::string & set_member_city(const std::string & to_set);
+	std::string &get_city();
+	std::string &set_city(const std::string &to_set);
 
-        std::string & get_member_state();
-        std::string & set_member_state(const std::string & to_set);
+	std::string &get_state();
+	std::string &set_state(const std::string &to_set);
 
-        std::string & get_member_zip();
-        std::string & set_member_zip(const std::string & to_set);
+	std::string &get_zip();
+	std::string &set_zip(const std::string &to_set);
 
-        bool & get_status();
-        bool & set_status(const bool & switcher);
+	bool &get_status();
+	bool &set_status(const bool &switcher);
 
-        bool GET_MEMBER_FROM_DB(const std::string & MEMBER_ID);
+	bool GET_MEMBER_FROM_DB(const std::string &MEMBER_ID);
 
 
-    private:
-        std::string member_name;
-        std::string member_id;
-        std::string address;
-        std::string city;
-        std::string State;
-        std::string zip;
-        bool status;
-        SQLEngine * My_DB;
+  private:
+
+	std::string member_name;
+	std::string member_id;
+	std::string address;
+	std::string city;
+	std::string State;
+	std::string zip;
+	bool status;
+
+	SQLEngine *My_DB;
+
+	// Member interactions
+	bool add_member(const Member &member);
+	bool update_member(const Member &member);
+	bool delete_member(const std::string &id);
+	bool validate_member(const std::string &id);
 };
 
-//address struct to replace redundant getters and setters
+// address struct to replace redundant getters and setters
 struct Address {
-    std::string street;
-    std::string city;
-    std::string state;
-    std::string zip;
+	std::string street;
+	std::string city;
+	std::string state;
+	std::string zip;
 
-    Address() = default;
-    Address(const std::string &street,
-            const std::string &city,
-            const std::string &state,
-            const std::string &zip)
-        : street(street), city(city), state(state), zip(zip) {}
+	Address() = default;
+
+	Address(const std::string &street, const std::string &city, const std::string &state, const std::string &zip) : street(street), city(city), state(state), zip(zip)
+	{
+	}
 };
 
-class Provider{
-    public:
-        Provider();
-        ~Provider();
-        Provider(const std::string & passed_name,
-                const Address &passed_address);
+class Provider {
+  public:
 
-        bool add_provider_DB();
-        bool update_provider_DB();
-        bool delete_provider_DB();
-        void Display_Provider_Info();
-        
-        std::string & get_name();
-        std::string & set_name(const std::string & to_set);
+	Provider();
+	~Provider();
+	Provider(const std::string &passed_name, const Address &passed_address);
 
-        std::string & get_id();
-        std::string & set_id(const std::string & to_set);
-        
-        Address & get_address();
-        Address & set_address(const Address & to_set);
+	bool add_provider_DB();
+	bool update_provider_DB();
+	bool delete_provider_DB();
+	void Display_Provider_Info();
 
-        /*
-        std::string & get_city();
-        std::string & set_city(const std::string & to_set);
+	std::string &get_name();
+	std::string &set_name(const std::string &to_set);
 
-        std::string & get_state();
-        std::string & set_state(const std::string & to_set);
+	std::string &get_id();
+	std::string &set_id(const std::string &to_set);
 
-        std::string & get_zip();
-        std::string & set_zip(const std::string & to_set);
-        */
+	Address &get_address();
+	Address &set_address(const Address &to_set);
 
-        bool GET_PROVIDER_FROM_DB(const std::string & PROVIDER_ID);
+	/*
+	std::string & get_city();
+	std::string & set_city(const std::string & to_set);
+
+	std::string & get_state();
+	std::string & set_state(const std::string & to_set);
+
+	std::string & get_zip();
+	std::string & set_zip(const std::string & to_set);
+	*/
+
+	bool GET_PROVIDER_FROM_DB(const std::string &PROVIDER_ID);
 
 
-    private:
-        std::string name;
-        std::string provider_id;
-        Address address;
-        /*
-        std::string address;
-        std::string city;
-        std::string State;
-        std::string zip;
-        */
+  private:
+
+	std::string name;
+	std::string provider_id;
+	Address address;
+	/*
+	std::string address;
+	std::string city;
+	std::string State;
+	std::string zip;
+	*/
+
+
+	// SQL Interactions
+	bool add_provider(const Provider &provider);
+	bool update_provider(const Provider &provider);
+	bool delete_provider(const std::string &id);
+	bool validate_provider(const std::string &id);
 };
 
-class ServiceRecord{
-    public:
-        ServiceRecord();
-        ~ServiceRecord();
+class Service {
+  public:
 
-        bool Member_Report(const Member & Member_Info);
-        bool Provider_Report(const Provider & Provider_Info);
-        bool Manager_Report(const Provider & Provider_Info);
+	Service();
+	~Service();
+	Service(const std::string &service_code, const std::string &service_fee, const std::string &service_description);
 
-    private:
-        std::string timestamp;
-        std::string date_of_service;
-        std::string provider_id;
-        std::string member_id;
-        std::string comment;
+	bool add_service();
+	bool delete_service(const std::string &service_code);
+	bool update_service(const std::string &service_code);
+
+
+  private:
+
+	std::string service_code;
+	std::string service_fee;
+	std::string service_description;
+
+	// SQL Service list retrieval
+	std::vector<Service> get_all_services();
 };
 
-class Service{
-    public:
-        Service();
-        ~Service();
-        Service(const std::string & service_code,
-                const std::string & service_fee,
-                const std::string & service_description);
-        
-        bool add_service();
-        bool delete_service(const std::string & service_code);
-        bool update_service(const std::string & service_code);
+class ServiceRecord {
+  public:
+
+	ServiceRecord();
+	~ServiceRecord();
+
+	bool Member_Report(const Member &Member_Info);
+	bool Provider_Report(const Provider &Provider_Info);
+	bool Manager_Report(const Provider &Provider_Info);
+
+  private:
+
+	std::string timestamp;
+	std::string date_of_service;
+	std::string provider_id;
+	std::string member_id;
+	std::string comment;
 
 
-    private:
-        std::string service_code;
-        std::string service_fee;
-        std::string service_description;   
+	bool save_service_record(const ServiceRecord &record);
+	Service get_service(const std::string &code);
 };
-
-
-
