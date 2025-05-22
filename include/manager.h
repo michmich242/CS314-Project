@@ -29,6 +29,9 @@ class Member{
         std::string & get_member_city();
         std::string & set_member_city();
 
+        std::string & get_member_state();
+        std::string & set_member_state();
+
         std::string & get_member_zip();
         std::string & set_member_zip();
 
@@ -60,7 +63,24 @@ class Provider{
         bool add_provider_DB();
         bool update_provider_DB();
         bool delete_provider_DB();
+        
+        std::string get_provider_name();
+        std::string set_provider_name();
 
+        std::string get_provider_id();
+        std::string set_provider_id();
+        
+        std::string get_provider_address();
+        std::string set_provider_address();
+
+        std::string get_provider_city();
+        std::string set_provider_city();
+
+        std::string get_provider_State();
+        std::string set_provider_State();
+
+        std::string get_provider_zip();
+        std::string set_provider_zip();
 
         bool & GET_PROVIDER_FROM_DB(const std::string & PROVIDER_ID);
 
