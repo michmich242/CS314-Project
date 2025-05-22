@@ -1,6 +1,7 @@
 // SQL API for ChocAn Database
 //
 
+#pragma once
 #include "manager.h"
 #include <fstream>
 #include <iostream>

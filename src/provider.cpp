@@ -4,10 +4,11 @@
 
 
 
-bool Provider::login()
+bool Provider_User::login()
 {
     SQLEngine db; //used to validate provider number
     int provider_number;
+    std::string provider_str = "";
 
     std::cout << "Please enter your 9 digit provider number: ";
     std::cin >> provider_number;
@@ -19,23 +20,15 @@ bool Provider::login()
     }
 
     // check if provider exists in db
-    if(db.validate_provider(provider_number)) { return true; };
+    provider_str = std::to_string(provider_number);
+    if(db.validate_provider(provider_str)) { return true; };
     
     return false;
 }
 
-bool Provider::input_new_service()
-{
-    return false;
-}
 
-bool Provider::update_service_records()
+void Provider_User::display_service_directory()
 {
-    return false;
-}
-
-bool Provider::display_service_directory()
-{
-    return false;
+    return;
 }
 
