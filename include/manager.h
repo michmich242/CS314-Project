@@ -57,6 +57,21 @@ class Member{
         SQLEngine * My_DB;
 };
 
+//address struct to replace redundant getters and setters
+struct Address {
+    std::string street;
+    std::string city;
+    std::string state;
+    std::string zip;
+
+    Address() = default;
+    Address(const std::string &street,
+            const std::string &city,
+            const std::string &state,
+            const std::string &zip)
+        : street(street), city(city), state(state), zip(zip) {}
+};
+
 class Provider{
     public:
         Provider();
@@ -71,23 +86,23 @@ class Provider{
         bool delete_provider_DB();
         void Display_Provider_Info();
         
-        std::string & get_provider_name();
-        std::string & set_provider_name(const std::string & to_set);
+        std::string & get_name();
+        std::string & set_name(const std::string & to_set);
 
-        std::string & get_provider_id();
-        std::string & set_provider_id(const std::string & to_set);
+        std::string & get_id();
+        std::string & set_id(const std::string & to_set);
         
-        std::string & get_provider_address();
-        std::string & set_provider_address(const std::string & to_set);
+        std::string & get_address();
+        std::string & set_address(const std::string & to_set);
 
-        std::string & get_provider_city();
-        std::string & set_provider_city(const std::string & to_set);
+        std::string & get_city();
+        std::string & set_city(const std::string & to_set);
 
-        std::string & get_provider_State();
-        std::string & set_provider_State(const std::string & to_set);
+        std::string & get_state();
+        std::string & set_state(const std::string & to_set);
 
-        std::string & get_provider_zip();
-        std::string & set_provider_zip(const std::string & to_set);
+        std::string & get_zip();
+        std::string & set_zip(const std::string & to_set);
 
         bool GET_PROVIDER_FROM_DB(const std::string & PROVIDER_ID);
 
@@ -100,7 +115,6 @@ class Provider{
         std::string State;
         std::string zip;
 };
-
 
 class ServiceRecord{
     public:
@@ -118,8 +132,6 @@ class ServiceRecord{
         std::string member_id;
         std::string comment;
 };
-
-
 
 class Service{
     public:

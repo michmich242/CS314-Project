@@ -9,6 +9,8 @@ class Provider_User{
         ~Provider_User();
         
         bool login();
+        bool member_validation();
+        bool service_billing();
         void display_service_directory();
         bool Post_Service_Billing();
 
@@ -18,5 +20,6 @@ class Provider_User{
         std::string provider_id;
         std::string service_code;
         std::string service_fee;
+        SQLEngine db;
 
 };

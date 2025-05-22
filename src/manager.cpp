@@ -172,20 +172,15 @@ bool & Member::set_status(const bool & switcher){
     return status;
 }
 
-
-
 bool Member::GET_MEMBER_FROM_DB(const std::string & MEMBER_ID){
 
     return false;
 }
 
 
+/* provider functions start */
 
-
-
-
-
-Provider::Provider(): name(""), provider_id(""), address(""), city(""), State(""), zip(""){
+Provider::Provider(): name(""), provider_id(""), address() {
 
 }
 
@@ -194,9 +189,8 @@ Provider::~Provider(){
 }
 
 Provider::Provider(const std::string & passed_name,
-    const std::string & passed_address,
-    const std::string & passed_city,
-    const std::string & passed_zip): name(passed_name), provider_id(""), address(passed_address), city(passed_city), zip(passed_zip){
+    const Address & passed_address)
+    : name(passed_name), provider_id(""), address(passed_address) {
 
 }
 
@@ -230,15 +224,17 @@ std::string & Provider::set_provider_id(const std::string & to_set){
     return provider_id;
 }
 
-std::string & Provider::get_provider_address(){
+Address & Provider::get_provider_address(){
     return address;
 }
 
-std::string & Provider::set_provider_address(const std::string & to_set){
+
+Address & Provider::set_provider_address(const Address & to_set){
     address = to_set;
     return address;
 }
 
+/*
 std::string & Provider::get_provider_city(){
     return city;
 }
@@ -265,10 +261,10 @@ std::string & Provider::set_provider_zip(const std::string & to_set){
     zip = to_set;
     return zip;
 }
-
-
+*/
 
 bool Provider::GET_PROVIDER_FROM_DB(const std::string & PROVIDER_ID){
 
     return false;
 }
+
