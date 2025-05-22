@@ -6,8 +6,19 @@
 #include <iostream>
 #include <string.h>
 
+// address struct to replace redundant getters and setters
+struct Address {
+	std::string street;
+	std::string city;
+	std::string state;
+	std::string zip;
 
-class SQLEngine;
+	Address() = default;
+
+	Address(const std::string &street, const std::string &city, const std::string &state, const std::string &zip) : street(street), city(city), state(state), zip(zip)
+	{
+	}
+};
 
 class Member {
   public:
@@ -62,20 +73,6 @@ class Member {
 	bool update_member(const Member &member);
 	bool delete_member(const std::string &id);
 	bool validate_member(const std::string &id);
-};
-
-// address struct to replace redundant getters and setters
-struct Address {
-	std::string street;
-	std::string city;
-	std::string state;
-	std::string zip;
-
-	Address() = default;
-
-	Address(const std::string &street, const std::string &city, const std::string &state, const std::string &zip) : street(street), city(city), state(state), zip(zip)
-	{
-	}
 };
 
 class Provider {
@@ -153,27 +150,4 @@ class Service {
 
 	// SQL Service list retrieval
 	std::vector<Service> get_all_services();
-};
-
-class ServiceRecord {
-  public:
-
-	ServiceRecord();
-	~ServiceRecord();
-
-	bool Member_Report(const Member &Member_Info);
-	bool Provider_Report(const Provider &Provider_Info);
-	bool Manager_Report(const Provider &Provider_Info);
-
-  private:
-
-	std::string timestamp;
-	std::string date_of_service;
-	std::string provider_id;
-	std::string member_id;
-	std::string comment;
-
-
-	bool save_service_record(const ServiceRecord &record);
-	Service get_service(const std::string &code);
 };
