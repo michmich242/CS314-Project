@@ -3,14 +3,16 @@
 #include <string.h>
 #include <iostream>
 
+class SQLEngine;
+
 class Member{
     public:
         Member();
         ~Member();
-        Member(const std::string & member_name,
-                const std::string & address,
-                const std::string & city,
-                const std::string & zip,
+        Member(const std::string & passed_member_name,
+                const std::string & passed_address,
+                const std::string & passed_city,
+                const std::string & passed_zip,
                 const bool & status);
 
         bool add_member_DB();
@@ -18,27 +20,27 @@ class Member{
         bool delete_member_DB();
 
         std::string & get_mem_name();
-        std::string & set_mem_name();
+        std::string & set_mem_name(const std::string & to_set);
 
         std::string & get_member_ID();
-        std::string & set_member_ID();
+        std::string & set_member_ID(const std::string & to_set);
 
         std::string & get_member_address();
-        std::string & set_member_address();
+        std::string & set_member_address(const std::string & to_set);
 
         std::string & get_member_city();
-        std::string & set_member_city();
+        std::string & set_member_city(const std::string & to_set);
 
         std::string & get_member_state();
-        std::string & set_member_state();
+        std::string & set_member_state(const std::string & to_set);
 
         std::string & get_member_zip();
-        std::string & set_member_zip();
+        std::string & set_member_zip(const std::string & to_set);
 
         bool & get_status();
-        bool & set_status();
+        bool & set_status(const bool & switcher);
 
-        bool & GET_MEMBER_FROM_DB(const std::string & MEMBER_ID);
+        bool GET_MEMBER_FROM_DB(const std::string & MEMBER_ID);
 
 
     private:
@@ -49,40 +51,41 @@ class Member{
         std::string State;
         std::string zip;
         bool status;
+        SQLEngine My_DB;
 };
 
 class Provider{
     public:
         Provider();
         ~Provider();
-        Provider(const std::string & name,
-                const std::string & address,
-                const std::string & city,
-                const std::string & zip);
+        Provider(const std::string & passed_name,
+                const std::string & passed_address,
+                const std::string & passed_city,
+                const std::string & passed_zip);
 
         bool add_provider_DB();
         bool update_provider_DB();
         bool delete_provider_DB();
         
-        std::string get_provider_name();
-        std::string set_provider_name();
+        std::string & get_provider_name();
+        std::string & set_provider_name(const std::string & to_set);
 
-        std::string get_provider_id();
-        std::string set_provider_id();
+        std::string & get_provider_id();
+        std::string & set_provider_id(const std::string & to_set);
         
-        std::string get_provider_address();
-        std::string set_provider_address();
+        std::string & get_provider_address();
+        std::string & set_provider_address(const std::string & to_set);
 
-        std::string get_provider_city();
-        std::string set_provider_city();
+        std::string & get_provider_city();
+        std::string & set_provider_city(const std::string & to_set);
 
-        std::string get_provider_State();
-        std::string set_provider_State();
+        std::string & get_provider_State();
+        std::string & set_provider_State(const std::string & to_set);
 
-        std::string get_provider_zip();
-        std::string set_provider_zip();
+        std::string & get_provider_zip();
+        std::string & set_provider_zip(const std::string & to_set);
 
-        bool & GET_PROVIDER_FROM_DB(const std::string & PROVIDER_ID);
+        bool GET_PROVIDER_FROM_DB(const std::string & PROVIDER_ID);
 
 
     private:
@@ -132,8 +135,6 @@ class Service{
         std::string service_fee;
         std::string service_description;   
 };
-
-
 
 
 
