@@ -5,7 +5,7 @@
 
 
 
-Member::Member(): member_name(""), member_id(""), address(""), city(""), State(""), zip(""), status(false), My_DB(nullptr){
+Member::Member(): member_name(""), member_id(""), address(), status(false), My_DB(nullptr){
     My_DB = new SQLEngine;
 }
 
@@ -15,10 +15,8 @@ Member::~Member(){
 }
 
 Member::Member(const std::string & passed_member_name,
-    const std::string & passed_address,
-    const std::string & passed_city,
-    const std::string & passed_zip,
-    const bool & passed_status): member_name(passed_member_name), member_id(""), address(passed_address), city(passed_city), zip(passed_zip), status(passed_status){
+    const Address & passed_address,
+    const bool & passed_status): member_name(passed_member_name), member_id(""), address(passed_address), status(passed_status){
 
     My_DB = new SQLEngine;
 }
@@ -27,10 +25,10 @@ Member::Member(const std::string & passed_member_name,
 void Member::Display_Member_Info(){
     std::cout << "Member name: " << member_name << std::endl
     << "Member ID: " << member_id << std::endl
-    << "Address " << address << std::endl
-    << "City " << city << std::endl
-    << "State " << State << std::endl
-    << "Zip " << zip << std::endl
+    << "Address " << address.street << std::endl
+    << "City " << address.city << std::endl
+    << "State " << address.state << std::endl
+    << "Zip " << address.zip << std::endl
     << "Status " << ((status == 1) ? "True\n" : "False\n");
 }
 
@@ -106,34 +104,35 @@ bool Member::delete_member_DB(){
 
 
 
-std::string & Member::get_mem_name(){
+std::string & Member::get_name(){
     return member_name;
 }
 
-std::string & Member::set_mem_name(const std::string & to_set){
+std::string & Member::set_name(const std::string & to_set){
     member_name = to_set;
     return member_name;
 }
 
-std::string & Member::get_member_ID(){
+std::string & Member::get_id(){
     return member_id;
 }
 
-std::string & Member::set_member_ID(const std::string & to_set){
+std::string & Member::set_id(const std::string & to_set){
     member_id = to_set;
     return member_id;
 }
 
 
-std::string & Member::get_member_address(){
+Address & Member::get_address(){
     return address;
 }
 
-std::string & Member::set_member_address(const std::string & to_set){
+Address & Member::set_address(const Address & to_set){
     address = to_set;
     return address;
 }
 
+/*
 std::string & Member::get_member_city(){
     return city;
 }
@@ -160,6 +159,7 @@ std::string & Member::set_member_zip(const std::string & to_set){
     zip = to_set;
     return zip;
 }
+*/
 
 bool & Member::get_status(){
     return status;

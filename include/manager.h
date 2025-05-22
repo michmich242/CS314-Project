@@ -6,57 +6,6 @@
 
 class SQLEngine;
 
-
-class Member{
-    public:
-        Member();
-        ~Member();
-        Member(const std::string & passed_member_name,
-                const std::string & passed_address,
-                const std::string & passed_city,
-                const std::string & passed_zip,
-                const bool & status);
-
-        bool add_member_DB();
-        bool update_member_DB();
-        bool delete_member_DB();
-        void Display_Member_Info();
-
-        std::string & get_mem_name();
-        std::string & set_mem_name(const std::string & to_set);
-
-        std::string & get_member_ID();
-        std::string & set_member_ID(const std::string & to_set);
-
-        std::string & get_member_address();
-        std::string & set_member_address(const std::string & to_set);
-
-        std::string & get_member_city();
-        std::string & set_member_city(const std::string & to_set);
-
-        std::string & get_member_state();
-        std::string & set_member_state(const std::string & to_set);
-
-        std::string & get_member_zip();
-        std::string & set_member_zip(const std::string & to_set);
-
-        bool & get_status();
-        bool & set_status(const bool & switcher);
-
-        bool GET_MEMBER_FROM_DB(const std::string & MEMBER_ID);
-
-
-    private:
-        std::string member_name;
-        std::string member_id;
-        std::string address;
-        std::string city;
-        std::string State;
-        std::string zip;
-        bool status;
-        SQLEngine * My_DB;
-};
-
 //address struct to replace redundant getters and setters
 struct Address {
     std::string street;
@@ -71,6 +20,43 @@ struct Address {
             const std::string &zip)
         : street(street), city(city), state(state), zip(zip) {}
 };
+
+class Member{
+    public:
+        Member();
+        ~Member();
+        Member(const std::string & passed_member_name,
+                const Address & passed_address,
+                const bool & status);
+
+        bool add_member_DB();
+        bool update_member_DB();
+        bool delete_member_DB();
+        void Display_Member_Info();
+
+        std::string & get_name();
+        std::string & set_name(const std::string & to_set);
+
+        std::string & get_id();
+        std::string & set_id(const std::string & to_set);
+
+        Address & get_address();
+        Address & set_address(const Address & to_set);
+        
+        bool & get_status();
+        bool & set_status(const bool & switcher);
+
+        bool GET_MEMBER_FROM_DB(const std::string & MEMBER_ID);
+
+
+    private:
+        std::string member_name;
+        std::string member_id;
+        Address address;
+        bool status;
+        SQLEngine * My_DB;
+};
+
 
 class Provider{
     public:
@@ -140,7 +126,8 @@ class Service{
     public:
         Service();
         ~Service();
-        Service(const std::string & service_code,
+        Service(const std::string & service_name,
+                const std::string & service_code,
                 const std::string & service_fee,
                 const std::string & service_description);
         
@@ -148,8 +135,11 @@ class Service{
         bool delete_service(const std::string & service_code);
         bool update_service(const std::string & service_code);
 
+        std::string get_name();
+        std::string get_fee();
 
     private:
+        std::string service_name;
         std::string service_code;
         std::string service_fee;
         std::string service_description;   
