@@ -1,10 +1,12 @@
 
 #pragma once
+#include <iostream>
+#include <pqxx/pqxx>
+#include <string.h>
+
 #include "manager.h"
 #include "provider.h"
 #include "sqlengine.h"
-#include <iostream>
-#include <string.h>
 
 // address struct to replace redundant getters and setters
 struct Address {
