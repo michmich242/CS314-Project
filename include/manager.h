@@ -77,9 +77,7 @@ class Provider{
         Provider();
         ~Provider();
         Provider(const std::string & passed_name,
-                const std::string & passed_address,
-                const std::string & passed_city,
-                const std::string & passed_zip);
+                const Address &passed_address);
 
         bool add_provider_DB();
         bool update_provider_DB();
@@ -92,9 +90,10 @@ class Provider{
         std::string & get_id();
         std::string & set_id(const std::string & to_set);
         
-        std::string & get_address();
-        std::string & set_address(const std::string & to_set);
+        Address & get_address();
+        Address & set_address(const Address & to_set);
 
+        /*
         std::string & get_city();
         std::string & set_city(const std::string & to_set);
 
@@ -103,6 +102,7 @@ class Provider{
 
         std::string & get_zip();
         std::string & set_zip(const std::string & to_set);
+        */
 
         bool GET_PROVIDER_FROM_DB(const std::string & PROVIDER_ID);
 
@@ -110,10 +110,13 @@ class Provider{
     private:
         std::string name;
         std::string provider_id;
+        Address address;
+        /*
         std::string address;
         std::string city;
         std::string State;
         std::string zip;
+        */
 };
 
 class ServiceRecord{

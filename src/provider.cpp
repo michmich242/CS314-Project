@@ -21,6 +21,8 @@ bool Provider_User::login()
 
     // check if provider exists in db
     if(db.validate_provider(num_as_string)) { return true; };
+
+    cout << "setting provider id: " << provider.set_id(num_as_string) << std::endl;
     
     return false;
 }
@@ -63,11 +65,10 @@ bool Provider_User::member_service_billing()
     std::string date_of_service = utils::get_user_date();
     std::string service_code    = utils::get_service_code();
 
-    //get service returns a service object
     service = db.get_service(service_code);
     std::cout << "service name: " << service.get_name(); << endl; 
 
-   std::string comment = utils::get_comments(); 
+    std::string comment = utils::get_comments(); 
 
     std::cout << "Total fee: " << service.get_fee() << endl;
 
@@ -76,8 +77,10 @@ bool Provider_User::member_service_billing()
     return false;
 }
 
-bool Provider_User::update_service_records(const Service &record)
+bool Provider_User::update_service_records(const Service &record, std::string provider_number)
 {
+    ServiceRecord s_record = new ServiceRecord();
+
     /*
     Save a record with:
     Current date and time (MM-DD-YYYY HH:MM:SS)
@@ -88,6 +91,11 @@ bool Provider_User::update_service_records(const Service &record)
     Previously supplied Optional Comment
     */
 
+   std::string current_date = utils::get_current_date();
+   
+
+
+    //save service record takes a ServiceRecord object
     if(db.save_service_record(record)) {
         return true;
     }
