@@ -3,7 +3,9 @@
 #include <string.h>
 #include <iostream>
 
+
 class SQLEngine;
+
 
 class Member{
     public:
@@ -18,6 +20,7 @@ class Member{
         bool add_member_DB();
         bool update_member_DB();
         bool delete_member_DB();
+        void Display_Member_Info();
 
         std::string & get_mem_name();
         std::string & set_mem_name(const std::string & to_set);
@@ -51,7 +54,7 @@ class Member{
         std::string State;
         std::string zip;
         bool status;
-        SQLEngine My_DB;
+        SQLEngine * My_DB;
 };
 
 class Provider{
@@ -66,6 +69,7 @@ class Provider{
         bool add_provider_DB();
         bool update_provider_DB();
         bool delete_provider_DB();
+        void Display_Provider_Info();
         
         std::string & get_provider_name();
         std::string & set_provider_name(const std::string & to_set);

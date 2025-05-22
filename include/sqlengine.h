@@ -3,12 +3,14 @@
 
 #pragma once
 #include "manager.h"
+#include "provider.h"
 #include <fstream>
 #include <iostream>
 #include <map>
 #include <memory>
 #include <pqxx/pqxx>
 #include <sstream>
+
 
 /*
 • Member name (25 characters).

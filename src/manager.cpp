@@ -1,14 +1,17 @@
 #include "../include/manager.h"
+#include "../include/sqlengine.h"
+#include "utils.cpp"
 
 
 
 
-Member::Member(): member_name(""), member_id(""), address(""), city(""), State(""), zip(""), status(false), My_DB(".dbinfo"){
-
+Member::Member(): member_name(""), member_id(""), address(""), city(""), State(""), zip(""), status(false), My_DB(nullptr){
+    My_DB = new SQLEngine;
 }
 
 Member::~Member(){
-
+    delete My_DB;
+    My_DB = nullptr;
 }
 
 Member::Member(const std::string & passed_member_name,
@@ -17,21 +20,90 @@ Member::Member(const std::string & passed_member_name,
     const std::string & passed_zip,
     const bool & passed_status): member_name(passed_member_name), member_id(""), address(passed_address), city(passed_city), zip(passed_zip), status(passed_status){
 
+    My_DB = new SQLEngine;
+}
+
+
+void Member::Display_Member_Info(){
+    std::cout << "Member name: " << member_name << std::endl
+    << "Member ID: " << member_id << std::endl
+    << "Address " << address << std::endl
+    << "City " << city << std::endl
+    << "State " << State << std::endl
+    << "Zip " << zip << std::endl
+    << "Status " << ((status == 1) ? "True\n" : "False\n");
 }
 
 
 bool Member::add_member_DB(){
 
-    return My_DB.update_member(*this);
+    return My_DB->add_member(*this);
 }
 
 bool Member::update_member_DB(){
-    return false;
+
+    int member_id_test = 0;
+
+
+    if(!My_DB->validate_member(member_id)){
+        return false;
+    }
+
+    if(member_id.length() != 9){
+        return false;
+    }
+
+
+    try{
+        member_id_test = stoi(member_id);
+        std::cout << member_id_test << std::endl;
+    }
+    catch (const std::invalid_argument & e){
+        std::cout << "Invalid argument: " << e.what() << std::endl;
+        return false;
+    }
+
+/*
+    if(!utils::is_valid_num(member_id_test)){
+        return false;
+    }
+*/
+    
+    return My_DB->update_member(*this);
 }
 
-bool delete_member_DB(){
-    return false;
+bool Member::delete_member_DB(){
+    
+  int member_id_test = 0;
+
+
+    if(!My_DB->validate_member(member_id)){
+        return false;
+    }
+
+    if(member_id.length() != 9){
+        return false;
+    }
+
+
+    try{
+        member_id_test = stoi(member_id);
+        std::cout << member_id_test << std::endl;
+    }
+    catch (const std::invalid_argument & e){
+        std::cout << "Invalid argument: " << e.what() << std::endl;
+        return false;
+    }
+
+
+    return My_DB->delete_member(member_id);
+
 }
+
+
+
+
+
 
 
 std::string & Member::get_mem_name(){
@@ -40,6 +112,7 @@ std::string & Member::get_mem_name(){
 
 std::string & Member::set_mem_name(const std::string & to_set){
     member_name = to_set;
+    return member_name;
 }
 
 std::string & Member::get_member_ID(){
