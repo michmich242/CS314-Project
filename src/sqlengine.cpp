@@ -34,8 +34,7 @@ SQLEngine::SQLEngine(const std::string &db_path)
 
 	// Create String from .dbinfo lines
 	std::ostringstream conn_str;
-	conn_str << "host=" << db_info["host"] << " port=" << db_info["port"] << " dbname=" << db_info["dbname"]
-			 << " user=" << db_info["user"] << " password=" << db_info["password"];
+	conn_str << "host=" << db_info["host"] << " port=" << db_info["port"] << " dbname=" << db_info["dbname"] << " user=" << db_info["user"] << " password=" << db_info["password"];
 
 	// Attempt to connect with given key-value pairs
 	try {
@@ -59,8 +58,10 @@ SQLEngine::is_connected() const
 	return conn && conn->is_open();
 }
 
-// Member interactions------------------------------------------------------------------------------
+// End of Engine Tools
 //
+
+// Member interactions--------------------------------------------------------
 //
 // Adds the passed in member object to the Member table
 bool
@@ -85,12 +86,10 @@ SQLEngine::add_member(const Member &member)
 			return false;
 		}
 
-
 		// Run Query
 		res = transaction.exec_params("INSERT INTO members (name, address, city, state, zip, status)) "
 									  "VALUES ($1, $2, $3, $4, $5, $6) RETURNING member_id",
-									  member.get_name(), member.get_address(), member.get_city(), member.get_state(),
-									  member.get_zip(), true);
+									  member.get_name(), member.get_address(), member.get_city(), member.get_state(), member.get_zip(), true);
 
 		// Check if the member number was generated
 		// assign to member_id
@@ -129,12 +128,12 @@ SQLEngine::update_member(const Member &member)
 
 		// Attempt to Update
 		res = transaction.exec_params("UPDATE members "
-									  "SET name = $1, address = $2, city = $3, zip = $4, state = $5, status = $6"
+									  "SET name = $1, address = $2, city = $3, zip "
+									  "= $4, state = $5, status = $6"
 									  "WHERE member_id = $7",
 
 									  // variables being passed to $#
-									  member.get_name(), member.get_address(), member.get_city(), member.get_zip(),
-									  member.get_state(), member.get_status(), member.get_id());
+									  member.get_name(), member.get_address(), member.get_city(), member.get_zip(), member.get_state(), member.get_status(), member.get_id());
 		// Check if query modified a row
 		if (res.affected_rows() == 0) {
 			std::cerr << "No member found with ID: " << member.get_id() << "\n";
@@ -221,7 +220,15 @@ SQLEngine::validate_member(const std::string &id)
 	}
 }
 
-// Provider Interactions
+// End of member class functions --------------------------------
+//
+
+//
+// Provider Interactions ----------------------------------------
+
+// Add Provider to db
+// @PARAM: const Provider &provider : Populated Provider Object
+// provider.provider_id WILL BE OVERWRITTEN
 bool
 SQLEngine::add_provider(const Provider &provider)
 {
@@ -244,12 +251,10 @@ SQLEngine::add_provider(const Provider &provider)
 			return false;
 		}
 
-
 		// Run Query
 		res = transaction.exec_params("INSERT INTO providers (name, address, city, state, zip, status))"
 									  "VALUES ($1, $2, $3, $4, $5, $6)",
-									  provider.get_name(), provider.get_address(), provider.get_city(),
-									  provider.get_state(), provider.get_zip(), true);
+									  provider.get_name(), provider.get_address(), provider.get_city(), provider.get_state(), provider.get_zip(), true);
 
 		// Check if the provider number was generated
 		// assign to provider_id
@@ -268,6 +273,9 @@ SQLEngine::add_provider(const Provider &provider)
 	}
 }
 
+// Modify an existing provider in the DB
+// @PARAM: const Provider &provider: Provider object with updated data
+// Refers to provider_id for context on which provider to update
 bool
 SQLEngine::update_provider(const Provider &provider)
 {
@@ -282,14 +290,14 @@ SQLEngine::update_provider(const Provider &provider)
 		pqxx::result res;
 
 		// Attempt to Update
-		res =
-			transaction.exec_params("UPDATE providers "
-									"SET name = $1, address = $2, city = $3, zip = $4, state = $5, status = $6"
-									"WHERE provider_id = $7",
+		res = transaction.exec_params("UPDATE providers "
+									  "SET name = $1, address = $2, city = $3, zip "
+									  "= $4, state = $5, status = $6"
+									  "WHERE provider_id = $7",
 
-									// variables being passed to $#
-									provider.get_name(), provider.get_address(), provider.get_city(),
-									provider.get_zip(), provider.get_state(), provider.get_status(), provider.get_id());
+									  // variables being passed to $#
+									  provider.get_name(), provider.get_address(), provider.get_city(), provider.get_zip(), provider.get_state(), provider.get_status(),
+									  provider.get_id());
 		// Check if query modified a row
 		if (res.affected_rows() == 0) {
 			std::cerr << "No provider found with ID: " << provider.get_id() << "\n";
@@ -306,6 +314,9 @@ SQLEngine::update_provider(const Provider &provider)
 	}
 }
 
+// Remove a provider from the database
+// @PARAM: const sd::string &id - 9 digit string id,
+// ID is required to be fully numeric and between <100000000-999999999>
 bool
 SQLEngine::delete_provider(const std::string &id)
 {
@@ -337,6 +348,7 @@ SQLEngine::delete_provider(const std::string &id)
 	}
 }
 
+//
 bool
 SQLEngine::validate_provider(const std::string &id)
 {
@@ -351,18 +363,16 @@ SQLEngine::validate_provider(const std::string &id)
 		pqxx::result res;
 
 		// Run Query
-		res = transaction.exec_params("SELECT active_status FROM providers WHERE provider_id = $1", id);
+		res = transaction.exec_params("SELECT provider_id FROM providers WHERE provider_id = $1", id);
 		transaction.commit();
-
 		// Check
 		if (res.empty()) {
-			std::cerr << "Member not found with ID: " << id << "\n";
+			std::cerr << "Provider not found with ID: " << id << "\n";
 			return false;
 		}
 
-		// Assign provider status to return boolean
-		bool status = res[0][0].as<bool>();
-		return status;
+		// Check did not catch, confirm existance of ID
+		return true;
 	}
 	catch (const std::exception &e) {
 		std::cerr << "Error Validating Provider: " << e.what() << "\n";
@@ -370,33 +380,53 @@ SQLEngine::validate_provider(const std::string &id)
 	}
 }
 
-// Service List and Records
-bool
-SQLEngine::save_service_record(const ServiceRecord &record)
-{
-	if (!conn || !conn->is_open()) {
-		std::cerr << "db connection not open\n";
-		return false;
-	}
+// End of Provider Functions----------------------------------------------------
+//
 
-	try {
-		// Start a transaction
-		pqxx::work transaction(*conn);
+//
+// Service List and Records ----------------------------------------------------
+//
 
-		transaction.exec_params();
-
-		transaction.commit();
-		return true;
-	}
-	catch (const std::exception &e) {
-		std::cerr << "Error inserting member: " << e.what() << "\n";
-		return false;
-	}
-}
-
+// Retrieves a specific service via service_code and returns new object
+// @PARAMS: const std::string &code - 6-digit service_code
 Service
 SQLEngine::get_service(const std::string &code)
 {
+	// Check connection
+	if (!conn || !conn->is_open()) {
+		std::cerr << "db connection not open\n";
+		return Service{};
+	}
+
+	try {
+		// Start a transaction
+		pqxx::work transaction(*conn);
+		pqxx::result res;
+
+		// Run Query
+		res = transaction.exec_params("SELECT name, fee FROM Services WHERE service_code = $1", code);
+
+		// Check result
+		if (res.empty()) {
+			std::cerr << "Could not find service with code:" << code << "\n";
+			return Service{};
+		}
+
+		// Create new Service from result
+		Service service(code, res[0][0].as<std::string>(), res[0][1].as<float>());
+		return service;
+	}
+	catch (const std::exception &e) {
+		std::cerr << "Error inserting member: " << e.what() << "\n";
+		return Service{};
+	}
+}
+
+// Query db for all services
+std::vector<Service>
+SQLEngine::get_all_services()
+{
+	// Check Conn
 	if (!conn || !conn->is_open()) {
 		std::cerr << "db connection not open\n";
 		return false;
@@ -405,10 +435,22 @@ SQLEngine::get_service(const std::string &code)
 	try {
 		// Start a transaction
 		pqxx::work transaction(*conn);
+		pqxx::result res;
 
-		transaction.exec_params();
+		// Run Query
+		res = transaction.exec_params("SELECT service_code, name, fee FROM Services");
+		if (res.affected_rows() == 0) {
+			std::cerr << "No Services Available\n";
+			return false;
+		}
 
-		transaction.commit();
+		// Create and populate Service Vector
+		std::vector<Service> vec;
+		for (int i = 0; i < res.size(); i++) {
+			Service service(res[i][0].as<std::string>(), res[i][1].as<std::string>(), res[i][2].as<float>());
+			vec.push_back(service);
+		}
+
 		return true;
 	}
 	catch (const std::exception &e) {
@@ -417,9 +459,14 @@ SQLEngine::get_service(const std::string &code)
 	}
 }
 
-std::vector<Service>
-SQLEngine::get_all_services()
+// Adds a service record to the dbms
+// @PARAMS: const ServiceRecord &record - Service Record populated with new db
+// info
+// **SERVICE CODE AND TIMESTAMP OVERWRITTEN**
+bool
+SQLEngine::save_service_record(const ServiceRecord &record)
 {
+	// Ensure connection
 	if (!conn || !conn->is_open()) {
 		std::cerr << "db connection not open\n";
 		return false;
@@ -428,9 +475,21 @@ SQLEngine::get_all_services()
 	try {
 		// Start a transaction
 		pqxx::work transaction(*conn);
+		pqxx::result res;
 
-		transaction.exec_params();
+		// Attempt Query
+		res = transaction.exec_params("INSERT INTO ServiceRecords"
+									  "(date_of_service, provider_id, member_id, service_code, comments)"
+									  "VALUES($1, $2, $3, $3, $5) RETURNING service_code",
+									  record.get_date(), record.get_provider(), record.get_member(), record.get_service(), record.get_comment(););
 
+		// Check result, should have returned service_code
+		if (!res.empty()) {
+			std::string new_service_code = res[0][0].as<std::string>();
+			record.set_service_code(new_service_code);
+		}
+
+		// Finalize Transaction
 		transaction.commit();
 		return true;
 	}
@@ -441,7 +500,7 @@ SQLEngine::get_all_services()
 }
 
 // Weekly Reporting
-std::vector<ServiceRecord>
+std::vector<MemberReport>
 SQLEngine::generate_member_service_reports()
 {
 	if (!conn || !conn->is_open()) {
@@ -464,31 +523,8 @@ SQLEngine::generate_member_service_reports()
 	}
 }
 
-std::vector<ServiceRecord>
+std::vector<ProviderReport>
 SQLEngine::generate_provider_service_reports()
-{
-	if (!conn || !conn->is_open()) {
-		std::cerr << "db connection not open\n";
-		return false;
-	}
-
-	try {
-		// Start a transaction
-		pqxx::work transaction(*conn);
-
-		transaction.exec_params();
-
-		transaction.commit();
-		return true;
-	}
-	catch (const std::exception &e) {
-		std::cerr << "Error inserting member: " << e.what() << "\n";
-		return false;
-	}
-}
-
-std::vector<ProviderSummary>
-SQLEngine::generate_provider_summary_report()
 {
 	if (!conn || !conn->is_open()) {
 		std::cerr << "db connection not open\n";

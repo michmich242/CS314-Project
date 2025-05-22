@@ -9,19 +9,58 @@
 #include <pqxx/pqxx>
 #include <sstream>
 
+/*
+• Member name (25 characters).
+• Member number (9 digits).
+• Member street address (25 characters).
+• Member city (14 characters).
+• Member state (2 letters).
+• Member zip code (5 digits).
+• For each service provided, the following details are required:
+	o Date of service (MM-DD-YYYY).
+	o Provider name (25 characters).
+	o Service name (20 characters).
+*/
+struct MemberService {
+	std::string date_of_service;
+	std::string provider_name;
+	std::string service_name;
+};
+
+struct MemberReport {
+	Member member;
+	std::vector<MemberService> services;
+};
+
 // Struct to pass back provider summaries
 // Passed back in a vector
-struct ProviderSummary {
-	std::string provider_id;
-	std::string provider_name;
+/*
+• Provider name (25 characters).
+• Provider number (9 digits).
+• Provider street address (25 characters).
+• Provider city (14 characters).
+• Provider state (2 letters).
+• Provider zip code (5 digits).
+• For each service provided, the following details are required:
+	o Date of service (MM-DD-YYYY).
+	o Date and time data were received by the computer (MM-DD-YYYY:HH:MM:SS).
+	o Member name (25 characters).
+	o Member number (9 digits).
+	o Service code (6 digits).
+	o Fee to be paid (up to $999.99).
+• Total number of consultations with members (3 digits).
+• Total fee for the week (up to $99,999.99).
+*/
+struct ProviderReport {
+	Provider provider;
+	std::vector<ServiceRecord> records;
 	int num_consultations;
 	float total_fee;
 };
 
 struct ManagerSummary {
-	std::vector<ProviderSummary> providers;
-	int total_consultations;
-	float total_fees;
+	std::vector<ProviderReport> provider_reports;
+	std::vector<MemberReport> member_reports;
 };
 
 class SQLEngine {
@@ -48,9 +87,8 @@ class SQLEngine {
 	std::vector<Service> get_all_services();
 
 	// Weekly Reporting
-	std::vector<ServiceRecord> generate_member_service_reports();
-	std::vector<ServiceRecord> generate_provider_service_reports();
-	std::vector<ProviderSummary> generate_provider_summary_report();
+	std::vector<MemberReport> generate_member_service_reports();
+	std::vector<ProviderReport> generate_provider_service_reports();
 	ManagerSummary generate_manager_summary_reports();
 
   private:
