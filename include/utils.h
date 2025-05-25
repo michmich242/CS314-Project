@@ -1,4 +1,29 @@
 /*
+#ifndef UTILS_H
+#define UTILS_H
+
+
+#include <string>
+
+namespace utils {
+    bool is_valid_num(const std::string& num);
+    std::string get_member_number();
+
+    bool is_valid_date(const std::string& date);
+    std::string get_date_of_service();
+
+    std::string get_current_date();
+
+    bool is_valid_service_code(const std::string& service_code);
+    std::string get_service_code();
+
+    std::string get_comments();
+}
+
+#endif // UTILS_H
+
+*/
+
 //Utility functions for input validation
 #include <iostream>
 #include <string>
@@ -10,7 +35,7 @@
 #include <iomanip>
 #include <sstream>
 
-#include "../include/utils.h"
+//#include "../include/utils.h"
 
 namespace utils {
     inline bool is_valid_num(const std::string &num) {
@@ -126,5 +151,3 @@ namespace utils {
     }
 
 }
-
-*/

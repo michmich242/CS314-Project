@@ -62,6 +62,11 @@ SQLEngine::is_connected() const
 //
 
 
+/* commenting out weekly reporting stuff 
+since it appears to be under construction */
+
+/*
+
 // Weekly Reporting
 std::vector<MemberReport>
 SQLEngine::generate_member_service_reports()
@@ -131,3 +136,5 @@ SQLEngine::generate_manager_summary_reports()
 		return false;
 	}
 }
+
+*/

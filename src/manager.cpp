@@ -2,6 +2,7 @@
 #include "../include/sqlengine.h"
 #include "utils.cpp"
 
+
 Member::Member() : member_name(""), member_id(""), address(), status(false), My_DB(nullptr)
 {
 	My_DB = new SQLEngine;
@@ -35,8 +36,7 @@ Member::Display_Member_Info()
 bool
 Member::add_DB()
 {
-
-	return My_DB->add_member(*this);
+	return false;
 }
 
 bool
@@ -45,10 +45,11 @@ Member::update_DB()
 
 	int member_id_test = 0;
 
-
+	/*
 	if (!My_DB->validate_member(member_id)) {
 		return false;
 	}
+	*/
 
 	if (member_id.length() != 9) {
 		return false;
@@ -70,7 +71,9 @@ Member::update_DB()
 		}
 	*/
 
+	/*
 	return My_DB->update_member(*this);
+	*/
 }
 
 bool
@@ -79,10 +82,11 @@ Member::delete_member_DB()
 
 	int member_id_test = 0;
 
-
+	/*
 	if (!My_DB->validate_member(member_id)) {
 		return false;
 	}
+	*/
 
 	if (member_id.length() != 9) {
 		return false;
@@ -98,8 +102,9 @@ Member::delete_member_DB()
 		return false;
 	}
 
+	//return My_DB->delete_member(member_id);
 
-	return My_DB->delete_member(member_id);
+	return false;
 }
 
 std::string &
@@ -128,14 +133,14 @@ Member::set_ID(const std::string &to_set)
 	return member_id;
 }
 
-std::string &
+Address &
 Member::get_address()
 {
 	return address;
 }
 
-std::string &
-Member::set_address(const std::string &to_set)
+Address &
+Member::set_address(const Address &to_set)
 {
 	address = to_set;
 	return address;
@@ -187,10 +192,10 @@ Member::set_status(const bool &switcher)
 bool
 Member::GET_MEMBER_FROM_DB(const std::string &MEMBER_ID)
 {
-
 	return false;
 }
 
+/*
 //
 // MEMBER SqL
 //-------------------------------------------------------------------------
@@ -200,7 +205,7 @@ bool
 Member::add_member(const Member &member)
 {
 	// Confirm Connection
-	if (!conn || !conn->is_open()) {
+	if (conn || !conn->is_open()) {
 		std::cerr << "db connection not open\n";
 		return false;
 	}
@@ -353,7 +358,7 @@ Member::validate_member(const std::string &id)
 }
 
 // End of member class functions --------------------------------
-
+*/
 
 //--------------------------------------------------------------------------
 /* provider functions start */
@@ -427,42 +432,14 @@ Provider::set_address(const Address &to_set)
 	return address;
 }
 
-/*
-std::string & Provider::get_provider_city(){
-	return city;
-}
-
-std::string & Provider::set_provider_city(const std::string & to_set){
-	city = to_set;
-	return city;
-}
-
-std::string & Provider::get_provider_State(){
-	return State;
-}
-
-std::string & Provider::set_provider_State(const std::string & to_set){
-	State = to_set;
-	return State;
-}
-
-std::string & Provider::get_provider_zip(){
-	return zip;
-}
-
-std::string & Provider::set_provider_zip(const std::string & to_set){
-	zip = to_set;
-	return zip;
-}
-*/
-
 bool
 Provider::GET_PROVIDER_FROM_DB(const std::string &PROVIDER_ID)
 {
-
 	return false;
 }
 
+
+/*
 //----------------------------------------------------------------------
 // Provider SQL
 
@@ -623,7 +600,7 @@ Provider::validate_provider(const std::string &id)
 // End of Provider Functions----------------------------------------------------
 
 //----------------------------------------------------------------------
-
+*/
 /*ServiceRecord functions start*/
 
 ServiceRecord::ServiceRecord() : timestamp(""), date_of_service(""), provider_id(""), member_id(""), comment("")
@@ -635,6 +612,7 @@ ServiceRecord::~ServiceRecord()
 {
 }
 
+/*
 // --------------------------------------------------------------------------------
 // Service Record SQL
 // Adds a service record to the dbms
@@ -676,7 +654,7 @@ ServiceRecord::save_service_record(const ServiceRecord &record)
 		return false;
 	}
 }
-
+*/
 // ---------------------------------------------------------------------------------
 /*Service functions start*/
 
@@ -688,7 +666,7 @@ Service::Service() : service_code(""), service_fee(""), service_description("")
 // -------------------------------------------------------------------------------
 // Service SQL
 
-
+/*
 // Retrieves a specific service via service_code and returns new object
 // @PARAMS: const std::string &code - 6-digit service_code
 Service
@@ -760,3 +738,5 @@ Service::get_all_services()
 		return false;
 	}
 }
+
+*/

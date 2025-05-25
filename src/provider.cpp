@@ -1,5 +1,5 @@
 #include "../include/provider.h"
-#include "utils.cpp"
+#include "../include/utils.h"
 
 
 Provider_User::Provider_User()
@@ -17,43 +17,34 @@ Provider_User::~Provider_User() {
 
 }
 
-bool Provider_User::login()
+bool Provider_User::login(std::string& input)
 {
-    int provider_number;
-    std::string num_as_string = "";
+  //  std::cout << "Please enter your 9 digit provider number: ";
+  //  std::getline(std::cin, input);
 
-    std::cout << "Please enter your 9 digit provider number: ";
-    std::cin >> provider_number;
-
-    while (!utils::is_valid_num(provider_number)) {
+    while (!utils::is_valid_num(input)) {
         std::cout << "Invalid input. Please try again: ";
-        std::cin >> provider_number;
+        std::getline(std::cin, input);
     }
 
-    num_as_string = std::to_string(provider_number);
-
     // check if provider exists in db
-    if(db->validate_provider(num_as_string)) { return true; };
+    //if(db->validate_provider(num_as_string)) { return true; };
 
-    std::cout << "setting provider id: " << provider.set_id(num_as_string) << std::endl;
+    //std::cout << "setting provider id: " << provider.set_id(num_as_string) << std::endl;
     
-    return false;
+    return true;
 }
 
-bool Provider_User::member_validation() {
+bool Provider_User::member_validation(std::string& member_number) {
 
-//    SQLEngine db;
-
-    int member_number;
-    std::cout << "Enter member number: ";
-    std::cin >> member_number;
 
     while(!utils::is_valid_num(member_number)){
         std::cout << "Invalid input. Please try again: ";
-        std::cin >> member_number;
+        std::getline(std::cin, member_number);
     }
 
-    return db->validate_member(std::to_string(member_number));
+    //return db->validate_member(std::to_string(member_number));
+    return true;
 }
 
 bool Provider_User::member_service_billing()
@@ -75,12 +66,17 @@ bool Provider_User::member_service_billing()
     std::string date_of_service = utils::get_date_of_service();
     std::string service_code    = utils::get_service_code();
 
+    /*
     Service service = db->get_service(service_code);
-    std::cout << "Service name: " << service.get_name() << std::endl;
+    */
+
+    //std::cout << "Service name: " << service.get_name() << std::endl;
+    std::cout << "Service name: " << "not connected to db!!" << std::endl;
 
     std::string comment = utils::get_comments();
 
-    std::cout << "Total fee: " << service.get_fee() << std::endl;
+    //std::cout << "Total fee: " << service.get_fee() << std::endl;
+    std::cout << "Total fee: " << "not connected to db!!" << std::endl;
 
     if (update_service_records(date_of_service, member_number, service_code, comment)) {
         return true;
@@ -105,7 +101,7 @@ bool Provider_User::update_service_records(std::string date_of_service,
     Previously supplied Optional Comment
     */
 
-   std::string current_date = utils::get_current_date();
+    std::string current_date = utils::get_current_date();
    
 
 
@@ -116,6 +112,9 @@ bool Provider_User::update_service_records(std::string date_of_service,
         return true;
     }
     */
+
+    std::cout << "update_service_records called. Not connected to db!!" << std::endl;
+
     return false;
 }
 

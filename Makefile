@@ -15,13 +15,15 @@ else ifneq (,$(findstring MSYS,$(UNAME_S)))
     PLATFORM := Windows
 endif
 
-
 ifeq ($(PLATFORM),macOS)
-	CFLAGS = -g -Wall -I /opt/homebrew/include -std=c++17
+    CFLAGS = -g -Wall -I /opt/homebrew/include -I /opt/homebrew/opt/googletest/include -std=c++17
+    LDFLAGS = -L /opt/homebrew/lib -L /opt/homebrew/opt/googletest/lib -lgtest -lgtest_main -lpthread -lpqxx -lpq
 else ifeq ($(PLATFORM),Windows)
-	CFLAGS = -g -Wall -I ./includes_library/pqxx/include -std=c++17
+    CFLAGS = -g -Wall -I ./includes_library/pqxx/include -std=c++17
+    LDFLAGS = -lpqxx -lpq
 else
-	CFLAGS = -g -Wall -lpqxx -lpq
+    CFLAGS = -g -Wall -lpqxx -lpq
+    LDFLAGS = -lpqxx -lpq
 endif
 
 
@@ -59,7 +61,7 @@ $(shell mkdir -p bin)
 
 
 # Linker flags
-LDFLAGS = -lpqxx -lpq
+#LDFLAGS = -lpqxx -lpq
 GTEST_FLAGS = -lgtest -lgtest_main -pthread
 
 
@@ -77,11 +79,12 @@ MAIN = main
 PROV = provider
 MAN = manager
 SQL = sqlengine
+UTILS = utils
 
 
 all: $(MAIN)
 
-$(MAIN): $(BIN)/$(MAIN).o $(BIN)/$(PROV).o $(BIN)/$(MAN).o $(BIN)/$(SQL).o
+$(MAIN): $(BIN)/$(MAIN).o $(BIN)/$(PROV).o $(BIN)/$(MAN).o $(BIN)/$(SQL).o $(BIN)/$(UTILS).o
 	$(COMP) $(CFLAGS) -o $@ $^
 
 $(BIN)/$(MAIN).o: $(SRC_DIR)/$(MAIN).cpp $(INCLUDE_DIR)/$(MAIN).h
@@ -96,10 +99,16 @@ $(BIN)/$(MAN).o: $(SRC_DIR)/$(MAN).cpp $(INCLUDE_DIR)/$(MAN).h $(INCLUDE_DIR)/$(
 $(BIN)/$(PROV).o: $(SRC_DIR)/$(PROV).cpp $(INCLUDE_DIR)/$(PROV).h $(INCLUDE_DIR)/$(SQL).h
 	$(COMP) $(CFLAGS) -c $< -o $@
 
+$(BIN)/$(UTILS).o: $(SRC_DIR)/$(UTILS).cpp $(INCLUDE_DIR)/$(UTILS).h
+	$(COMP) $(CFLAGS) -c $< -o $@
+
 
 #install google tests for use
-$(TEST_BIN): $(TEST_OBJ) $(BIN)/$(MAN).o $(BIN)/$(PROV).o $(BIN)/$(SQL).o
-	$(COMP) $(CFLAGS) -o $@ $^ $(GTEST_FLAGS)
+#$(TEST_BIN): $(TEST_OBJ) $(BIN)/$(MAN).o $(BIN)/$(PROV).o $(BIN)/$(SQL).o
+#	$(COMP) $(CFLAGS) -o $@ $^ $(GTEST_FLAGS)
+
+$(TEST_BIN): $(TEST_OBJ) $(BIN)/$(MAN).o $(BIN)/$(PROV).o $(BIN)/$(SQL).o $(BIN)/$(UTILS).o
+	$(COMP) $(CFLAGS) -o $@ $^ $(LDFLAGS)
 
 $(BIN)/%.o: $(TEST_DIR)/%.cpp
 	$(COMP) $(CFLAGS) -I$(INCLUDE_DIR) -c $< -o $@

@@ -4,8 +4,10 @@
 #include <pqxx/pqxx>
 #include <string.h>
 
-#include "manager.h"
-#include "provider.h"
+//this is the manager.h file
+
+//#include "manager.h"
+//#include "provider.h"
 #include "sqlengine.h"
 
 // address struct to replace redundant getters and setters
@@ -17,7 +19,10 @@ struct Address {
 
 	Address() = default;
 
-	Address(const std::string &street, const std::string &city, const std::string &state, const std::string &zip) : street(street), city(city), state(state), zip(zip)
+	Address(const std::string &street, 
+			const std::string &city, 
+			const std::string &state, 
+			const std::string &zip) : street(street), city(city), state(state), zip(zip)
 	{
 	}
 };
@@ -27,7 +32,7 @@ class Member {
 
 	Member();
 	~Member();
-	Member(const std::string &passed_member_name, const std::string &passed_address, const std::string &passed_city, const std::string &passed_zip, const bool &status);
+	Member(const std::string &passed_member_name, const Address &passed_address, const bool &status);
 
 	bool add_member_DB();
 	bool update_member_DB();
@@ -40,9 +45,10 @@ class Member {
 	std::string &get_ID();
 	std::string &set_ID(const std::string &to_set);
 
-	std::string &get_address();
-	std::string &set_address(const std::string &to_set);
+	Address &get_address();
+	Address &set_address(const Address &to_set);
 
+	/*
 	std::string &get_city();
 	std::string &set_city(const std::string &to_set);
 
@@ -51,9 +57,13 @@ class Member {
 
 	std::string &get_zip();
 	std::string &set_zip(const std::string &to_set);
+	*/
 
 	bool &get_status();
 	bool &set_status(const bool &switcher);
+	bool add_DB();
+	bool update_DB();
+
 
 	bool GET_MEMBER_FROM_DB(const std::string &MEMBER_ID);
 
@@ -62,10 +72,7 @@ class Member {
 
 	std::string member_name;
 	std::string member_id;
-	std::string address;
-	std::string city;
-	std::string State;
-	std::string zip;
+	Address address;
 	bool status;
 
 	SQLEngine *My_DB;
@@ -109,6 +116,9 @@ class Provider {
 	std::string & set_zip(const std::string & to_set);
 	*/
 
+	bool add_DB();
+	bool update_DB();
+
 	bool GET_PROVIDER_FROM_DB(const std::string &PROVIDER_ID);
 
 
@@ -143,6 +153,8 @@ class Service {
 	bool delete_service(const std::string &service_code);
 	bool update_service(const std::string &service_code);
 
+	Service get_service(const std::string &service_code);
+
 
   private:
 
@@ -152,4 +164,24 @@ class Service {
 
 	// SQL Service list retrieval
 	std::vector<Service> get_all_services();
+};
+
+class ServiceRecord {
+private:
+    std::string timestamp;
+    std::string date_of_service;
+    std::string provider_id;
+    std::string member_id;
+    std::string service_code;
+    std::string comment;
+
+    pqxx::connection *conn;
+
+public:
+    // Constructor and Destructor
+    ServiceRecord();
+    ~ServiceRecord();
+
+	// DB Operation
+    bool save_service_record(const ServiceRecord &record);
 };
