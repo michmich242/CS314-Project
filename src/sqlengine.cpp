@@ -33,13 +33,16 @@ SQLEngine::SQLEngine(const std::string &db_path)
 	}
 
 	// Create String from .dbinfo lines
-	std::ostringstream conn_str;
-	conn_str << "host=" << db_info["host"] << " port=" << db_info["port"] << " dbname=" << db_info["dbname"] << " user=" << db_info["user"] << " password=" << db_info["password"];
+	// std::ostringstream direct_connect;
+	// direct_connect << db_info["DConnect"];
+	std::ostringstream transaction_pooler;
+	transaction_pooler << db_info["TPooler"];
 
 	// Attempt to connect with given key-value pairs
 	try {
 		// Assign Unique pointer
-		conn = std::make_unique<pqxx::connection>(conn_str.str());
+		conn = std::make_unique<pqxx::connection>(transaction_pooler.str());
+
 		if (!conn->is_open()) {
 			std::cerr << "Failed to open database connection.\n";
 		}
@@ -62,7 +65,7 @@ SQLEngine::is_connected() const
 //
 
 
-/* commenting out weekly reporting stuff 
+/* commenting out weekly reporting stuff
 since it appears to be under construction */
 
 /*
