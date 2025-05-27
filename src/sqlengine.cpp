@@ -20,7 +20,7 @@ SQLEngine::SQLEngine()
 bool
 SQLEngine::conn_db(const std::string &db_path)
 {
-    std::map<std::string, std::string> db_info;
+	std::map<std::string, std::string> db_info;
 
 	// Open .dbinfo
 	std::ifstream infile(db_path);
@@ -29,16 +29,16 @@ SQLEngine::conn_db(const std::string &db_path)
 		return false;
 	}
 
-    // Intake .dbinfo, use map to make key-value pairs
-    std::string key_value;
-    while (std::getline(infile, key_value)) {
-        size_t eq = key_value.find('=');
-        if (eq == std::string::npos)
-            continue;
-        std::string key = key_value.substr(0, eq);
-        std::string value = key_value.substr(eq + 1);
-        db_info[key] = value;
-    }
+	// Intake .dbinfo, use map to make key-value pairs
+	std::string key_value;
+	while (std::getline(infile, key_value)) {
+		size_t eq = key_value.find('=');
+		if (eq == std::string::npos)
+			continue;
+		std::string key = key_value.substr(0, eq);
+		std::string value = key_value.substr(eq + 1);
+		db_info[key] = value;
+	}
 
 	// Create String from .dbinfo lines
 	// std::ostringstream direct_connect;
@@ -55,6 +55,7 @@ SQLEngine::conn_db(const std::string &db_path)
 			std::cerr << "Failed to open database connection.\n";
 			return false;
 		}
+
 		return true;
 	}
 	catch (const std::exception &e) {

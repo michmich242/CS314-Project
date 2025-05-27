@@ -10,7 +10,6 @@
 #include <pqxx/pqxx>
 #include <sstream>
 
-
 /*
 • Member name (25 characters).
 • Member number (9 digits).
@@ -89,12 +88,10 @@ class SQLEngine {
 	std::vector<ProviderReport> generate_provider_service_reports();
 	ManagerSummary generate_manager_summary_reports();
 
-	pqxx::connection * get_connection();
-
   private:
 
 	bool conn_db(const std::string &db_path = ".dbinfo");
 	std::unique_ptr<pqxx::connection> conn;
 };
 
-extern SQLEngine * My_DB;
+extern SQLEngine *My_DB;
