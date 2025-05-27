@@ -2,23 +2,24 @@
 #include "../include/sqlengine.h"
 #include "utils.cpp"
 
+SQLEngine * My_DB = new SQLEngine();
 
-Member::Member() : member_name(""), member_id(""), address(), status(false), My_DB(nullptr)
+
+Member::Member() : member_name(""), member_id(""), address(), status(false)
 {
-	My_DB = new SQLEngine;
 }
 
 Member::~Member()
 {
-	delete My_DB;
-	My_DB = nullptr;
 }
 
-Member::Member(const std::string &passed_member_name, const Address &passed_address, const bool &passed_status)
-	: member_name(passed_member_name), member_id(""), address(passed_address), status(passed_status)
-{
 
-	My_DB = new SQLEngine;
+Member::Member(const std::string & passed_member_name,
+    const std::string & passed_address,
+    const std::string & passed_city,
+    const std::string & passed_zip,
+    const bool & passed_status): member_name(passed_member_name), member_id(""), address(passed_address), city(passed_city), zip(passed_zip), status(passed_status){
+
 }
 
 void
@@ -26,16 +27,20 @@ Member::Display_Member_Info()
 {
 	std::cout << "Member name: " << member_name << std::endl
 			  << "Member ID: " << member_id << std::endl
-			  << "Address " << address.street << std::endl
-			  << "City " << address.city << std::endl
-			  << "State " << address.state << std::endl
-			  << "Zip " << address.zip << std::endl
+			  << "Address " << address << std::endl
+			  << "City " << city << std::endl
+			  << "State " << state << std::endl
+			  << "Zip " << zip << std::endl
 			  << "Status " << ((status == 1) ? "True\n" : "False\n");
 }
 
 bool
 Member::add_DB()
 {
+
+
+
+
 	return false;
 }
 
@@ -45,11 +50,10 @@ Member::update_DB()
 
 	int member_id_test = 0;
 
-	/*
-	if (!My_DB->validate_member(member_id)) {
+	if(!My_DB->is_connected()){
 		return false;
 	}
-	*/
+
 
 	if (member_id.length() != 9) {
 		return false;
@@ -121,60 +125,59 @@ Member::set_name(const std::string &to_set)
 }
 
 std::string &
-Member::get_ID()
+Member::get_id()
 {
 	return member_id;
 }
 
 std::string &
-Member::set_ID(const std::string &to_set)
+Member::set_id(const std::string &to_set)
 {
 	member_id = to_set;
 	return member_id;
 }
 
-Address &
-Member::get_address()
-{
-	return address;
+
+std::string & Member::get_address(){
+    return address;
 }
 
-Address &
-Member::set_address(const Address &to_set)
-{
-	address = to_set;
-	return address;
+std::string & Member::set_member_address(const std::string & to_set){
+    address = to_set;
+    return address;
 }
 
-/*
 std::string & Member::get_city(){
->>>>>>> f930c2b7d2c0753fca6b349d13a6236719c1e63e
-	return city;
+    return city;
 }
 
 std::string & Member::set_city(const std::string & to_set){
-	city = to_set;
-	return city;
+    city = to_set;
+    return city;
 }
 
 std::string & Member::get_state(){
-	return State;
+    return state;
 }
 
 std::string & Member::set_state(const std::string & to_set){
-	State = to_set;
-	return State;
+    state = to_set;
+    return state;
 }
 
 std::string & Member::get_zip(){
-	return zip;
+    return zip;
 }
 
 std::string & Member::set_zip(const std::string & to_set){
-	zip = to_set;
-	return zip;
+    zip = to_set;
+    return zip;
 }
-*/
+
+
+
+
+
 
 bool &
 Member::get_status()
@@ -195,28 +198,28 @@ Member::GET_MEMBER_FROM_DB(const std::string &MEMBER_ID)
 	return false;
 }
 
-/*
+
 //
 // MEMBER SqL
 //-------------------------------------------------------------------------
 //
 // Adds the passed in member object to the Member table
 bool
-Member::add_member(const Member &member)
+Member::add_member(Member &member)
 {
 	// Confirm Connection
-	if (conn || !conn->is_open()) {
+	if (!My_DB || !My_DB->is_connected()) {
 		std::cerr << "db connection not open\n";
 		return false;
 	}
 
 	try {
 		// Start a transaction, typical read/write connection
-		pqxx::work transaction(*conn);
+		pqxx::work transaction(*(My_DB->get_connection()));
 		pqxx::result res;
 
 		// Check if Member already exists
-		res = transaction.exec_params("SELECT 1 FROM members WHERE member_id = $1", member.get_id());
+		res = transaction.exec(pqxx::zview("SELECT 1 FROM members WHERE member_id = $1"), pqxx::params{member.get_id()});
 
 		if (!res.empty()) {
 			std::cerr << "Member with ID: " << member.get_id() << " already exists";
@@ -224,9 +227,9 @@ Member::add_member(const Member &member)
 		}
 
 		// Run Query
-		res = transaction.exec_params("INSERT INTO members (name, address, city, state, zip, status)) "
-									  "VALUES ($1, $2, $3, $4, $5, $6) RETURNING member_id",
-									  member.get_name(), member.get_address(), member.get_city(), member.get_state(), member.get_zip(), true);
+		res = transaction.exec(pqxx::zview("INSERT INTO members (name, address, city, state, zip, status) "
+									  "VALUES ($1, $2, $3, $4, $5, $6) RETURNING member_id"),
+									  pqxx::params{member.get_name(), member.get_address(), member.get_city(), member.get_state(), member.get_zip(), true});
 
 		// Check if the member number was generated
 		// assign to member_id
@@ -244,8 +247,12 @@ Member::add_member(const Member &member)
 		std::cerr << "Error Inserting Member: " << e.what() << "\n";
 		return false;
 	}
+
+	return true;
 }
 
+
+/*
 // Updates the member_id with the information found in member
 // The member should have mathcing member_id to the one
 // being modified
@@ -371,9 +378,14 @@ Provider::~Provider()
 {
 }
 
-Provider::Provider(const std::string &passed_name, const Address &passed_address) : name(passed_name), provider_id(""), address(passed_address)
-{
+
+Provider::Provider(const std::string & passed_name,
+    const std::string & passed_address,
+    const std::string & passed_city,
+    const std::string & passed_zip): name(passed_name), provider_id(""), address(passed_address), city(passed_city), zip(passed_zip){
+
 }
+
 
 bool
 Provider::add_DB()
@@ -419,17 +431,41 @@ Provider::set_id(const std::string &to_set)
 	return provider_id;
 }
 
-Address &
-Provider::get_address()
-{
-	return address;
+
+std::string & Provider::get_address(){
+    return address;
 }
 
-Address &
-Provider::set_address(const Address &to_set)
-{
-	address = to_set;
-	return address;
+std::string & Provider::set_address(const std::string & to_set){
+    address = to_set;
+    return address;
+}
+
+std::string & Provider::get_city(){
+    return city;
+}
+
+std::string & Provider::set_city(const std::string & to_set){
+    city = to_set;
+    return city;
+}
+
+std::string & Provider::get_state(){
+    return state;
+}
+
+std::string & Provider::set_state(const std::string & to_set){
+    state = to_set;
+    return state;
+}
+
+std::string & Provider::get_zip(){
+    return zip;
+}
+
+std::string & Provider::set_zip(const std::string & to_set){
+    zip = to_set;
+    return zip;
 }
 
 bool

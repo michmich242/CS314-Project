@@ -11,28 +11,19 @@
 #include "sqlengine.h"
 
 // address struct to replace redundant getters and setters
-struct Address {
-	std::string street;
-	std::string city;
-	std::string state;
-	std::string zip;
 
-	Address() = default;
-
-	Address(const std::string &street, 
-			const std::string &city, 
-			const std::string &state, 
-			const std::string &zip) : street(street), city(city), state(state), zip(zip)
-	{
-	}
-};
 
 class Member {
   public:
 
 	Member();
 	~Member();
-	Member(const std::string &passed_member_name, const Address &passed_address, const bool &status);
+	Member(const std::string & passed_member_name,
+			const std::string & passed_address,
+			const std::string & passed_city,
+			const std::string & passed_zip,
+			const bool & status);
+
 
 	bool add_member_DB();
 	bool update_member_DB();
@@ -42,22 +33,22 @@ class Member {
 	std::string &get_name();
 	std::string &set_name(const std::string &to_set);
 
-	std::string &get_ID();
-	std::string &set_ID(const std::string &to_set);
+	std::string &get_id();
+	std::string &set_id(const std::string &to_set);
 
-	Address &get_address();
-	Address &set_address(const Address &to_set);
 
-	/*
-	std::string &get_city();
-	std::string &set_city(const std::string &to_set);
+	std::string & get_address();
+	std::string & set_member_address(const std::string & to_set);
 
-	std::string &get_state();
-	std::string &set_state(const std::string &to_set);
+	std::string & get_city();
+	std::string & set_city(const std::string & to_set);
 
-	std::string &get_zip();
-	std::string &set_zip(const std::string &to_set);
-	*/
+	std::string & get_state();
+	std::string & set_state(const std::string & to_set);
+
+	std::string & get_zip();
+	std::string & set_zip(const std::string & to_set);
+
 
 	bool &get_status();
 	bool &set_status(const bool &switcher);
@@ -72,24 +63,42 @@ class Member {
 
 	std::string member_name;
 	std::string member_id;
-	Address address;
+	std::string address;
+	std::string city;
+	std::string state;
+	std::string zip;
+
 	bool status;
 
-	SQLEngine *My_DB;
 
 	// Member interactions
-	bool add_member(const Member &member);
+	bool add_member(Member &member);
 	bool update_member(const Member &member);
 	bool delete_member(const std::string &id);
 	bool validate_member(const std::string &id);
 };
+
+
+
+
+
+
+
+
+
+
+
+
 
 class Provider {
   public:
 
 	Provider();
 	~Provider();
-	Provider(const std::string &passed_name, const Address &passed_address);
+	Provider(const std::string & passed_name,
+		const std::string & passed_address,
+		const std::string & passed_city,
+		const std::string & passed_zip);
 
 	bool add_provider_DB();
 	bool update_provider_DB();
@@ -102,10 +111,9 @@ class Provider {
 	std::string &get_id();
 	std::string &set_id(const std::string &to_set);
 
-	Address &get_address();
-	Address &set_address(const Address &to_set);
-
-	/*
+	std::string & get_address();
+	std::string & set_address(const std::string & to_set);
+	
 	std::string & get_city();
 	std::string & set_city(const std::string & to_set);
 
@@ -114,7 +122,7 @@ class Provider {
 
 	std::string & get_zip();
 	std::string & set_zip(const std::string & to_set);
-	*/
+	
 
 	bool add_DB();
 	bool update_DB();
@@ -126,13 +134,10 @@ class Provider {
 
 	std::string name;
 	std::string provider_id;
-	Address address;
-	/*
 	std::string address;
 	std::string city;
-	std::string State;
+	std::string state;
 	std::string zip;
-	*/
 
 
 	// SQL Interactions
@@ -165,6 +170,13 @@ class Service {
 	// SQL Service list retrieval
 	std::vector<Service> get_all_services();
 };
+
+
+
+
+
+
+
 
 class ServiceRecord {
 private:

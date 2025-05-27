@@ -1,4 +1,5 @@
 #include "../include/sqlengine.h"
+extern SQLEngine * My_DB;
 
 // SQLEngine constructor, does not need an input unless overriding file path
 // default path: .dbinfo
@@ -10,6 +11,12 @@
 // user=username
 // password=12345
 //
+
+
+pqxx::connection * SQLEngine::get_connection(){
+	return conn.get();
+}
+
 SQLEngine::SQLEngine(const std::string &db_path)
 {
 	std::map<std::string, std::string> db_info;
@@ -34,8 +41,11 @@ SQLEngine::SQLEngine(const std::string &db_path)
 
 	// Create String from .dbinfo lines
 	std::ostringstream conn_str;
-	conn_str << "host=" << db_info["host"] << " port=" << db_info["port"] << " dbname=" << db_info["dbname"] << " user=" << db_info["user"] << " password=" << db_info["password"];
+	conn_str << "host=" << db_info["host"] << " port=" << db_info["port"] << " dbname=" << db_info["dbname"] << " user=" << db_info["user"] << " password=" << db_info["password"] 
+	<< " sslmode=verify-full"
+	<< " sslrootcert=C:/Users/karam/DbeaverCert/prod-ca-2021.cer";
 
+	std::cout << conn_str.str() << std::endl;
 	// Attempt to connect with given key-value pairs
 	try {
 		// Assign Unique pointer

@@ -86,6 +86,8 @@ class SQLEngine {
 	std::vector<ProviderReport> generate_provider_service_reports();
 	ManagerSummary generate_manager_summary_reports();
 
+	pqxx::connection * get_connection();
+
   private:
 
 	std::unique_ptr<pqxx::connection> conn;
