@@ -25,10 +25,10 @@ class Member {
 			const bool & status);
 
 
-	bool add_member_DB();
-	bool update_member_DB();
+
 	bool delete_member_DB();
 	void Display_Member_Info();
+	void display_Member_Menu();
 
 	std::string &get_name();
 	std::string &set_name(const std::string &to_set);
@@ -76,6 +76,14 @@ class Member {
 	bool update_member(const Member &member);
 	bool delete_member(const std::string &id);
 	bool validate_member(const std::string &id);
+	
+	void get_valid_member_input(std::string &member_name,
+    std::string &address,
+    std::string &city,
+    std::string &state,
+    std::string &zip,
+	std::string &status_str);
+
 };
 
 

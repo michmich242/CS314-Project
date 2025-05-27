@@ -1,4 +1,5 @@
 #include "../include/main.h"
+#include "../include/manager.h"
 
 int main(int argc, char *argv[])
 {
@@ -27,6 +28,28 @@ int main(int argc, char *argv[])
 bool
 start_manager()
 {
+	int check {0};
+
+	while(check != 3){
+		std::cout << "1. Member Manager Terminal" << std::endl;
+		std::cout << "2. Provider Manager Terminal" << std::endl;
+		std::cout << "3. Exit Program" << std::endl;
+		std::cout << "Enter your option (1 - 3): ";
+
+
+		std::cin >> check;
+		std::cin.ignore(100, '\n');
+		std::cout << std::endl;
+
+		if(check == 1){
+			Member Manager_Member;
+			Manager_Member.display_Member_Menu();
+		}
+
+	}
+
+
+
 	return true;
 }
 

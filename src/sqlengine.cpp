@@ -62,6 +62,9 @@ SQLEngine::SQLEngine(const std::string &db_path)
 
 		std::cout << "Successfully connected" << std::endl;
 	}
+
+
+
 }
 
 // Checks if our connection is working,

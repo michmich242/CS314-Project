@@ -1,8 +1,67 @@
 #include "../include/manager.h"
 #include "../include/sqlengine.h"
 #include "utils.cpp"
+#include <regex>
 
 SQLEngine * My_DB = new SQLEngine();
+
+
+
+void Member::get_valid_member_input(
+    std::string &member_name,
+    std::string &address,
+    std::string &city,
+    std::string &state,
+    std::string &zip,
+	std::string &status_str)
+{
+    // Helper lambda
+    auto get_input = [](const std::string &prompt, const std::regex &pattern, int max_len = -1) {
+        std::string input;
+        while (true) {
+            std::cout << prompt;
+            std::getline(std::cin, input);
+            if ((max_len == -1 || input.length() <= static_cast<size_t>(max_len)) &&
+                std::regex_match(input, pattern)) {
+                return input;
+            }
+            std::cout << "Invalid input. Please try again.\n";
+        }
+    };
+
+    member_name = get_input("Enter member name (max 25 characters): ", std::regex("^.{1,25}$"));
+    address     = get_input("Enter street address (max 25 characters): ", std::regex("^.{1,25}$"));
+    city        = get_input("Enter city (max 14 characters): ", std::regex("^.{1,14}$"));
+    state       = get_input("Enter state (2 letters): ", std::regex("^[A-Za-z]{2}$"));
+    zip         = get_input("Enter ZIP code (5 digits): ", std::regex("^\\d{5}$"));
+	status_str = get_input("Is the member active? (1 for active, 0 for inactive): ", std::regex("^[01]$"));
+
+	status = (status_str == "1");
+
+}
+
+
+
+void Member::display_Member_Menu(){
+	int check {0};
+	while(check != 4){
+		std::cout << "1. Add Member" << std::endl;
+		std::cout << "2. Update Member" << std::endl;
+		std::cout << "3. Remove Member" << std::endl;
+		std::cout << "4. Quit to Main Manager Menu" << std::endl;
+		std::cout << "Enter your option (1 - 4): ";
+
+		std::cin >> check;
+		std::cin.ignore(100, '\n');
+
+		if(check == 1){
+			add_DB();
+		}
+
+	}
+
+}
+
 
 
 Member::Member() : member_name(""), member_id(""), address(), status(false)
@@ -37,11 +96,21 @@ Member::Display_Member_Info()
 bool
 Member::add_DB()
 {
+	if(!My_DB->is_connected()){
+		return false;
+	}
 
+	std::string hold_name;
+	std::string hold_id;
+	std::string hold_address;
+	std::string hold_city;
+	std::string hold_state;
+	std::string hold_zip;
+	std::string stats;
 
+	get_valid_member_input(member_name, address, city, state, zip, stats);
 
-
-	return false;
+	return add_member(*this);
 }
 
 bool
@@ -199,6 +268,13 @@ Member::GET_MEMBER_FROM_DB(const std::string &MEMBER_ID)
 }
 
 
+
+
+
+
+
+
+
 //
 // MEMBER SqL
 //-------------------------------------------------------------------------
@@ -219,7 +295,7 @@ Member::add_member(Member &member)
 		pqxx::result res;
 
 		// Check if Member already exists
-		res = transaction.exec(pqxx::zview("SELECT 1 FROM members WHERE member_id = $1"), pqxx::params{member.get_id()});
+		res = transaction.exec(pqxx::zview("SELECT 1 FROM chocan.members WHERE member_id = $1"), pqxx::params{member.get_id()});
 
 		if (!res.empty()) {
 			std::cerr << "Member with ID: " << member.get_id() << " already exists";
@@ -227,7 +303,7 @@ Member::add_member(Member &member)
 		}
 
 		// Run Query
-		res = transaction.exec(pqxx::zview("INSERT INTO members (name, address, city, state, zip, status) "
+		res = transaction.exec(pqxx::zview("INSERT INTO chocan.members (name, address, city, state_abbrev, zip, active_status) "
 									  "VALUES ($1, $2, $3, $4, $5, $6) RETURNING member_id"),
 									  pqxx::params{member.get_name(), member.get_address(), member.get_city(), member.get_state(), member.get_zip(), true});
 
