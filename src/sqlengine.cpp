@@ -10,7 +10,15 @@
 // user=username
 // password=12345
 //
-SQLEngine::SQLEngine(const std::string &db_path)
+SQLEngine::SQLEngine()
+{
+	if (!conn_db()) {
+		std::cerr << "Failed to connect\n";
+	}
+}
+
+bool
+SQLEngine::conn_db(const std::string &db_path)
 {
 	std::map<std::string, std::string> db_info;
 
@@ -18,7 +26,7 @@ SQLEngine::SQLEngine(const std::string &db_path)
 	std::ifstream infile(db_path);
 	if (!infile) {
 		std::cerr << "Failed to retrieve database info.\n" << std::endl;
-		return;
+		return false;
 	}
 
 	// Intake .dbinfo, use map to make key-value pairs
@@ -45,11 +53,23 @@ SQLEngine::SQLEngine(const std::string &db_path)
 
 		if (!conn->is_open()) {
 			std::cerr << "Failed to open database connection.\n";
+			return false;
 		}
+		return true;
 	}
 	catch (const std::exception &e) {
 		std::cerr << "Connection Failed: " << e.what() << "\n";
+		return false;
 	}
+}
+
+pqxx::connection &
+SQLEngine::get_connection()
+{
+	if (!is_connected()) {
+		conn_db();
+	}
+	return *conn;
 }
 
 // Checks if our connection is working,

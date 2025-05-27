@@ -6,6 +6,7 @@
 #include <iostream>
 #include <map>
 #include <memory>
+#include <pqxx/params>
 #include <pqxx/pqxx>
 #include <sstream>
 
@@ -78,8 +79,9 @@ struct ManagerSummary {
 class SQLEngine {
   public:
 
-	SQLEngine(const std::string &db_path = ".dbinfo");
+	SQLEngine();
 	bool is_connected() const;
+	pqxx::connection &get_connection();
 
 	// Weekly Reporting
 	std::vector<MemberReport> generate_member_service_reports();
@@ -88,5 +90,6 @@ class SQLEngine {
 
   private:
 
+	bool conn_db(const std::string &db_path = ".dbinfo");
 	std::unique_ptr<pqxx::connection> conn;
 };

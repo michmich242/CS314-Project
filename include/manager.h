@@ -1,87 +1,74 @@
-
+// manager.h
+//
+// This file contains the classes for:
+//
+//      - Manager
+//      - Provider
+//      - Services
+//      - ServiceRecords
+//
 #pragma once
+#include <cstring>
 #include <iostream>
 #include <pqxx/pqxx>
-#include <string.h>
 
-//this is the manager.h file
-
-//#include "manager.h"
-//#include "provider.h"
 #include "sqlengine.h"
-
-// address struct to replace redundant getters and setters
-struct Address {
-	std::string street;
-	std::string city;
-	std::string state;
-	std::string zip;
-
-	Address() = default;
-
-	Address(const std::string &street, 
-			const std::string &city, 
-			const std::string &state, 
-			const std::string &zip) : street(street), city(city), state(state), zip(zip)
-	{
-	}
-};
 
 class Member {
   public:
 
 	Member();
 	~Member();
-	Member(const std::string &passed_member_name, const Address &passed_address, const bool &status);
+	Member(const std::string &member_name, const std::string &address, const std::string &city,
+		   const std::string &state, const std::string &zip, const bool &status);
 
-	bool add_member_DB();
-	bool update_member_DB();
-	bool delete_member_DB();
+	bool add_member();
+	bool update_member();
+	bool delete_member();
 	void Display_Member_Info();
 
 	std::string &get_name();
-	std::string &set_name(const std::string &to_set);
+	bool set_name(const std::string &to_set);
 
 	std::string &get_ID();
-	std::string &set_ID(const std::string &to_set);
+	bool set_ID(const std::string &to_set);
 
-	Address &get_address();
-	Address &set_address(const Address &to_set);
+	std::string &get_address();
+	bool set_address(const std::string &to_set);
 
-	/*
 	std::string &get_city();
-	std::string &set_city(const std::string &to_set);
+	bool set_city(const std::string &to_set);
 
 	std::string &get_state();
-	std::string &set_state(const std::string &to_set);
+	bool set_state(const std::string &to_set);
 
 	std::string &get_zip();
-	std::string &set_zip(const std::string &to_set);
-	*/
+	bool set_zip(const std::string &to_set);
+
 
 	bool &get_status();
-	bool &set_status(const bool &switcher);
-	bool add_DB();
-	bool update_DB();
-
+	bool set_status();
 
 	bool GET_MEMBER_FROM_DB(const std::string &MEMBER_ID);
 
 
   private:
 
-	std::string member_name;
-	std::string member_id;
-	Address address;
+	std::string name;
+	std::string id;
+	std::string address;
+	std::string city;
+	std::string state;
+	std::string zip;
 	bool status;
 
 	SQLEngine *My_DB;
 
 	// Member interactions
-	bool add_member(const Member &member);
-	bool update_member(const Member &member);
-	bool delete_member(const std::string &id);
-	bool validate_member(const std::string &id);
+	bool add_member_DB(Member &member);
+	bool update_member_DB(Member &member);
+	bool delete_member_DB(const std::string &id);
+	bool validate_member_DB(const std::string &id);
 };
 
 class Provider {
@@ -89,35 +76,33 @@ class Provider {
 
 	Provider();
 	~Provider();
-	Provider(const std::string &passed_name, const Address &passed_address);
+	Provider(const std::string &passed_name, const std::string &address, const std::string &city,
+			 const std::string &state, const std::string &zip);
 
-	bool add_provider_DB();
-	bool update_provider_DB();
-	bool delete_provider_DB();
+	bool add_provider();
+	bool update_provider();
+	bool delete_provider();
 	void Display_Provider_Info();
 
 	std::string &get_name();
-	std::string &set_name(const std::string &to_set);
+	bool set_name(const std::string &to_set);
 
-	std::string &get_id();
-	std::string &set_id(const std::string &to_set);
+	std::string &get_ID();
+	bool set_ID(const std::string &to_set);
 
-	Address &get_address();
-	Address &set_address(const Address &to_set);
+	std::string &get_address();
+	bool set_address(const std::string &to_set);
 
-	/*
-	std::string & get_city();
-	std::string & set_city(const std::string & to_set);
 
-	std::string & get_state();
-	std::string & set_state(const std::string & to_set);
+	std::string &get_city();
+	bool set_city(const std::string &to_set);
 
-	std::string & get_zip();
-	std::string & set_zip(const std::string & to_set);
-	*/
+	std::string &get_state();
+	bool set_state(const std::string &to_set);
 
-	bool add_DB();
-	bool update_DB();
+	std::string &get_zip();
+	bool set_zip(const std::string &to_set);
+
 
 	bool GET_PROVIDER_FROM_DB(const std::string &PROVIDER_ID);
 
@@ -125,21 +110,18 @@ class Provider {
   private:
 
 	std::string name;
-	std::string provider_id;
-	Address address;
-	/*
+	std::string id;
 	std::string address;
 	std::string city;
-	std::string State;
+	std::string state;
 	std::string zip;
-	*/
 
 
 	// SQL Interactions
-	bool add_provider(const Provider &provider);
-	bool update_provider(const Provider &provider);
-	bool delete_provider(const std::string &id);
-	bool validate_provider(const std::string &id);
+	bool add_provider_DB(Provider &provider);
+	bool update_provider_DB(Provider &provider);
+	bool delete_provider_DB(const std::string &id);
+	bool validate_provider_DB(const std::string &id);
 };
 
 class Service {
@@ -167,21 +149,23 @@ class Service {
 };
 
 class ServiceRecord {
-private:
-    std::string timestamp;
-    std::string date_of_service;
-    std::string provider_id;
-    std::string member_id;
-    std::string service_code;
-    std::string comment;
+  private:
 
-    pqxx::connection *conn;
+	std::string timestamp;
+	std::string date_of_service;
+	std::string provider_id;
+	std::string member_id;
+	std::string service_code;
+	std::string comment;
 
-public:
-    // Constructor and Destructor
-    ServiceRecord();
-    ~ServiceRecord();
+	pqxx::connection *conn;
+
+  public:
+
+	// Constructor and Destructor
+	ServiceRecord();
+	~ServiceRecord();
 
 	// DB Operation
-    bool save_service_record(const ServiceRecord &record);
+	bool save_service_record(ServiceRecord &record);
 };

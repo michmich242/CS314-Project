@@ -2,8 +2,9 @@
 #include "../include/sqlengine.h"
 #include "utils.cpp"
 
+SQLEngine *My_DB = new SQLEngine();
 
-Member::Member() : member_name(""), member_id(""), address(), status(false), My_DB(nullptr)
+Member::Member() : name(""), id(""), address(""), city(""), state(""), zip(""), status(false), My_DB(nullptr)
 {
 	My_DB = new SQLEngine;
 }
@@ -14,8 +15,9 @@ Member::~Member()
 	My_DB = nullptr;
 }
 
-Member::Member(const std::string &passed_member_name, const Address &passed_address, const bool &passed_status)
-	: member_name(passed_member_name), member_id(""), address(passed_address), status(passed_status)
+Member::Member(const std::string &name, const std::string &address, const std::string &city, const std::string &state,
+			   const std::string &zip, const bool &status)
+	: name(name), id(""), address(address), city(city), state(state), zip(zip), status(status)
 {
 
 	My_DB = new SQLEngine;
@@ -24,60 +26,24 @@ Member::Member(const std::string &passed_member_name, const Address &passed_addr
 void
 Member::Display_Member_Info()
 {
-	std::cout << "Member name: " << member_name << std::endl
-			  << "Member ID: " << member_id << std::endl
-			  << "Address " << address.street << std::endl
-			  << "City " << address.city << std::endl
-			  << "State " << address.state << std::endl
-			  << "Zip " << address.zip << std::endl
-			  << "Status " << ((status == 1) ? "True\n" : "False\n");
+	std::cout << "Member name: " << name << "\nMember ID: " << id << "\nAddress " << address << "\nCity " << city
+			  << "\nState " << state << "\nZip " << zip << "\nStatus " << status;
 }
 
 bool
-Member::add_DB()
+Member::add_member()
 {
 	return false;
 }
 
 bool
-Member::update_DB()
+Member::update_member()
 {
-
-	int member_id_test = 0;
-
-	/*
-	if (!My_DB->validate_member(member_id)) {
-		return false;
-	}
-	*/
-
-	if (member_id.length() != 9) {
-		return false;
-	}
-
-
-	try {
-		member_id_test = stoi(member_id);
-		std::cout << member_id_test << std::endl;
-	}
-	catch (const std::invalid_argument &e) {
-		std::cout << "Invalid argument: " << e.what() << std::endl;
-		return false;
-	}
-
-	/*
-		if(!utils::is_valid_num(member_id_test)){
-			return false;
-		}
-	*/
-
-	/*
-	return My_DB->update_member(*this);
-	*/
+	return false;
 }
 
 bool
-Member::delete_member_DB()
+Member::delete_member()
 {
 
 	int member_id_test = 0;
@@ -88,13 +54,13 @@ Member::delete_member_DB()
 	}
 	*/
 
-	if (member_id.length() != 9) {
+	if (id.length() != 9) {
 		return false;
 	}
 
 
 	try {
-		member_id_test = stoi(member_id);
+		member_id_test = stoi(id);
 		std::cout << member_id_test << std::endl;
 	}
 	catch (const std::invalid_argument &e) {
@@ -102,7 +68,7 @@ Member::delete_member_DB()
 		return false;
 	}
 
-	//return My_DB->delete_member(member_id);
+	// return My_DB->delete_member(member_id);
 
 	return false;
 }
@@ -110,71 +76,80 @@ Member::delete_member_DB()
 std::string &
 Member::get_name()
 {
-	return member_name;
+	return name;
 }
 
-std::string &
+bool
 Member::set_name(const std::string &to_set)
 {
-	member_name = to_set;
-	return member_name;
+	name = to_set;
+	return true;
 }
 
 std::string &
 Member::get_ID()
 {
-	return member_id;
+	return id;
+}
+
+bool
+Member::set_ID(const std::string &to_set)
+{
+	id = to_set;
+	return true;
 }
 
 std::string &
-Member::set_ID(const std::string &to_set)
-{
-	member_id = to_set;
-	return member_id;
-}
-
-Address &
 Member::get_address()
 {
 	return address;
 }
 
-Address &
-Member::set_address(const Address &to_set)
+bool
+Member::set_address(const std::string &to_set)
 {
 	address = to_set;
-	return address;
+	return true;
 }
 
-/*
-std::string & Member::get_city(){
->>>>>>> f930c2b7d2c0753fca6b349d13a6236719c1e63e
+std::string &
+Member::get_city()
+{
 	return city;
 }
 
-std::string & Member::set_city(const std::string & to_set){
+bool
+Member::set_city(const std::string &to_set)
+{
 	city = to_set;
-	return city;
+	return true;
 }
 
-std::string & Member::get_state(){
-	return State;
+std::string &
+Member::get_state()
+{
+	return state;
 }
 
-std::string & Member::set_state(const std::string & to_set){
-	State = to_set;
-	return State;
+bool
+Member::set_state(const std::string &to_set)
+{
+	state = to_set;
+	return true;
 }
 
-std::string & Member::get_zip(){
+std::string &
+Member::get_zip()
+{
 	return zip;
 }
 
-std::string & Member::set_zip(const std::string & to_set){
+bool
+Member::set_zip(const std::string &to_set)
+{
 	zip = to_set;
-	return zip;
+	return true;
 }
-*/
 
 bool &
 Member::get_status()
@@ -182,10 +157,10 @@ Member::get_status()
 	return status;
 }
 
-bool &
-Member::set_status(const bool &switcher)
+bool
+Member::set_status()
 {
-	status = switcher;
+	status = (status == true) ? false : true;
 	return status;
 }
 
@@ -195,48 +170,43 @@ Member::GET_MEMBER_FROM_DB(const std::string &MEMBER_ID)
 	return false;
 }
 
-/*
 //
 // MEMBER SqL
 //-------------------------------------------------------------------------
 //
 // Adds the passed in member object to the Member table
 bool
-Member::add_member(const Member &member)
+Member::add_member_DB(Member &member)
 {
 	// Confirm Connection
-	if (conn || !conn->is_open()) {
+	if (!My_DB || !My_DB->is_connected()) {
 		std::cerr << "db connection not open\n";
 		return false;
 	}
 
 	try {
 		// Start a transaction, typical read/write connection
-		pqxx::work transaction(*conn);
-		pqxx::result res;
+		pqxx::work transaction(My_DB->get_connection());
 
-		// Check if Member already exists
-		res = transaction.exec_params("SELECT 1 FROM members WHERE member_id = $1", member.get_id());
+		try {
+			auto exists = transaction.query_value<int>(pqxx::zview("SELECT 1 FROM members WHERE member_id = $1"),
+													   pqxx::params{member.get_ID()});
 
-		if (!res.empty()) {
-			std::cerr << "Member with ID: " << member.get_id() << " already exists";
+			std::cerr << "Member with ID: " << member.get_ID() << "already exists\n";
 			return false;
 		}
-
-		// Run Query
-		res = transaction.exec_params("INSERT INTO members (name, address, city, state, zip, status)) "
-									  "VALUES ($1, $2, $3, $4, $5, $6) RETURNING member_id",
-									  member.get_name(), member.get_address(), member.get_city(), member.get_state(), member.get_zip(), true);
-
-		// Check if the member number was generated
-		// assign to member_id
-		if (!res.empty()) {
-			std::string new_member_id = res[0][0].as<std::string>();
-			member.set_id(new_member_id);
+		catch (const pqxx::unexpected_rows &) {
+			// member doesnt exist
 		}
 
-		// Finalizes Transactions
-		// Protects from partial read/writes
+		std::string new_member_id = transaction.query_value<std::string>(
+			pqxx::zview("INSERT INTO MEMBERS (name, address, city, state, zip, status) "
+						"VALUES ($1, $2, $3, $4, $5, $6) RETURNING member_id"),
+			pqxx::params{member.get_name(), member.get_address(), member.get_city(), member.get_state(),
+						 member.get_zip(), true});
+
+		member.set_ID(new_member_id);
+
 		transaction.commit();
 		return true;
 	}
@@ -250,30 +220,30 @@ Member::add_member(const Member &member)
 // The member should have mathcing member_id to the one
 // being modified
 bool
-Member::update_member(const Member &member)
+Member::update_member_DB(Member &member)
 {
 	// Double check if connection is open
-	if (!conn || !conn->is_open()) {
+	if (!My_DB || !My_DB->is_connected()) {
 		std::cerr << "db connection not open\n";
 		return false;
 	}
 
 	try {
 		// Start a transaction
-		pqxx::work transaction(*conn);
-		pqxx::result res;
+		pqxx::work transaction(My_DB->get_connection());
 
 		// Attempt to Update
-		res = transaction.exec_params("UPDATE members "
-									  "SET name = $1, address = $2, city = $3, zip "
-									  "= $4, state = $5, status = $6"
-									  "WHERE member_id = $7",
+		pqxx::result res = transaction.exec_params(
+			R"(UPDATE members
+                           SET name = $1, address = $2, city = $3, zip= $4, state = $5, status = $6
+    			           WHERE member_id = $7 LIMIT 1)",
 
-									  // variables being passed to $#
-									  member.get_name(), member.get_address(), member.get_city(), member.get_zip(), member.get_state(), member.get_status(), member.get_id());
+			// variables being passed to $#
+			pqxx::params{member.get_name(), member.get_address(), member.get_city(), member.get_zip(),
+						 member.get_state(), member.get_status(), member.get_ID()});
 		// Check if query modified a row
 		if (res.affected_rows() == 0) {
-			std::cerr << "No member found with ID: " << member.get_id() << "\n";
+			std::cerr << "No member found with ID: " << member.get_ID() << "\n";
 			return false;
 		}
 
@@ -290,21 +260,20 @@ Member::update_member(const Member &member)
 // Delete member given id, value is expected to be properly pre-processed
 // Member IDs are in the range of 100000000 -> 199999999
 bool
-Member::delete_member(const std::string &id)
+Member::delete_member_DB(const std::string &id)
 {
 	// Check Connection
-	if (!conn || !conn->is_open()) {
+	if (!My_DB || !My_DB->is_connected()) {
 		std::cerr << "db connection not open\n";
 		return false;
 	}
 
 	try {
 		// Start a transaction
-		pqxx::work transaction(*conn);
-		pqxx::result res;
+		pqxx::work transaction(My_DB->get_connection());
 
 		// Run Query
-		res = transaction.exec_params("DELETE FROM members WHERE member_id = $1", id);
+		auto res = transaction.exec_params("DELETE FROM members WHERE member_id = $1", id);
 
 		// Ensure a row was deleted
 		if (res.affected_rows() == 0) {
@@ -324,46 +293,42 @@ Member::delete_member(const std::string &id)
 
 // Check Member Active Status
 bool
-Member::validate_member(const std::string &id)
+Member::validate_member_DB(const std::string &id)
 {
 	// Check Connection
-	if (!conn || !conn->is_open()) {
+	if (!My_DB || !My_DB->is_connected()) {
 		std::cerr << "db connection not open\n";
 		return false;
 	}
 
 	try {
 		// Start a transaction
-		pqxx::work transaction(*conn);
-		pqxx::result res;
+		pqxx::work transaction(My_DB->get_connection());
 
-		// Run Query
-		res = transaction.exec_params("SELECT active_status FROM members WHERE member_id = $1", id);
-		transaction.commit();
-
-		// Check
-		if (res.empty()) {
-			std::cerr << "Member not found with ID: " << id << "\n";
+		try {
+			bool status = transaction.query_value<bool>(pqxx::zview("SELECT status FROM members WHERE member_id = $1"),
+														pqxx::params{id});
+			transaction.commit();
+			return status;
+		}
+		catch (const pqxx::unexpected_rows &) {
+			std::cerr << "Member not found with ID:" << id << "\n";
 			return false;
 		}
-
-		// Assign member status to return boolean
-		bool status = res[0][0].as<bool>();
-		return status;
 	}
 	catch (const std::exception &e) {
-		std::cerr << "Error Validating Member: " << e.what() << "\n";
+		std::cerr << "Error validating member: " << e.what() << "\n";
 		return false;
 	}
 }
 
 // End of member class functions --------------------------------
-*/
+
 
 //--------------------------------------------------------------------------
 /* provider functions start */
 
-Provider::Provider() : name(""), provider_id(""), address()
+Provider::Provider() : name(""), id(""), address(""), city(""), state(""), zip("")
 {
 }
 
@@ -371,26 +336,10 @@ Provider::~Provider()
 {
 }
 
-Provider::Provider(const std::string &passed_name, const Address &passed_address) : name(passed_name), provider_id(""), address(passed_address)
+Provider::Provider(const std::string &name, const std::string &address, const std::string &city,
+				   const std::string &state, const std::string &zip)
+	: name(name), id(""), address(address), city(city), state(state), zip(zip)
 {
-}
-
-bool
-Provider::add_DB()
-{
-	return false;
-}
-
-bool
-Provider::update_DB()
-{
-	return false;
-}
-
-bool
-delete_DB()
-{
-	return false;
 }
 
 std::string &
@@ -399,37 +348,76 @@ Provider::get_name()
 	return name;
 }
 
-std::string &
+bool
 Provider::set_name(const std::string &to_set)
 {
 	name = to_set;
-	return name;
+	return true;
 }
 
 std::string &
-Provider::get_id()
+Provider::get_ID()
 {
-	return provider_id;
+	return id;
+}
+
+bool
+Provider::set_ID(const std::string &to_set)
+{
+	id = to_set;
+	return true;
 }
 
 std::string &
-Provider::set_id(const std::string &to_set)
-{
-	provider_id = to_set;
-	return provider_id;
-}
-
-Address &
 Provider::get_address()
 {
 	return address;
 }
 
-Address &
-Provider::set_address(const Address &to_set)
+bool
+Provider::set_address(const std::string &to_set)
 {
 	address = to_set;
-	return address;
+	return true;
+}
+
+std::string &
+Provider::get_city()
+{
+	return city;
+}
+
+bool
+Provider::set_city(const std::string &to_set)
+{
+	city = to_set;
+	return true;
+}
+
+std::string &
+Provider::get_state()
+{
+	return state;
+}
+
+bool
+Provider::set_state(const std::string &to_set)
+{
+	state = to_set;
+	return true;
+}
+
+std::string &
+Provider::get_zip()
+{
+	return zip;
+}
+
+bool
+Provider::set_zip(const std::string &to_set)
+{
+	zip = to_set;
+	return true;
 }
 
 bool
@@ -438,47 +426,43 @@ Provider::GET_PROVIDER_FROM_DB(const std::string &PROVIDER_ID)
 	return false;
 }
 
-
-/*
 //----------------------------------------------------------------------
 // Provider SQL
 
 // Add Provider to db
-// @PARAM: const Provider &provider : Populated Provider Object
+// @PARAM: Provider &provider : Populated Provider Object
 // provider.provider_id WILL BE OVERWRITTEN
 bool
-Provider::add_provider(const Provider &provider)
+Provider::add_provider_DB(Provider &provider)
 {
 	// Check Connection
-	if (!conn || !conn->is_open()) {
+	if (!My_DB || !My_DB->is_connected()) {
 		std::cerr << "db connection not open\n";
 		return false;
 	}
 
 	try {
 		// Start a transaction
-		pqxx::work transaction(*conn);
-		pqxx::result res;
+		pqxx::work transaction(My_DB->get_connection());
 
-		// Check if Member already exists
-		res = transaction.exec_params("SELECT 1 FROM providers WHERE provider_id = $1", provider.get_id());
+		try {
+			auto exists = transaction.query_value<int>(pqxx::zview("SELECT 1 FROM providers WHERE provider_id = $1"),
+													   pqxx::params{provider.get_ID()});
 
-		if (!res.empty()) {
-			std::cerr << "Member with ID: " << provider.get_id() << " already exists";
+			std::cerr << "Provider with ID: " << provider.get_ID() << "already exists\n";
 			return false;
 		}
-
-		// Run Query
-		res = transaction.exec_params("INSERT INTO providers (name, address, city, state, zip, status))"
-									  "VALUES ($1, $2, $3, $4, $5, $6)",
-									  provider.get_name(), provider.get_address(), provider.get_city(), provider.get_state(), provider.get_zip(), true);
-
-		// Check if the provider number was generated
-		// assign to provider_id
-		if (!res.empty()) {
-			std::string new_provider_id = res[0][0].as<std::string>();
-			provider.set_id(new_provider_id);
+		catch (const pqxx::unexpected_rows &) {
+			// provider doesnt exist
 		}
+		// Run Query
+		std::string new_provider_id = transaction.query_value<std::string>(
+			pqxx::zview("INSERT INTO providers (name, address, city, state, zip, status))"
+						"VALUES ($1, $2, $3, $4, $5, $6)"),
+			pqxx::params{provider.get_name(), provider.get_address(), provider.get_city(), provider.get_state(),
+						 provider.get_zip(), true});
+
+		provider.set_ID(new_provider_id);
 
 		// Finalize Transaction
 		transaction.commit();
@@ -491,33 +475,31 @@ Provider::add_provider(const Provider &provider)
 }
 
 // Modify an existing provider in the DB
-// @PARAM: const Provider &provider: Provider object with updated data
+// @PARAM: Provider &provider: Provider object with updated data
 // Refers to provider_id for context on which provider to update
 bool
-Provider::update_provider(const Provider &provider)
+Provider::update_provider_DB(Provider &provider)
 {
-	if (!conn || !conn->is_open()) {
+	if (!My_DB || !My_DB->is_connected()) {
 		std::cerr << "db connection not open\n";
 		return false;
 	}
 
 	try {
 		// Start a transaction
-		pqxx::work transaction(*conn);
-		pqxx::result res;
+		pqxx::work transaction(My_DB->get_connection());
+		pqxx::result res = transaction.exec_params(
+			R"(UPDATE providers 
+			SET name = $1, address = $2, city = $3, zip = $4, state = $5 
+			WHERE provider_id = $6)",
 
-		// Attempt to Update
-		res = transaction.exec_params("UPDATE providers "
-									  "SET name = $1, address = $2, city = $3, zip "
-									  "= $4, state = $5, status = $6"
-									  "WHERE provider_id = $7",
+			// variables being passed to $#
+			pqxx::params{provider.get_name(), provider.get_address(), provider.get_city(), provider.get_zip(),
+						 provider.get_state(), provider.get_ID()});
 
-									  // variables being passed to $#
-									  provider.get_name(), provider.get_address(), provider.get_city(), provider.get_zip(), provider.get_state(), provider.get_status(),
-									  provider.get_id());
 		// Check if query modified a row
 		if (res.affected_rows() == 0) {
-			std::cerr << "No provider found with ID: " << provider.get_id() << "\n";
+			std::cerr << "No provider found with ID: " << provider.get_ID() << "\n";
 			return false;
 		}
 
@@ -535,16 +517,16 @@ Provider::update_provider(const Provider &provider)
 // @PARAM: const sd::string &id - 9 digit string id,
 // ID is required to be fully numeric and between <100000000-999999999>
 bool
-Provider::delete_provider(const std::string &id)
+Provider::delete_provider_DB(const std::string &id)
 {
-	if (!conn || !conn->is_open()) {
+	if (!My_DB || !My_DB->is_connected()) {
 		std::cerr << "db connection not open\n";
 		return false;
 	}
 
 	try {
 		// Start a transaction
-		pqxx::work transaction(*conn);
+		pqxx::work transaction(My_DB->get_connection());
 		pqxx::result res;
 
 		// Run Query
@@ -565,34 +547,33 @@ Provider::delete_provider(const std::string &id)
 	}
 }
 
-//
+// Check Member Active Status
 bool
-Provider::validate_provider(const std::string &id)
+Provider::validate_provider_DB(const std::string &id)
 {
-	if (!conn || !conn->is_open()) {
+	// Check Connection
+	if (!My_DB || !My_DB->is_connected()) {
 		std::cerr << "db connection not open\n";
 		return false;
 	}
 
 	try {
 		// Start a transaction
-		pqxx::work transaction(*conn);
-		pqxx::result res;
+		pqxx::work transaction(My_DB->get_connection());
 
-		// Run Query
-		res = transaction.exec_params("SELECT provider_id FROM providers WHERE provider_id = $1", id);
-		transaction.commit();
-		// Check
-		if (res.empty()) {
-			std::cerr << "Provider not found with ID: " << id << "\n";
+		try {
+			bool status = transaction.query_value<bool>(
+				pqxx::zview("SELECT status FROM providers WHERE provider_id = $1"), pqxx::params{id});
+			transaction.commit();
+			return status;
+		}
+		catch (const pqxx::unexpected_rows &) {
+			std::cerr << "Provider not found with ID:" << id << "\n";
 			return false;
 		}
-
-		// Check did not catch, confirm existance of ID
-		return true;
 	}
 	catch (const std::exception &e) {
-		std::cerr << "Error Validating Provider: " << e.what() << "\n";
+		std::cerr << "Error validating provider: " << e.what() << "\n";
 		return false;
 	}
 }
@@ -600,7 +581,7 @@ Provider::validate_provider(const std::string &id)
 // End of Provider Functions----------------------------------------------------
 
 //----------------------------------------------------------------------
-*/
+
 /*ServiceRecord functions start*/
 
 ServiceRecord::ServiceRecord() : timestamp(""), date_of_service(""), provider_id(""), member_id(""), comment("")
@@ -637,7 +618,8 @@ ServiceRecord::save_service_record(const ServiceRecord &record)
 		res = transaction.exec_params("INSERT INTO ServiceRecords"
 									  "(date_of_service, provider_id, member_id, service_code, comments)"
 									  "VALUES($1, $2, $3, $3, $5) RETURNING service_code",
-									  record.get_date(), record.get_provider(), record.get_member(), record.get_service(), record.get_comment(););
+									  record.get_date(), record.get_provider(), record.get_member(),
+record.get_service(), record.get_comment(););
 
 		// Check result, should have returned service_code
 		if (!res.empty()) {
