@@ -9,6 +9,7 @@
 #include <pqxx/pqxx>
 #include <sstream>
 
+
 /*
 • Member name (25 characters).
 • Member number (9 digits).
@@ -92,3 +93,5 @@ class SQLEngine {
 
 	std::unique_ptr<pqxx::connection> conn;
 };
+
+extern SQLEngine * My_DB;
