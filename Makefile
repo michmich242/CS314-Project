@@ -85,7 +85,7 @@ UTILS = utils
 all: $(MAIN)
 
 $(MAIN): $(BIN)/$(MAIN).o $(BIN)/$(PROV).o $(BIN)/$(MAN).o $(BIN)/$(SQL).o $(BIN)/$(UTILS).o
-	$(COMP) $(CFLAGS) -o $@ $^
+	$(COMP) $(CFLAGS) -o $@ $^ $(LDFLAGS)
 
 $(BIN)/$(MAIN).o: $(SRC_DIR)/$(MAIN).cpp $(INCLUDE_DIR)/$(MAIN).h
 	$(COMP) $(CFLAGS) -c $< -o $@

@@ -1,45 +1,150 @@
 #include "../include/manager.h"
 #include "../include/sqlengine.h"
 #include "utils.cpp"
+#include <regex>
 
-SQLEngine *My_DB = new SQLEngine();
+SQLEngine * My_DB = new SQLEngine();
 
-Member::Member() : name(""), id(""), address(""), city(""), state(""), zip(""), status(false), My_DB(nullptr)
+void Member::get_valid_member_input(
+    std::string &member_name,
+    std::string &address,
+    std::string &city,
+    std::string &state,
+    std::string &zip,
+	std::string &status_str)
 {
-	My_DB = new SQLEngine;
+    // Helper lambda
+    auto get_input = [](const std::string &prompt, const std::regex &pattern, int max_len = -1) {
+        std::string input;
+        while (true) {
+            std::cout << prompt;
+            std::getline(std::cin, input);
+            if ((max_len == -1 || input.length() <= static_cast<size_t>(max_len)) &&
+                std::regex_match(input, pattern)) {
+                return input;
+            }
+            std::cout << "Invalid input. Please try again.\n";
+        }
+    };
+
+    member_name = get_input("Enter member name (max 25 characters): ", std::regex("^.{1,25}$"));
+    address     = get_input("Enter street address (max 25 characters): ", std::regex("^.{1,25}$"));
+    city        = get_input("Enter city (max 14 characters): ", std::regex("^.{1,14}$"));
+    state       = get_input("Enter state (2 letters): ", std::regex("^[A-Za-z]{2}$"));
+    zip         = get_input("Enter ZIP code (5 digits): ", std::regex("^\\d{5}$"));
+	status_str = get_input("Is the member active? (1 for active, 0 for inactive): ", std::regex("^[01]$"));
+
+	status = (status_str == "1");
+
+}
+
+
+
+void Member::display_Member_Menu(){
+	int check {0};
+	while(check != 4){
+		std::cout << "1. Add Member" << std::endl;
+		std::cout << "2. Update Member" << std::endl;
+		std::cout << "3. Remove Member" << std::endl;
+		std::cout << "4. Quit to Main Manager Menu" << std::endl;
+		std::cout << "Enter your option (1 - 4): ";
+
+		std::cin >> check;
+		std::cin.ignore(100, '\n');
+
+		if(check == 1){
+			add_DB();
+		}
+
+	}
+
+}
+
+
+
+Member::Member() : member_name(""), member_id(""), address(), status(false)
+{
 }
 
 Member::~Member()
 {
-	delete My_DB;
-	My_DB = nullptr;
 }
 
-Member::Member(const std::string &name, const std::string &address, const std::string &city, const std::string &state,
-			   const std::string &zip, const bool &status)
-	: name(name), id(""), address(address), city(city), state(state), zip(zip), status(status)
-{
 
-	My_DB = new SQLEngine;
+Member::Member(const std::string & passed_member_name,
+    const std::string & passed_address,
+    const std::string & passed_city,
+    const std::string & passed_zip,
+    const bool & passed_status): member_name(passed_member_name), member_id(""), address(passed_address), city(passed_city), zip(passed_zip), status(passed_status){
+
 }
 
 void
 Member::Display_Member_Info()
 {
-	std::cout << "Member name: " << name << "\nMember ID: " << id << "\nAddress " << address << "\nCity " << city
-			  << "\nState " << state << "\nZip " << zip << "\nStatus " << status;
+	std::cout << "Member name: " << member_name << std::endl
+			  << "Member ID: " << member_id << std::endl
+			  << "Address " << address << std::endl
+			  << "City " << city << std::endl
+			  << "State " << state << std::endl
+			  << "Zip " << zip << std::endl
+			  << "Status " << ((status == 1) ? "True\n" : "False\n");
 }
 
 bool
 Member::add_member()
 {
-	return false;
+	if(!My_DB->is_connected()){
+		return false;
+	}
+
+	std::string hold_name;
+	std::string hold_id;
+	std::string hold_address;
+	std::string hold_city;
+	std::string hold_state;
+	std::string hold_zip;
+	std::string stats;
+
+	get_valid_member_input(member_name, address, city, state, zip, stats);
+
+	return add_member(*this);
 }
 
 bool
 Member::update_member()
 {
-	return false;
+
+	int member_id_test = 0;
+
+	if(!My_DB->is_connected()){
+		return false;
+	}
+
+
+	if (member_id.length() != 9) {
+		return false;
+	}
+
+
+	try {
+		member_id_test = stoi(member_id);
+		std::cout << member_id_test << std::endl;
+	}
+	catch (const std::invalid_argument &e) {
+		std::cout << "Invalid argument: " << e.what() << std::endl;
+		return false;
+	}
+
+	/*
+		if(!utils::is_valid_num(member_id_test)){
+			return false;
+		}
+	*/
+
+	/*
+	return My_DB->update_member(*this);
+	*/
 }
 
 bool
@@ -87,7 +192,7 @@ Member::set_name(const std::string &to_set)
 }
 
 std::string &
-Member::get_ID()
+Member::get_id()
 {
 	return id;
 }
@@ -100,56 +205,50 @@ Member::set_ID(const std::string &to_set)
 }
 
 std::string &
-Member::get_address()
+Member::set_id(const std::string &to_set)
 {
-	return address;
+	member_id = to_set;
+	return member_id;
 }
 
-bool
-Member::set_address(const std::string &to_set)
-{
-	address = to_set;
-	return true;
+
+std::string & Member::get_address(){
+    return address;
 }
 
-std::string &
-Member::get_city()
-{
-	return city;
+std::string & Member::set_member_address(const std::string & to_set){
+    address = to_set;
+    return address;
 }
 
-bool
-Member::set_city(const std::string &to_set)
-{
-	city = to_set;
-	return true;
+std::string & Member::get_city(){
+    return city;
 }
 
-std::string &
-Member::get_state()
-{
-	return state;
+std::string & Member::set_city(const std::string & to_set){
+    city = to_set;
+    return city;
 }
 
-bool
-Member::set_state(const std::string &to_set)
-{
-	state = to_set;
-	return true;
+std::string & Member::get_state(){
+    return state;
 }
 
-std::string &
-Member::get_zip()
-{
-	return zip;
+std::string & Member::set_state(const std::string & to_set){
+    state = to_set;
+    return state;
 }
 
-bool
-Member::set_zip(const std::string &to_set)
-{
-	zip = to_set;
-	return true;
+std::string & Member::get_zip(){
+    return zip;
 }
+
+std::string & Member::set_zip(const std::string & to_set){
+    zip = to_set;
+    return zip;
+}
+
+
 
 bool &
 Member::get_status()
@@ -169,6 +268,7 @@ Member::GET_MEMBER_FROM_DB(const std::string &MEMBER_ID)
 {
 	return false;
 }
+
 
 //
 // MEMBER SqL
@@ -197,7 +297,8 @@ Member::add_member_DB(Member &member)
 		}
 		catch (const pqxx::unexpected_rows &) {
 			// member doesnt exist
-		}
+        }
+
 
 		std::string new_member_id = transaction.query_value<std::string>(
 			pqxx::zview("INSERT INTO MEMBERS (name, address, city, state, zip, status) "
@@ -214,8 +315,12 @@ Member::add_member_DB(Member &member)
 		std::cerr << "Error Inserting Member: " << e.what() << "\n";
 		return false;
 	}
+
+	return true;
 }
 
+
+/*
 // Updates the member_id with the information found in member
 // The member should have mathcing member_id to the one
 // being modified
@@ -336,10 +441,31 @@ Provider::~Provider()
 {
 }
 
-Provider::Provider(const std::string &name, const std::string &address, const std::string &city,
-				   const std::string &state, const std::string &zip)
-	: name(name), id(""), address(address), city(city), state(state), zip(zip)
+
+Provider::Provider(const std::string & passed_name,
+    const std::string & passed_address,
+    const std::string & passed_city,
+    const std::string & passed_zip): name(passed_name), provider_id(""), address(passed_address), city(passed_city), zip(passed_zip){
+
+}
+
+
+bool
+Provider::add_DB()
 {
+	return false;
+}
+
+bool
+Provider::update_DB()
+{
+	return false;
+}
+
+bool
+delete_DB()
+{
+	return false;
 }
 
 std::string &
@@ -368,56 +494,42 @@ Provider::set_ID(const std::string &to_set)
 	return true;
 }
 
-std::string &
-Provider::get_address()
-{
-	return address;
+
+
+std::string & Provider::get_address(){
+    return address;
 }
 
-bool
-Provider::set_address(const std::string &to_set)
-{
-	address = to_set;
-	return true;
+std::string & Provider::set_address(const std::string & to_set){
+    address = to_set;
+    return address;
 }
 
-std::string &
-Provider::get_city()
-{
-	return city;
+std::string & Provider::get_city(){
+    return city;
 }
 
-bool
-Provider::set_city(const std::string &to_set)
-{
-	city = to_set;
-	return true;
+std::string & Provider::set_city(const std::string & to_set){
+    city = to_set;
+    return city;
 }
 
-std::string &
-Provider::get_state()
-{
-	return state;
+std::string & Provider::get_state(){
+    return state;
 }
 
-bool
-Provider::set_state(const std::string &to_set)
-{
-	state = to_set;
-	return true;
+std::string & Provider::set_state(const std::string & to_set){
+    state = to_set;
+    return state;
 }
 
-std::string &
-Provider::get_zip()
-{
-	return zip;
+std::string & Provider::get_zip(){
+    return zip;
 }
 
-bool
-Provider::set_zip(const std::string &to_set)
-{
-	zip = to_set;
-	return true;
+std::string & Provider::set_zip(const std::string & to_set){
+    zip = to_set;
+    return zip;
 }
 
 bool
