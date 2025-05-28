@@ -49,6 +49,9 @@ Member::display_Member_Menu()
 		if (check == 1) {
 			add_member();
 		}
+		else if(check == 2){
+			update_member();
+		}
 	}
 }
 
@@ -69,14 +72,16 @@ Member::Member(const std::string &passed_member_name, const std::string &passed_
 
 void
 Member::Display_Member_Info()
-{
-	std::cout << "Member name: " << name << std::endl
-			  << "Member ID: " << id << std::endl
-			  << "Address " << address << std::endl
-			  << "City " << city << std::endl
-			  << "State " << state << std::endl
-			  << "Zip " << zip << std::endl
-			  << "Status " << ((status == 1) ? "True\n" : "False\n");
+{	
+	std::cout << "----------------------------------------------------" << std::endl;
+	std::cout << "	Member name: " << name << std::endl
+			  << "	Member ID: " << id << std::endl
+			  << "	Address " << address << std::endl
+			  << "	City " << city << std::endl
+			  << "	State " << state << std::endl
+			  << "	Zip " << zip << std::endl
+			  << "	Status " << ((status == 1) ? "True\n" : "False\n");
+	std::cout << "----------------------------------------------------" << std::endl;
 }
 
 bool
@@ -106,37 +111,38 @@ bool
 Member::update_member()
 {
 
-	int member_id_test = 0;
+	std::string input_id;
 
 	if (!My_DB->is_connected()) {
-		return false;
-	}
-
-
-	if (id.length() != 9) {
+		std::cout << "DB not connected" << std::endl;
 		return false;
 	}
 
 
 	try {
-		member_id_test = stoi(id);
-		std::cout << member_id_test << std::endl;
+
+		std::regex nine_digits("^\\d{9}$");
+		while(!(std::regex_match(input_id, nine_digits))){
+			std::cout << "Enter a 9 digit member ID: ";
+			std::cin >> input_id;
+			std::cin.ignore(100, '\n');
+		}
+
+		id = input_id;
+		std::cout << id << std::endl;
+
+		//bool GET_MEMBER_FROM_DB(const std::string &MEMBER_ID);
+
 	}
 	catch (const std::invalid_argument &e) {
 		std::cout << "Invalid argument: " << e.what() << std::endl;
 		return false;
 	}
 
-	/*
-		if(!utils::is_valid_num(member_id_test)){
-			return false;
-		}
-	*/
 
-	/*
-	return My_DB->update_member(*this);
-	*/
-return true;
+
+
+	return update_member_DB(*this);
 }
 
 
@@ -265,11 +271,6 @@ Member::set_status()
 	return status;
 }
 
-bool
-Member::GET_MEMBER_FROM_DB(const std::string &MEMBER_ID)
-{
-	return false;
-}
 
 //
 // MEMBER SqL
@@ -333,11 +334,35 @@ Member::update_member_DB(Member &member)
 		// Start a transaction
 		pqxx::work transaction(My_DB->get_connection());
 
+		if(!(GET_MEMBER_FROM_DB(&transaction))){
+			std::cout << "Unable to retrieve ID: " << get_ID() << " from DB\n" << std::endl;
+			return false;
+		}
+
+		std::cout << "Successfully retrieved member ID from the DB." << std::endl;
+
+		Display_Member_Info();
+
+		std::string hold_name;
+		std::string hold_id;
+		std::string hold_address;
+		std::string hold_city;
+		std::string hold_state;
+		std::string hold_zip;
+		std::string stats;
+
+		std::cout << "Enter new the updated values for the following\n" << std::endl;
+
+		get_valid_member_input(name, address, city, state, zip, stats);
+
+
+
+
 		// Attempt to Update
-		pqxx::result res = transaction.exec_params(
-			R"(UPDATE chocan.members
+		pqxx::result res = transaction.exec(
+			pqxx::zview(R"(UPDATE chocan.members
 						   SET name = $1, address = $2, city = $3, zip= $4, state_abbrev = $5, active_status = $6
-						   WHERE member_id = $7 LIMIT 1)",
+						   WHERE member_id = $7)"),
 
 			// variables being passed to $#
 			pqxx::params{get_name(), get_address(), get_city(), get_zip(), get_state(), get_status(), get_ID()});
@@ -346,6 +371,10 @@ Member::update_member_DB(Member &member)
 			std::cerr << "No member found with ID: " << get_ID() << "\n";
 			return false;
 		}
+
+
+
+
 
 		// Finalize Transaction
 		transaction.commit();
@@ -356,6 +385,42 @@ Member::update_member_DB(Member &member)
 		return false;
 	}
 }
+
+
+
+bool Member::GET_MEMBER_FROM_DB(pqxx::work * transaction){
+	if(!My_DB || !My_DB->is_connected()){
+		std::cout << "DB connection failed\n" << std::endl;
+		return false;
+	}
+	try{
+		pqxx::result res = transaction->exec(pqxx::zview(R"(SELECT name, address, city, zip, state_abbrev, active_status
+			 FROM chocan.members 
+			 WHERE member_id = $1)"), pqxx::params{get_ID()});
+
+		if(res.empty()){
+			std::cout << "No member found with ID: " << get_ID() << std::endl;
+			return false;
+		}
+
+		name = res[0][0].c_str();
+		address = res[0][1].c_str();
+		city = res[0][2].c_str();
+		zip = res[0][3].c_str();
+		state = res[0][4].c_str();
+		status = res[0][5].as<bool>();
+
+	
+		return true;
+	}
+	catch (const std::exception &e){
+		std::cout << "Error retrieving member: " << e.what() << std::endl;
+		return false;
+	}
+}
+
+
+
 
 // Delete member given id, value is expected to be properly pre-processed
 // Member IDs are in the range of 100000000 -> 199999999

@@ -51,7 +51,7 @@ class Member {
 	bool get_status() const;
 	bool set_status();
 
-	bool GET_MEMBER_FROM_DB(const std::string &MEMBER_ID);
+	bool GET_MEMBER_FROM_DB(pqxx::work * transaction);
 
 
   private:
