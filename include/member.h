@@ -16,6 +16,7 @@ class Member {
   public:
 
 	Member();
+	~Member();
 
 	Member(const std::string &passed_member_name, const std::string &passed_address, const std::string &passed_city,
 		   const std::string &passed_zip, const bool &status);

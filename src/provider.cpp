@@ -3,9 +3,10 @@
 #include "utils.cpp"
 #include <regex>
 
-SQLEngine *My_DB = new SQLEngine();
 //--------------------------------------------------------------------------
 /* provider functions start */
+
+
 
 Provider::Provider() : name(""), id(""), address(""), city(""), state(""), zip("")
 {

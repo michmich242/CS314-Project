@@ -56,8 +56,8 @@ Member::Member() : name(""), id(""), address(), status(false)
 {
 }
 
-Member::~Member()
-{
+Member::~Member(){
+
 }
 
 Member::Member(const std::string &passed_member_name, const std::string &passed_address, const std::string &passed_city,
@@ -82,7 +82,7 @@ Member::Display_Member_Info()
 bool
 Member::add_member()
 {
-	if (!My_DB->is_My_DBected()) {
+	if (!My_DB->is_connected()) {
 		return false;
 	}
 
@@ -99,13 +99,16 @@ Member::add_member()
 	return add_member_DB(*this);
 }
 
+
+
+
 bool
 Member::update_member()
 {
 
 	int member_id_test = 0;
 
-	if (!My_DB->is_My_DBected()) {
+	if (!My_DB->is_connected()) {
 		return false;
 	}
 
@@ -133,19 +136,22 @@ Member::update_member()
 	/*
 	return My_DB->update_member(*this);
 	*/
+return true;
 }
 
+
+/*
 bool
 Member::delete_member()
 {
 
 	int member_id_test = 0;
 
-	/*
+	
 	if (!My_DB->validate_member(member_id)) {
 		return false;
 	}
-	*/
+	
 
 	if (id.length() != 9) {
 		return false;
@@ -165,6 +171,8 @@ Member::delete_member()
 
 	return false;
 }
+*/
+
 
 std::string &
 Member::get_name()
@@ -272,14 +280,14 @@ bool
 Member::add_member_DB(Member &member)
 {
 	// Confirm Connection
-	if (!My_DB || !My_DB->is_My_DBected()) {
+	if (!My_DB || !My_DB->is_connected()) {
 		std::cerr << "db My_DBection not open\n";
 		return false;
 	}
 
 	try {
 		// Start a transaction, typical read/write My_DBection
-		pqxx::work transaction(My_DB->get_My_DBection());
+		pqxx::work transaction(My_DB->get_connection());
 
 		try {
 			auto exists = transaction.query_value<int>(pqxx::zview("SELECT 1 FROM chocan.members WHERE member_id = $1"),
@@ -316,14 +324,14 @@ bool
 Member::update_member_DB(Member &member)
 {
 	// Double check if My_DBection is open
-	if (!My_DB || !My_DB->is_My_DBected()) {
+	if (!My_DB || !My_DB->is_connected()) {
 		std::cerr << "db My_DBection not open\n";
 		return false;
 	}
 
 	try {
 		// Start a transaction
-		pqxx::work transaction(My_DB->get_My_DBection());
+		pqxx::work transaction(My_DB->get_connection());
 
 		// Attempt to Update
 		pqxx::result res = transaction.exec_params(
@@ -355,14 +363,14 @@ bool
 Member::delete_member_DB(const std::string &id)
 {
 	// Check Connection
-	if (!My_DB || !My_DB->is_My_DBected()) {
+	if (!My_DB || !My_DB->is_connected()) {
 		std::cerr << "db My_DBection not open\n";
 		return false;
 	}
 
 	try {
 		// Start a transaction
-		pqxx::work transaction(My_DB->get_My_DBection());
+		pqxx::work transaction(My_DB->get_connection());
 
 		// Run Query
 		auto res = transaction.exec_params("DELETE FROM chocan.members WHERE member_id = $1", id);
@@ -388,14 +396,14 @@ bool
 Member::validate_member_DB(const std::string &id)
 {
 	// Check Connection
-	if (!My_DB || !My_DB->is_My_DBected()) {
+	if (!My_DB || !My_DB->is_connected()) {
 		std::cerr << "db My_DBection not open\n";
 		return false;
 	}
 
 	try {
 		// Start a transaction
-		pqxx::work transaction(My_DB->get_My_DBection());
+		pqxx::work transaction(My_DB->get_connection());
 
 		try {
 			bool status = transaction.query_value<bool>(
