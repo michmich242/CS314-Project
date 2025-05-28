@@ -38,6 +38,7 @@ TEST_OBJ = $(patsubst $(TEST_DIR)/%.cpp,$(BIN)/%.o,$(TEST_SRC))
 
 MAIN = main
 PROV = provider
+PROV_USER = provider_user
 MAN = manager
 MEMBER = member
 SQL = sqlengine
@@ -63,10 +64,13 @@ $(BIN)/$(MAN).o: $(SRC_DIR)/$(MAN).cpp $(INCLUDE_DIR)/$(MAN).h $(INCLUDE_DIR)/$(
 $(BIN)/$(PROV).o: $(SRC_DIR)/$(PROV).cpp $(INCLUDE_DIR)/$(PROV).h $(INCLUDE_DIR)/$(SQL).h
 	$(COMP) $(CFLAGS) -c $< -o $@
 
+$(BIN)/$(PROV_USER).o: $(SRC_DIR)/$(PROV_USER).cpp $(INCLUDE_DIR)/$(PROV_USER).h
+	$(COMP) $(CFLAGS) -c $< -o $@
+
 $(BIN)/$(UTILS).o: $(SRC_DIR)/$(UTILS).cpp $(INCLUDE_DIR)/$(UTILS).h
 	$(COMP) $(CFLAGS) -c $< -o $@
 
-$(TEST_BIN): $(TEST_OBJ) $(BIN)/$(MAN).o $(BIN)/$(PROV).o $(BIN)/$(SQL).o $(BIN)/$(UTILS).o
+$(TEST_BIN): $(TEST_OBJ) $(BIN)/$(MAN).o $(BIN)/$(PROV).o $(BIN)/$(SQL).o $(BIN)/$(UTILS).o $(BIN)/$(MEMBER).o $(BIN)/$(PROV_USER).o
 	$(COMP) $(CFLAGS) -o $@ $^ $(LDFLAGS)
 
 $(BIN)/%.o: $(TEST_DIR)/%.cpp
@@ -78,3 +82,6 @@ clean cls:
 git:
 	git add *.cpp *.h Makefile .gitignore
 	git commit
+
+test: $(TEST_BIN)
+	./$(TEST_BIN)

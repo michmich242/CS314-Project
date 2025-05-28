@@ -7,5 +7,6 @@
 #pragma once
 #include "member.h"
 #include "provider.h"
+#include "provider_user.h"
 #include "service.h"
 #include "service_record.h"

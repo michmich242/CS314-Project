@@ -39,6 +39,15 @@ namespace utils {
 
 namespace utils {
     inline bool is_valid_num(const std::string &num) {
+
+        //check for non-numeric characters
+        for (char c : num) {
+            if (!std::isdigit(static_cast<unsigned char>(c))) {
+                return false;  
+            }
+        }
+
+        //check for correct length
         if (num.length() != 9) {
             return false;
         }
