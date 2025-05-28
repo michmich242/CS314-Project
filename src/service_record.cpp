@@ -3,7 +3,6 @@
 #include "utils.cpp"
 #include <regex>
 
-SQLEngine *My_DB = new SQLEngine();
 //----------------------------------------------------------------------
 
 /*ServiceRecord functions start*/
@@ -92,14 +91,14 @@ bool
 ServiceRecord::save_record_DB(ServiceRecord &record)
 {
 	// Ensure My_DBection
-	if (!My_DB || !My_DB->is_My_DBected()) {
+	if (!My_DB || !My_DB->is_connected()) {
 		std::cerr << "db My_DBection not open\n";
 		return false;
 	}
 
 	try {
 		// Start a transaction
-		pqxx::work transaction(My_DB->get_My_DBection());
+		pqxx::work transaction(My_DB->get_connection());
 
 		// Attempt Query
 		std::string new_service_code = transaction.query_value<std::string>(

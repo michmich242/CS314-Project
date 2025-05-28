@@ -1,15 +1,14 @@
-#include "../include/provider.h"
+#include "../include/provider_user.h"
 #include "../include/utils.h"
 
 
-Provider_User::Provider_User()
-    : provider_id(""),
+Provider_User::Provider_User(): 
+      provider_id(""),
       service_code(""),
       service_fee(""),
       db(nullptr),
       provider()
 {
-    db = new SQLEngine;
     std::cout << "Provider_User initialized..." << std::endl;
 }
 
