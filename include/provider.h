@@ -1,26 +1,63 @@
+// provider.h
+//
+// This file contains the class for:
+//
+//      - Provider
+//
 #pragma once
-#include "manager.h"
 #include "sqlengine.h"
+#include <cstring>
+#include <iostream>
 
-class Provider_User {
+class Provider {
   public:
 
-	Provider_User();
-	~Provider_User();
+	Provider();
 
-	bool login(std::string&);
-	bool member_validation(std::string&);
-	bool member_service_billing();
-	void display_service_directory();
-	bool update_service_records(std::string date_of_service, std::string member_number, std::string service_code, std::string comment);
+	Provider(const std::string &passed_name, const std::string &passed_address, const std::string &passed_city,
+			 const std::string &passed_zip);
 
-	//bool add_db();
+	bool add_provider();
+	bool update_provider();
+	bool delete_provider();
+	void Display_Provider_Info();
+
+	std::string &get_name();
+	std::string &set_name(const std::string &to_set);
+
+	std::string &get_ID();
+	std::string &set_ID(const std::string &to_set);
+
+
+	std::string &get_address();
+	std::string &set_address(const std::string &to_set);
+
+	std::string &get_city();
+	std::string &set_city(const std::string &to_set);
+
+	std::string &get_state();
+	std::string &set_state(const std::string &to_set);
+
+	std::string &get_zip();
+	std::string &set_zip(const std::string &to_set);
+
+
+	bool GET_PROVIDER_FROM_DB(const std::string &PROVIDER_ID);
+
 
   private:
 
-	std::string provider_id;
-	std::string service_code;
-	std::string service_fee;
-	SQLEngine *db;
-	Provider provider;
+	std::string name;
+	std::string id;
+
+	std::string address;
+	std::string city;
+	std::string state;
+	std::string zip;
+
+
+	// SQL Interactions
+	bool add_provider_DB(Provider &provider);
+	bool update_provider_DB(Provider &provider);
+	bool delete_provider_DB(const std::string &id);
 };
