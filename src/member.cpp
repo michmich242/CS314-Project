@@ -420,7 +420,7 @@ Member::delete_member_DB(const std::string &id)
 		pqxx::work transaction(My_DB->get_connection());
 
 		// Run Query
-		auto res = transaction.exec_params("DELETE FROM chocan.members WHERE member_id = $1", id);
+		auto res = transaction.exec(pqxx::zview("DELETE FROM chocan.members WHERE member_id = $1"), pqxx::params{id});
 
 		// Ensure a row was deleted
 		if (res.affected_rows() == 0) {
