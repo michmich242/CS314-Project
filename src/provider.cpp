@@ -12,8 +12,7 @@ Provider::Provider() : name(""), id(""), address(""), city(""), state(""), zip("
 {
 }
 
-Provider::Provider(const std::string &passed_name, const std::string &passed_address, const std::string &passed_city,
-				   const std::string &passed_zip)
+Provider::Provider(const std::string &passed_name, const std::string &passed_address, const std::string &passed_city, const std::string &passed_zip)
 	: name(passed_name), id(""), address(passed_address), city(passed_city), zip(passed_zip)
 {
 }
@@ -140,8 +139,7 @@ Provider::add_provider_DB(Provider &provider)
 		pqxx::work transaction(My_DB->get_connection());
 
 		try {
-			auto exists = transaction.query_value<int>(
-				pqxx::zview("SELECT 1 FROM chocan.providers WHERE provider_id = $1"), pqxx::params{provider.get_ID()});
+			auto exists = transaction.query_value<int>(pqxx::zview("SELECT 1 FROM chocan.providers WHERE provider_id = $1"), pqxx::params{provider.get_ID()});
 
 			std::cerr << "Provider with ID: " << provider.get_ID() << "already exists\n";
 			return false;
@@ -150,10 +148,9 @@ Provider::add_provider_DB(Provider &provider)
 			// provider doesnt exist
 		}
 		// Run Query
-		std::string new_provider_id = transaction.query_value<std::string>(
-			pqxx::zview("INSERT INTO chocan.providers (name, address, city, state_abbrev, zip, active_status))"
-						"VALUES ($1, $2, $3, $4, $5, $6)"),
-			pqxx::params{get_name(), get_address(), get_city(), get_state(), get_zip(), true});
+		std::string new_provider_id = transaction.query_value<std::string>(pqxx::zview("INSERT INTO chocan.providers (name, address, city, state_abbrev, zip, active_status))"
+																					   "VALUES ($1, $2, $3, $4, $5, $6)"),
+																		   pqxx::params{get_name(), get_address(), get_city(), get_state(), get_zip(), true});
 
 		provider.set_ID(new_provider_id);
 
@@ -181,13 +178,12 @@ Provider::update_provider_DB(Provider &provider)
 	try {
 		// Start a transaction
 		pqxx::work transaction(My_DB->get_connection());
-		pqxx::result res = transaction.exec_params(
-			R"(UPDATE chocan.providers 
-			SET name = $1, address = $2, city = $3, zip = $4, state_abbrev = $5 
-			WHERE provider_id = $6)",
+		pqxx::result res = transaction.exec(pqxx::zview(R"(UPDATE chocan.providers 
+			                SET name = $1, address = $2, city = $3, zip = $4, state_abbrev = $5 
+                			WHERE provider_id = $6)"),
 
-			// variables being passed to $#
-			pqxx::params{get_name(), get_address(), get_city(), get_zip(), get_state(), get_ID()});
+											// variables being passed to $#
+											pqxx::params{get_name(), get_address(), get_city(), get_zip(), get_state(), get_ID()});
 
 		// Check if query modified a row
 		if (res.affected_rows() == 0) {
@@ -222,7 +218,7 @@ Provider::delete_provider_DB(const std::string &id)
 		pqxx::result res;
 
 		// Run Query
-		res = transaction.exec_params("DELETE FROM chocan.providers WHERE provider_id = $1", id);
+		res = transaction.exec(pqxx::zview("DELETE FROM chocan.providers WHERE provider_id = $1"), pqxx::params{id});
 
 		// Ensure a row was deleted
 		if (res.affected_rows() == 0) {
