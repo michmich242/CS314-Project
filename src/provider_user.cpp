@@ -7,13 +7,11 @@ Provider_User::start_provider()
 	return true;
 }
 
-Provider_User::Provider_User()
+Provider_User::Provider_User(SQLEngine &db_ref) : db(db_ref)
 {
 	// Hard-Coded Demo Provider
 	user = Provider("demo", "123 demo st.", "Demoville", "Dm", "99999");
 	user.set_ID("200000000");
-
-	db = SQLEngine();
 
 	std::cout << "Provider_User initialized..." << std::endl;
 }

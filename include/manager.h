@@ -15,7 +15,7 @@
 class Manager {
   private:
 
-	SQLEngine db;
+	SQLEngine &db;
 
 	// Member input functions
 	// Consider moving to util
@@ -23,6 +23,10 @@ class Manager {
 
 
   public:
+
+	Manager(SQLEngine &db_ref) : db(db_ref)
+	{
+	}
 
 	bool start_manager();
 

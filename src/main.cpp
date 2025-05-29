@@ -13,11 +13,13 @@ int main(int argc, char *argv[])
 
 
 	if (argv[1][0] == '0') {
-        Provider_User user;
+        SQLEngine db;
+        Provider_User user(db);
 		user.start_provider();
 	}
 	else if (argv[1][0] == '1') {
-        Manager user;
+        SQLEngine db;
+        Manager user(db);
 		user.start_manager();
 	}
 	else {
