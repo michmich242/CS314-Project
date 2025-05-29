@@ -7,13 +7,18 @@
 
 /*ServiceRecord functions start*/
 
-ServiceRecord::ServiceRecord() : timestamp(""), date_of_service(""), provider_id(""), member_id(""), comment("")
+ServiceRecord::ServiceRecord() : id(""), timestamp(""), date_of_service(""), provider_id(""), member_id(""), comment("")
 {
 	std::cout << "initializing ServiceRecord object..." << std::endl;
 }
 
-ServiceRecord::~ServiceRecord()
+//
+// Accessors ---------------------------------------------------------------------------
+//
+std::string &
+ServiceRecord::get_ID()
 {
+	return id;
 }
 
 std::string &
@@ -44,6 +49,16 @@ std::string &
 ServiceRecord::get_comment()
 {
 	return comment;
+}
+
+//
+// Mutators ---------------------------------------------------------------------------
+//
+std::string &
+ServiceRecord::set_ID(const std::string &id)
+{
+	this->id = id;
+	return this->id;
 }
 
 std::string &
@@ -79,42 +94,4 @@ ServiceRecord::set_comment(const std::string &comment)
 {
 	this->comment = comment;
 	return this->comment;
-}
-
-// --------------------------------------------------------------------------------
-// Service Record SQL
-// Adds a service record to the dbms
-// @PARAMS: const ServiceRecord &record - Service Record populated with new db
-// info
-// **SERVICE CODE AND TIMESTAMP OVERWRITTEN**
-bool
-ServiceRecord::save_record_DB(ServiceRecord &record)
-{
-	// Ensure My_DBection
-	if (!My_DB || !My_DB->is_connected()) {
-		std::cerr << "db My_DBection not open\n";
-		return false;
-	}
-
-	try {
-		// Start a transaction
-		pqxx::work transaction(My_DB->get_connection());
-
-		// Attempt Query
-		std::string new_service_code = transaction.query_value<std::string>(
-			pqxx::zview(R"(INSERT INTO ServiceRecords
-						  (date_of_service, provider_id, member_id, service_code, comments)
-            			  VALUES($1, $2, $3, $4, $5) RETURNING service_code)"),
-			pqxx::params{get_date(), get_provider(), get_member(), get_service_code(), get_comment()});
-
-		set_service_code(new_service_code);
-
-		// Finalize transaction
-		transaction.commit();
-		return true;
-	}
-	catch (const std::exception &e) {
-		std::cerr << "Error inserting member: " << e.what() << "\n";
-		return false;
-	}
 }

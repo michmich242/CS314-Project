@@ -10,6 +10,11 @@
 #include <pqxx/pqxx>
 #include <sstream>
 
+#include "member.h"
+#include "provider.h"
+#include "service.h"
+#include "service_record.h"
+
 /*
 • Member name (25 characters).
 • Member number (9 digits).
@@ -83,10 +88,34 @@ class SQLEngine {
 	bool is_connected() const;
 	pqxx::connection &get_connection();
 
+	// Manager Terminal
 	// Weekly Reporting
 	std::vector<MemberReport> generate_member_service_reports();
 	std::vector<ProviderReport> generate_provider_service_reports();
 	ManagerSummary generate_manager_summary_reports();
+
+
+	// Member Class Functions
+	bool add_member(Member &member);
+	bool update_member(Member &member);
+	bool delete_member(const std::string &id);
+	bool get_member(Member &member);
+	bool validate_member(const std::string &id);
+
+	// Provider Class Functions
+	// SQL Interactions
+	bool add_provider(Provider &provider);
+	bool update_provider(Provider &provider);
+	bool delete_provider(const std::string &id);
+	bool get_provider(std::string &id);
+
+	// Service Directory Functions
+	Service get_service(const std::string &code);
+	bool get_all_services(std::vector<Service> &services);
+
+
+	// Provider Terminal Save Service Record
+	bool save_service_record(ServiceRecord &record);
 
   private:
 

@@ -6,7 +6,6 @@
 //      - Services
 //
 #pragma once
-#include "sqlengine.h"
 #include <cstring>
 #include <iostream>
 
@@ -16,24 +15,18 @@ class Service {
 	Service();
 	Service(const std::string &code, float fee, const std::string &description);
 
-	bool add_service();
-	bool delete_service(const std::string &service_code);
-	bool update_service(const std::string &service_code);
+	const std::string &get_code();
+	std::string &set_code(std::string &code);
+	const float &get_fee();
+	float &set_fee(float &fee);
+	const std::string &get_description();
+	std::string &set_description(std::string &description);
 
-	bool get_service(Service &empty_service);
+	bool get_service();
 
   private:
 
 	std::string code;
 	float fee;
 	std::string description;
-
-	// SQL Service list retrieval
-
-	Service get_service_DB(const std::string &service_code);
-	bool add_service_DB(Service &service);
-	bool remove_service_DB(Service &service);
-	bool update_service_DB(Service &service);
-
-	bool get_all_services(std::vector<Service> &services);
 };
