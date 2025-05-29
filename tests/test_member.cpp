@@ -1,5 +1,5 @@
 //member tests
-#include "manager.h"
+#include "../include/member.h"
 #include <gtest/gtest.h>
 
 //default constructor

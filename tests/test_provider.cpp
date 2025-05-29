@@ -1,3 +1,3 @@
 // File to test provider
-#include "manager.h"
+#include "../include/provider.h"
 #include <gtest/gtest.h>
