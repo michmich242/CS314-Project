@@ -90,8 +90,8 @@ class SQLEngine {
 
 	// Manager Terminal
 	// Weekly Reporting
-	std::vector<MemberReport> generate_member_service_reports();
-	std::vector<ProviderReport> generate_provider_service_reports();
+	bool generate_member_service_reports(std::vector<MemberReport> &);
+	bool generate_provider_service_reports(std::vector<ProviderReport> &);
 	ManagerSummary generate_manager_summary_reports();
 
 
@@ -122,5 +122,3 @@ class SQLEngine {
 	bool conn_db(const std::string &db_path = ".dbinfo");
 	std::unique_ptr<pqxx::connection> conn;
 };
-
-extern SQLEngine *My_DB;

@@ -81,28 +81,25 @@ SQLEngine::is_connected() const
 {
 	return conn && conn->is_open();
 }
+
 //
 // End of Engine Tools
 //
 
 
-/* commenting out weekly reporting stuff
-since it appears to be under construction */
-
 /*
-
 // Weekly Reporting
-std::vector<MemberReport>
-SQLEngine::generate_member_service_reports()
+bool
+SQLEngine::generate_member_service_reports(std::vector<MemberReport> &vector)
 {
-	if (!conn || !conn->is_open()) {
+	if (is_connected()) {
 		std::cerr << "db connection not open\n";
 		return false;
 	}
 
 	try {
 		// Start a transaction
-		pqxx::work transaction(*conn);
+		pqxx::work transaction(get_connection());
 
 		transaction.exec_params();
 
@@ -160,9 +157,9 @@ SQLEngine::generate_manager_summary_reports()
 		return false;
 	}
 }
+
 */
 // MANAGER TERMINAL CRUD
-
 
 
 
@@ -191,9 +188,10 @@ SQLEngine::add_member(Member &member)
 		}
 		catch (const pqxx::unexpected_rows &) {
 			// member doesnt exist
-			std::string new_member_id = transaction.query_value<std::string>(pqxx::zview("INSERT INTO chocan.MEMBERS (name, address, city, state_abbrev, zip, active_status) "
-																						 "VALUES ($1, $2, $3, $4, $5, $6) RETURNING member_id"),
-																			 pqxx::params{member.get_name(), member.get_address(), member.get_city(), member.get_state(), member.get_zip(), true});
+			std::string new_member_id =
+				transaction.query_value<std::string>(pqxx::zview("INSERT INTO chocan.MEMBERS (name, address, city, state_abbrev, zip, active_status) "
+																 "VALUES ($1, $2, $3, $4, $5, $6) RETURNING member_id"),
+													 pqxx::params{member.get_name(), member.get_address(), member.get_city(), member.get_state(), member.get_zip(), true});
 
 			member.set_ID(new_member_id);
 
@@ -226,14 +224,13 @@ SQLEngine::update_member(Member &member)
 		pqxx::work transaction(get_connection());
 
 		// Attempt to Update
-		pqxx::result res = transaction.exec(
-            pqxx::zview(R"(UPDATE chocan.members
+		pqxx::result res =
+			transaction.exec(pqxx::zview(R"(UPDATE chocan.members
 						   SET name = $1, address = $2, city = $3, zip= $4, state_abbrev = $5, active_status = $6
 						   WHERE member_id = $7)"),
 
-											// variables being passed to $#
-		    pqxx::params{member.get_name(), member.get_address(), member.get_city()
-                         , member.get_zip(), member.get_state(), member.get_status(), member.get_ID()});
+							 // variables being passed to $#
+							 pqxx::params{member.get_name(), member.get_address(), member.get_city(), member.get_zip(), member.get_state(), member.get_status(), member.get_ID()});
 
 		// Check if query modified a row
 		if (res.affected_rows() == 0) {
@@ -259,17 +256,17 @@ SQLEngine::get_member(Member &member)
 		return false;
 	}
 	try {
-        pqxx::work transaction(*conn);
+		pqxx::work transaction(*conn);
 		pqxx::result res = transaction.exec(pqxx::zview(R"(SELECT name, address, city, zip, state_abbrev, active_status
 			 FROM chocan.members 
 			 WHERE member_id = $1)"),
-											 pqxx::params{ member.get_ID() });
+											pqxx::params{member.get_ID()});
 
 		if (res.empty()) {
 			std::cout << "No member found with ID: " << member.get_ID() << "\n";
 			return false;
 		}
-        Member member;
+		Member member;
 		member.set_name(res[0][0].c_str());
 		member.set_address(res[0][1].c_str());
 		member.set_city(res[0][2].c_str());
@@ -349,6 +346,7 @@ SQLEngine::validate_member(const std::string &id)
 		return false;
 	}
 }
+
 //
 // End of member CRUD
 //
@@ -383,9 +381,10 @@ SQLEngine::add_provider(Provider &provider)
 			// provider doesnt exist
 		}
 		// Run Query
-		std::string new_provider_id = transaction.query_value<std::string>(pqxx::zview("INSERT INTO chocan.providers (name, address, city, state_abbrev, zip))"
-																					   "VALUES ($1, $2, $3, $4, $5)"),
-																		   pqxx::params{provider.get_name(), provider.get_address(), provider.get_city(), provider.get_state(), provider.get_zip()});
+		std::string new_provider_id =
+			transaction.query_value<std::string>(pqxx::zview("INSERT INTO chocan.providers (name, address, city, state_abbrev, zip))"
+															 "VALUES ($1, $2, $3, $4, $5)"),
+												 pqxx::params{provider.get_name(), provider.get_address(), provider.get_city(), provider.get_state(), provider.get_zip()});
 
 		provider.set_ID(new_provider_id);
 
@@ -413,12 +412,13 @@ SQLEngine::update_provider(Provider &provider)
 	try {
 		// Start a transaction
 		pqxx::work transaction(get_connection());
-		pqxx::result res = transaction.exec(pqxx::zview(R"(UPDATE chocan.providers 
+		pqxx::result res =
+			transaction.exec(pqxx::zview(R"(UPDATE chocan.providers 
 			                SET name = $1, address = $2, city = $3, zip = $4, state_abbrev = $5 
                 			WHERE provider_id = $6)"),
 
-											// variables being passed to $#
-											pqxx::params{provider.get_name(), provider.get_address(), provider.get_city(), provider.get_zip(), provider.get_state(), provider.get_ID()});
+							 // variables being passed to $#
+							 pqxx::params{provider.get_name(), provider.get_address(), provider.get_city(), provider.get_zip(), provider.get_state(), provider.get_ID()});
 
 		// Check if query modified a row
 		if (res.affected_rows() == 0) {
@@ -470,14 +470,13 @@ SQLEngine::delete_provider(const std::string &id)
 	}
 }
 
-
-
 bool
 SQLEngine::get_provider(std::string &id)
 {
 	return false;
 }
-// 
+
+//
 // End of Provider CRUD
 //
 
@@ -500,8 +499,7 @@ SQLEngine::get_service(const std::string &code)
 		pqxx::work transaction(get_connection());
 
 		// Run Query
-		auto [i_description, fee] = transaction.query1<std::string, float>(
-			pqxx::zview("SELECT description, fee FROM Services WHERE service_code = $1"), pqxx::params{code});
+		auto [i_description, fee] = transaction.query1<std::string, float>(pqxx::zview("SELECT description, fee FROM Services WHERE service_code = $1"), pqxx::params{code});
 
 		return Service(code, fee, i_description);
 	}
@@ -528,8 +526,7 @@ SQLEngine::get_all_services(std::vector<Service> &services)
 		services.clear();
 
 		// Run Query
-		for (auto [code, description, fee] : transaction.query<std::string, std::string, float>(
-				 "SELECT service_code, description, fee FROM Services ORDER BY service_code")) {
+		for (auto [code, description, fee] : transaction.query<std::string, std::string, float>("SELECT service_code, description, fee FROM Services ORDER BY service_code")) {
 			services.emplace_back(code, fee, description);
 		}
 
@@ -545,6 +542,7 @@ SQLEngine::get_all_services(std::vector<Service> &services)
 		return false;
 	}
 }
+
 //
 // End of Service Directory Functions
 //
@@ -570,12 +568,11 @@ SQLEngine::save_service_record(ServiceRecord &record)
 		pqxx::work transaction(get_connection());
 
 		// Attempt Query
-		std::string new_id = transaction.query_value<std::string>(
-			pqxx::zview(R"(INSERT INTO ServiceRecords
+		std::string new_id =
+			transaction.query_value<std::string>(pqxx::zview(R"(INSERT INTO ServiceRecords
 						  (date_of_service, provider_id, member_id, service_code, comments)
             			  VALUES($1, $2, $3, $4, $5) RETURNING service_code)"),
-			pqxx::params{record.get_date(), record.get_provider(), record.get_member(), record.get_service_code(),
-						 record.get_comment()});
+												 pqxx::params{record.get_date(), record.get_provider(), record.get_member(), record.get_service_code(), record.get_comment()});
 
 		record.set_service_code(new_id);
 
