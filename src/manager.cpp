@@ -36,10 +36,10 @@ Manager::display_Member_Menu()
 {
 	int check{0};
 	while (check != 4) {
-		std::cout << "1. Add Member" << std::endl;
-		std::cout << "2. Update Member" << std::endl;
-		std::cout << "3. Remove Member" << std::endl;
-		std::cout << "4. Quit to Main Manager Menu" << std::endl;
+		std::cout << "1. Add Member\n";
+		std::cout << "2. Update Member\n";
+		std::cout << "3. Remove Member\n";
+		std::cout << "4. Quit to Main Manager Menu\n";
 		std::cout << "Enter your option (1 - 4): ";
 
 		std::cin >> check;
@@ -85,7 +85,7 @@ Manager::update_member()
 			std::cin.ignore(100, '\n');
 		}
 		member.set_ID(input_id);
-		std::cout << member.get_ID() << std::endl;
+		std::cout << member.get_ID() << "\n";
 
 		if (!db.get_member(member)) {
 			std::cerr << "No member with given ID";
@@ -93,13 +93,13 @@ Manager::update_member()
 		}
 	}
 	catch (const std::invalid_argument &e) {
-		std::cout << "Invalid argument: " << e.what() << std::endl;
+		std::cout << "Invalid argument: " << e.what() << "\n";
 		return false;
 	}
 
 	member.Display_Member_Info();
 
-	std::cout << "Enter new the updated values for the following\n" << std::endl;
+	std::cout << "Enter new the updated values for the following\n\n";
 
 	get_valid_member_input(member);
 	return db.update_member(member);
