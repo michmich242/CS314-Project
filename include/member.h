@@ -74,5 +74,5 @@ class Member {
 	bool validate_member_DB(const std::string &id);
 
 	void get_valid_member_input(std::string &member_name, std::string &address, std::string &city, std::string &state,
-								std::string &zip, std::string &status_str);
+								std::string &zip, int check);
 };
