@@ -6,7 +6,7 @@
 SQLEngine *My_DB = new SQLEngine();
 
 void
-Member::get_valid_member_input(std::string &member_name, std::string &address, std::string &city, std::string &state, std::string &zip, int check)
+Member::get_valid_member_input(int check)
 {
 	// Helper lambda
 
@@ -22,7 +22,7 @@ Member::get_valid_member_input(std::string &member_name, std::string &address, s
 		}
 	};
 
-	member_name = get_input("Enter member name (max 25 characters): ", std::regex("^.{1,25}$"));
+	name = get_input("Enter member name (max 25 characters): ", std::regex("^.{1,25}$"));
 	address = get_input("Enter street address (max 25 characters): ", std::regex("^.{1,25}$"));
 	city = get_input("Enter city (max 14 characters): ", std::regex("^.{1,14}$"));
 	state = get_input("Enter state (2 letters): ", std::regex("^[A-Za-z]{2}$"));
@@ -99,7 +99,7 @@ Member::add_member()
 	}
 
 
-	get_valid_member_input(name, address, city, state, zip, 1);
+	get_valid_member_input(1);
 
 	return add_member_DB(*this);
 }
@@ -338,7 +338,7 @@ Member::update_member_DB(Member &member)
 
 		std::cout << "Enter new the updated values for the following\n" << std::endl;
 
-		get_valid_member_input(name, address, city, state, zip, 0);
+		get_valid_member_input(0);
 
 
 
