@@ -14,7 +14,7 @@ endif
 
 ifeq ($(PLATFORM),macOS)
     CFLAGS = -g -Wall -I /opt/homebrew/include -I /opt/homebrew/opt/googletest/include -std=c++17
-    LDFLAGS = -L /opt/homebrew/lib -L /opt/homebrew/opt/googletest/lib -lgtest -lgtest_main -lpthread -lpqxx -lpq
+    LDFLAGS = -L /opt/homebrew/lib -L /opt/homebrew/opt/googletest/lib -L/opt/homebrew/opt/libpq/lib -lgtest -lgtest_main -lpthread -lpqxx -lpq
 else ifeq ($(PLATFORM),Windows)
     CFLAGS = -g -Wall -I ./includes_library/pqxx/include -std=c++17
     LDFLAGS = -lpqxx -lpq
