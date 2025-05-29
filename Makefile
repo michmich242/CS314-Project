@@ -20,7 +20,7 @@ else ifeq ($(PLATFORM),Windows)
     LDFLAGS = -lpqxx -lpq
 else
     CFLAGS = -g -Wall -lpqxx -lpq
-    LDFLAGS = -lpqxx -lpq
+    LDFLAGS = -lpqxx -lpq -pthread -lgtest -lgtest_main
 endif
 
 $(info Detected platform: $(PLATFORM))
