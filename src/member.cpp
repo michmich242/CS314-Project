@@ -6,8 +6,7 @@
 SQLEngine *My_DB = new SQLEngine();
 
 void
-Member::get_valid_member_input(std::string &member_name, std::string &address, std::string &city, std::string &state,
-							   std::string &zip, std::string &status_str)
+Member::get_valid_member_input(std::string &member_name, std::string &address, std::string &city, std::string &state, std::string &zip, std::string &status_str)
 {
 	// Helper lambda
 	auto get_input = [](const std::string &prompt, const std::regex &pattern, int max_len = -1) {
@@ -49,7 +48,7 @@ Member::display_Member_Menu()
 		if (check == 1) {
 			add_member();
 		}
-		else if(check == 2){
+		else if (check == 2) {
 			update_member();
 		}
 	}
@@ -59,20 +58,18 @@ Member::Member() : name(""), id(""), address(), status(false)
 {
 }
 
-Member::~Member(){
-
+Member::~Member()
+{
 }
 
-Member::Member(const std::string &passed_member_name, const std::string &passed_address, const std::string &passed_city,
-			   const std::string &passed_zip, const bool &passed_status)
-	: name(passed_member_name), id(""), address(passed_address), city(passed_city), zip(passed_zip),
-	  status(passed_status)
+Member::Member(const std::string &passed_member_name, const std::string &passed_address, const std::string &passed_city, const std::string &passed_zip, const bool &passed_status)
+	: name(passed_member_name), id(""), address(passed_address), city(passed_city), zip(passed_zip), status(passed_status)
 {
 }
 
 void
 Member::Display_Member_Info()
-{	
+{
 	std::cout << "----------------------------------------------------" << std::endl;
 	std::cout << "	Member name: " << name << std::endl
 			  << "	Member ID: " << id << std::endl
@@ -104,9 +101,6 @@ Member::add_member()
 	return add_member_DB(*this);
 }
 
-
-
-
 bool
 Member::update_member()
 {
@@ -122,7 +116,7 @@ Member::update_member()
 	try {
 
 		std::regex nine_digits("^\\d{9}$");
-		while(!(std::regex_match(input_id, nine_digits))){
+		while (!(std::regex_match(input_id, nine_digits))) {
 			std::cout << "Enter a 9 digit member ID: ";
 			std::cin >> input_id;
 			std::cin.ignore(100, '\n');
@@ -131,8 +125,7 @@ Member::update_member()
 		id = input_id;
 		std::cout << id << std::endl;
 
-		//bool GET_MEMBER_FROM_DB(const std::string &MEMBER_ID);
-
+		// bool GET_MEMBER_FROM_DB(const std::string &MEMBER_ID);
 	}
 	catch (const std::invalid_argument &e) {
 		std::cout << "Invalid argument: " << e.what() << std::endl;
@@ -141,10 +134,8 @@ Member::update_member()
 
 
 
-
 	return update_member_DB(*this);
 }
-
 
 /*
 bool
@@ -153,11 +144,11 @@ Member::delete_member()
 
 	int member_id_test = 0;
 
-	
+
 	if (!My_DB->validate_member(member_id)) {
 		return false;
 	}
-	
+
 
 	if (id.length() != 9) {
 		return false;
@@ -271,7 +262,6 @@ Member::set_status()
 	return status;
 }
 
-
 //
 // MEMBER SqL
 //-------------------------------------------------------------------------
@@ -291,18 +281,16 @@ Member::add_member_DB(Member &member)
 		pqxx::work transaction(My_DB->get_connection());
 
 		try {
-			auto exists = transaction.query_value<int>(pqxx::zview("SELECT 1 FROM chocan.members WHERE member_id = $1"),
-													   pqxx::params{get_ID()});
+			auto exists = transaction.query_value<int>(pqxx::zview("SELECT 1 FROM chocan.members WHERE member_id = $1"), pqxx::params{get_ID()});
 
 			std::cerr << "Member with ID: " << get_ID() << "already exists\n";
 			return false;
 		}
 		catch (const pqxx::unexpected_rows &) {
 			// member doesnt exist
-			std::string new_member_id = transaction.query_value<std::string>(
-				pqxx::zview("INSERT INTO chocan.MEMBERS (name, address, city, state_abbrev, zip, active_status) "
-							"VALUES ($1, $2, $3, $4, $5, $6) RETURNING member_id"),
-				pqxx::params{get_name(), get_address(), get_city(), get_state(), get_zip(), true});
+			std::string new_member_id = transaction.query_value<std::string>(pqxx::zview("INSERT INTO chocan.MEMBERS (name, address, city, state_abbrev, zip, active_status) "
+																						 "VALUES ($1, $2, $3, $4, $5, $6) RETURNING member_id"),
+																			 pqxx::params{get_name(), get_address(), get_city(), get_state(), get_zip(), true});
 
 			member.set_ID(new_member_id);
 
@@ -334,7 +322,7 @@ Member::update_member_DB(Member &member)
 		// Start a transaction
 		pqxx::work transaction(My_DB->get_connection());
 
-		if(!(GET_MEMBER_FROM_DB(&transaction))){
+		if (!(GET_MEMBER_FROM_DB(&transaction))) {
 			std::cout << "Unable to retrieve ID: " << get_ID() << " from DB\n" << std::endl;
 			return false;
 		}
@@ -357,22 +345,18 @@ Member::update_member_DB(Member &member)
 
 
 
-
 		// Attempt to Update
-		pqxx::result res = transaction.exec(
-			pqxx::zview(R"(UPDATE chocan.members
+		pqxx::result res = transaction.exec(pqxx::zview(R"(UPDATE chocan.members
 						   SET name = $1, address = $2, city = $3, zip= $4, state_abbrev = $5, active_status = $6
 						   WHERE member_id = $7)"),
 
-			// variables being passed to $#
-			pqxx::params{get_name(), get_address(), get_city(), get_zip(), get_state(), get_status(), get_ID()});
+											// variables being passed to $#
+											pqxx::params{get_name(), get_address(), get_city(), get_zip(), get_state(), get_status(), get_ID()});
 		// Check if query modified a row
 		if (res.affected_rows() == 0) {
 			std::cerr << "No member found with ID: " << get_ID() << "\n";
 			return false;
 		}
-
-
 
 
 
@@ -386,19 +370,20 @@ Member::update_member_DB(Member &member)
 	}
 }
 
-
-
-bool Member::GET_MEMBER_FROM_DB(pqxx::work * transaction){
-	if(!My_DB || !My_DB->is_connected()){
+bool
+Member::GET_MEMBER_FROM_DB(pqxx::work *transaction)
+{
+	if (!My_DB || !My_DB->is_connected()) {
 		std::cout << "DB connection failed\n" << std::endl;
 		return false;
 	}
-	try{
+	try {
 		pqxx::result res = transaction->exec(pqxx::zview(R"(SELECT name, address, city, zip, state_abbrev, active_status
 			 FROM chocan.members 
-			 WHERE member_id = $1)"), pqxx::params{get_ID()});
+			 WHERE member_id = $1)"),
+											 pqxx::params{get_ID()});
 
-		if(res.empty()){
+		if (res.empty()) {
 			std::cout << "No member found with ID: " << get_ID() << std::endl;
 			return false;
 		}
@@ -410,17 +395,14 @@ bool Member::GET_MEMBER_FROM_DB(pqxx::work * transaction){
 		state = res[0][4].c_str();
 		status = res[0][5].as<bool>();
 
-	
+
 		return true;
 	}
-	catch (const std::exception &e){
+	catch (const std::exception &e) {
 		std::cout << "Error retrieving member: " << e.what() << std::endl;
 		return false;
 	}
 }
-
-
-
 
 // Delete member given id, value is expected to be properly pre-processed
 // Member IDs are in the range of 100000000 -> 199999999
@@ -471,8 +453,7 @@ Member::validate_member_DB(const std::string &id)
 		pqxx::work transaction(My_DB->get_connection());
 
 		try {
-			bool status = transaction.query_value<bool>(
-				pqxx::zview("SELECT status FROM chocan.members WHERE member_id = $1"), pqxx::params{id});
+			bool status = transaction.query_value<bool>(pqxx::zview("SELECT status FROM chocan.members WHERE member_id = $1"), pqxx::params{id});
 			transaction.commit();
 			return status;
 		}

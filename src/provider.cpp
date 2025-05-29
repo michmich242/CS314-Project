@@ -5,15 +5,13 @@
 
 //--------------------------------------------------------------------------
 /* provider functions start */
-
-
-
 Provider::Provider() : name(""), id(""), address(""), city(""), state(""), zip("")
 {
 }
 
-Provider::Provider(const std::string &passed_name, const std::string &passed_address, const std::string &passed_city, const std::string &passed_zip)
-	: name(passed_name), id(""), address(passed_address), city(passed_city), zip(passed_zip)
+Provider::Provider(const std::string &passed_name, const std::string &passed_address, const std::string &passed_city, const std::string &passed_state,
+				   const std::string &passed_zip)
+	: name(passed_name), id(""), address(passed_address), city(passed_city), state(passed_state), zip(passed_zip)
 {
 }
 
@@ -114,7 +112,7 @@ Provider::set_zip(const std::string &to_set)
 }
 
 bool
-Provider::GET_PROVIDER_FROM_DB(const std::string &PROVIDER_ID)
+Provider::GET_PROVIDER_FROM_DB(pqxx::work &transaction)
 {
 	return false;
 }

@@ -15,7 +15,7 @@ class Provider {
 	Provider();
 
 	Provider(const std::string &passed_name, const std::string &passed_address, const std::string &passed_city,
-			 const std::string &passed_zip);
+			 const std::string &passed_state, const std::string &passed_zip);
 
 	bool add_provider();
 	bool update_provider();
@@ -41,10 +41,6 @@ class Provider {
 	std::string &get_zip();
 	std::string &set_zip(const std::string &to_set);
 
-
-	bool GET_PROVIDER_FROM_DB(const std::string &PROVIDER_ID);
-
-
   private:
 
 	std::string name;
@@ -60,4 +56,6 @@ class Provider {
 	bool add_provider_DB(Provider &provider);
 	bool update_provider_DB(Provider &provider);
 	bool delete_provider_DB(const std::string &id);
+
+	bool GET_PROVIDER_FROM_DB(pqxx::work &transaction);
 };
