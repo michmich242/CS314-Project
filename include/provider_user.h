@@ -17,6 +17,7 @@ class Provider_User {
 
   public:
 
+	Provider_User() = delete;
 	Provider_User(SQLEngine &db_ref);
 
 	bool start_provider();

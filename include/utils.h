@@ -53,7 +53,7 @@ namespace utils {
         }
         return true;
     }
-
+ 
     inline std::string get_member_number() {
         //prompt user for 9 digit member number
         std::string num;

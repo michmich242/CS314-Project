@@ -8,8 +8,8 @@ Provider::Provider() : name(""), id(""), address(""), city(""), state(""), zip("
 {
 }
 
-Provider::Provider(const std::string &passed_name, const std::string &passed_address, const std::string &passed_city, const std::string &passed_state,
-				   const std::string &passed_zip)
+Provider::Provider(const std::string &passed_name, const std::string &passed_address, 
+				   const std::string &passed_city, const std::string &passed_state, const std::string &passed_zip)
 	: name(passed_name), id(""), address(passed_address), city(passed_city), state(passed_state), zip(passed_zip)
 {
 }

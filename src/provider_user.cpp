@@ -46,9 +46,8 @@ Provider_User::member_validation(std::string &member_ID)
 		std::cout << "Invalid input. Please try again: ";
 		std::getline(std::cin, member_ID);
 	}
-
+    
 	return db.validate_member(member_ID);
-	return true;
 }
 
 // Calls db.save_service_record(record)

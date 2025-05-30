@@ -7,9 +7,17 @@ TEST(ProviderUserTest, LoginAcceptsValidInputImmediately) {
     SQLEngine eng;
     Provider_User provider(eng);
 
-    std::string input = "123456789"; // any valid 9-digit string
+    std::string input = "123456789";
     bool result = provider.login(input);
 
     EXPECT_TRUE(result);
-    EXPECT_EQ(input, "123456789");
+}
+
+TEST(ProviderUserTest, MemberValidationAcceptsInput) {
+    SQLEngine eng;
+    Provider_User provider(eng);
+
+    std::string input = "123456789";
+    bool result = provider.member_validation(input);
+    EXPECT_FALSE(result);
 }

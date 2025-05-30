@@ -25,7 +25,6 @@ class Member {
 	std::string &get_ID();
 	std::string &set_ID(const std::string &to_set);
 
-
 	std::string &get_address();
 	std::string &set_address(const std::string &to_set);
 

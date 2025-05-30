@@ -13,8 +13,8 @@ class Provider {
 
 	Provider();
 
-	Provider(const std::string &passed_name, const std::string &passed_address, const std::string &passed_city,
-			 const std::string &passed_state, const std::string &passed_zip);
+	Provider(const std::string &passed_name, const std::string &passed_address, 
+			 const std::string &passed_city, const std::string &passed_state, const std::string &passed_zip);
 
 	bool add_provider();
 	bool update_provider();

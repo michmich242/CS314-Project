@@ -23,9 +23,38 @@ TEST(MemberConstructorTest, ConstructorInitializesFields) {
               true);
 
    
-     EXPECT_EQ(m.get_name(), "test name");   // Or whatever the default is
+     EXPECT_EQ(m.get_name(), "test name");   
      EXPECT_EQ(m.get_address(), "test address");
      EXPECT_EQ(m.get_city(), "test city");
      EXPECT_EQ(m.get_zip(), "test zip");
      EXPECT_TRUE(m.get_status());
    }
+
+//getters/setters
+TEST(MemberSettersAndGetters, SetValuesSuccess) {
+    Member m;
+
+    m.set_name("test name");
+    m.set_ID("test id");
+    m.set_address("test address");
+    m.set_city("test city");
+    m.set_state("test state");
+    m.set_zip("test zip");
+
+    EXPECT_EQ(m.get_name(), "test name");
+    EXPECT_EQ(m.get_ID(), "test id");
+    EXPECT_EQ(m.get_address(), "test address");
+    EXPECT_EQ(m.get_city(), "test city");
+    EXPECT_EQ(m.get_state(), "test state");
+    EXPECT_EQ(m.get_zip(), "test zip");
+}
+
+//test add member
+/*
+TEST(MemberAddTest, AddMemberToDB) {
+  Member m;
+
+  bool result = m.add_member();
+  EXPECT_EQ(result, true);
+}
+*/
