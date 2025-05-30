@@ -46,7 +46,7 @@ Provider_User::member_validation(std::string &member_ID)
 		std::cout << "Invalid input. Please try again: ";
 		std::getline(std::cin, member_ID);
 	}
-    
+
 	return db.validate_member(member_ID);
 }
 
@@ -72,11 +72,9 @@ Provider_User::create_service_record()
 	std::string date_of_service = utils::get_date_of_service();
 	std::string service_code = utils::get_service_code();
 
-
 	Service service = db.get_service(service_code);
 
-
-	// std::cout << "Service name: " << service.get_name() << std::endl;
+	//std::cout << "Service name: " << service.get_name() << std::endl;
 	std::cout << "Service name: " << "not connected to db!!" << std::endl;
 
 	std::string comment = utils::get_comments();
