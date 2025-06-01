@@ -43,12 +43,14 @@ namespace utils {
         //check for non-numeric characters
         for (char c : num) {
             if (!std::isdigit(static_cast<unsigned char>(c))) {
+                std::cout << "Member number must be numeric (ex: 123456789)" << std::endl;
                 return false;  
             }
         }
 
         //check for correct length
         if (num.length() != 9) {
+            std::cout << "Member number must be 9 digits. ";
             return false;
         }
         return true;

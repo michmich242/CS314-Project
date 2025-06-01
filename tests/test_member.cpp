@@ -49,12 +49,5 @@ TEST(MemberSettersAndGetters, SetValuesSuccess) {
     EXPECT_EQ(m.get_zip(), "test zip");
 }
 
-//test add member
-/*
-TEST(MemberAddTest, AddMemberToDB) {
-  Member m;
 
-  bool result = m.add_member();
-  EXPECT_EQ(result, true);
-}
-*/
+

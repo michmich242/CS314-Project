@@ -332,7 +332,7 @@ SQLEngine::validate_member(const std::string &id)
 		pqxx::work transaction(get_connection());
 
 		try {
-			bool status = transaction.query_value<bool>(pqxx::zview("SELECT status FROM chocan.members WHERE member_id = $1"), pqxx::params{id});
+			bool status = transaction.query_value<bool>(pqxx::zview("SELECT active_status FROM chocan.members WHERE member_id = $1"), pqxx::params{id});
 			transaction.commit();
 			return status;
 		}
@@ -499,7 +499,9 @@ SQLEngine::get_service(const std::string &code)
 		pqxx::work transaction(get_connection());
 
 		// Run Query
-		auto [i_description, fee] = transaction.query1<std::string, float>(pqxx::zview("SELECT description, fee FROM Services WHERE service_code = $1"), pqxx::params{code});
+		auto [i_description, fee] = transaction.query1
+		<std::string, float>(pqxx::zview("SELECT description, fee FROM Services WHERE service_code = $1"), 
+		pqxx::params{code});
 
 		return Service(code, fee, i_description);
 	}
