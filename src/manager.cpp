@@ -51,6 +51,9 @@ Manager::display_Member_Menu()
 		else if (check == 2) {
 			update_member();
 		}
+		else if (check == 3){
+			delete_member();
+		}
 	}
 }
 
@@ -130,4 +133,29 @@ Manager::get_valid_member_input(Member &member)
 	member.set_city(get_input("Enter city (max 14 characters): ", std::regex("^.{1,14}$")));
 	member.set_state(get_input("Enter state (2 letters): ", std::regex("^[A-Za-z]{2}$")));
 	member.set_zip(get_input("Enter ZIP code (5 digits): ", std::regex("^\\d{5}$")));
+}
+
+
+bool Manager::delete_member(){
+
+	std::string input_id;
+
+	try {
+
+		std::regex nine_digits("^\\d{9}$");
+		while (!(std::regex_match(input_id, nine_digits))) {
+			std::cout << "Enter a 9 digit member ID: ";
+			std::cin >> input_id;
+			std::cin.ignore(100, '\n');
+		}
+
+	}
+	catch (const std::invalid_argument &e) {
+		std::cout << "Invalid argument: " << e.what() << "\n";
+		return false;
+	}
+
+	return db.delete_member(input_id);
+
+
 }
