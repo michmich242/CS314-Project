@@ -7,12 +7,13 @@ Provider_User::start_provider() {
 	int check {0};
 	std::cout << "Welcome to the provider terminal!" << std::endl;
 
-	while (check != 3) {
+	while (check != 4) {
 		
 		std::cout << "1. member validation" << std::endl;
 		std::cout << "2. service billing" << std::endl;
 		std::cout << "3. provider directory" << std::endl;
-		std::cout << "Enter your option (1 - 3): ";
+		std::cout << "4. quit" << std::endl;
+		std::cout << "Enter your option (1 - 4): ";
 
 
 		std::cin >> check;
