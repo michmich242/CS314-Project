@@ -71,14 +71,23 @@ struct ProviderReport {
 	std::string state;
 	std::string zip;
 
-	std::vector<ServiceSummary> records;
+	std::vector<ServiceSummary> services;
+	int num_consultations;
+	float total_fee;
+};
+
+// Manager Summary Structs
+struct ProviderSummary {
+	Provider provider;
+	std::vector<ServiceRecord> records;
 	int num_consultations;
 	float total_fee;
 };
 
 struct ManagerSummary {
-	std::vector<ProviderReport> provider_reports;
-	std::vector<MemberReport> member_reports;
+	std::vector<ProviderSummary> summaries;
+	int total_consultations;
+	float total_fees;
 };
 
 class SQLEngine {
@@ -92,7 +101,7 @@ class SQLEngine {
 	// Weekly Reporting
 	bool generate_member_service_reports(std::vector<MemberReport> &);
 	bool generate_provider_service_reports(std::vector<ProviderReport> &);
-	ManagerSummary generate_manager_summary_reports();
+	bool generate_manager_summary_reports(std::vector<ManagerSummary> &);
 
 
 	// Member Class Functions

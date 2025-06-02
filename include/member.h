@@ -15,7 +15,7 @@ class Member {
 	~Member();
 
 	Member(const std::string &passed_member_name, const std::string &passed_address, const std::string &passed_city,
-		   const std::string &passed_zip, const bool &status);
+		   const std::string &state, const std::string &passed_zip, const bool &status);
 
 	void Display_Member_Info();
 
@@ -52,6 +52,4 @@ class Member {
 	std::string zip;
 
 	bool status;
-
-
 };

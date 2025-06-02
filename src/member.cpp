@@ -11,25 +11,26 @@ Member::~Member()
 {
 }
 
-Member::Member(const std::string &passed_member_name, const std::string &passed_address, const std::string &passed_city, const std::string &passed_zip, const bool &passed_status)
-	: name(passed_member_name), id(""), address(passed_address), city(passed_city), zip(passed_zip), status(passed_status)
+Member::Member(const std::string &passed_member_name, const std::string &passed_address, const std::string &passed_city,
+			   const std::string &passed_state, const std::string &passed_zip, const bool &passed_status)
+	: name(passed_member_name), id(""), address(passed_address), city(passed_city), state(passed_state),
+	  zip(passed_zip), status(passed_status)
 {
 }
 
 void
 Member::Display_Member_Info()
 {
-	std::cout << "----------------------------------------------------" << std::endl;
-	std::cout << "	Member name: " << name << std::endl
-			  << "	Member ID: " << id << std::endl
-			  << "	Address: " << address << std::endl
-			  << "	City: " << city << std::endl
-			  << "	State: " << state << std::endl
-			  << "	Zip: " << zip << std::endl
-			  << "	Status: " << ((status == 1) ? "True\n" : "False\n");
-	std::cout << "----------------------------------------------------" << std::endl;
+	std::cout << "----------------------------------------------------\n";
+	std::cout << "	Member name: " << name << "\n"
+			  << "	Member ID: " << id << "\n"
+			  << "	Address: " << address << "\n"
+			  << "	City: " << city << "\n"
+			  << "	State: " << state << "\n"
+			  << "	Zip: " << zip << "\n"
+			  << "	Status: " << ((status) ? "True\n" : "False\n");
+	std::cout << "----------------------------------------------------\n";
 }
-
 
 std::string &
 Member::get_name()
@@ -119,5 +120,5 @@ bool
 Member::set_status(bool status)
 {
 	this->status = status;
-    return this->status;
+	return this->status;
 }

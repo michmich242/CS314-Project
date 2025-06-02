@@ -25,7 +25,7 @@ SQLEngine::conn_db(const std::string &db_path)
 	// Open .dbinfo
 	std::ifstream infile(db_path);
 	if (!infile) {
-		std::cerr << "Failed to retrieve database info.\n" << std::endl;
+		std::cerr << "Failed to retrieve database info.\n";
 		return false;
 	}
 
@@ -87,10 +87,9 @@ SQLEngine::is_connected() const
 //
 
 
-/*
 // Weekly Reporting
 bool
-SQLEngine::generate_member_service_reports(std::vector<MemberReport> &vector)
+SQLEngine::generate_member_service_reports(std::vector<MemberReport> &reports)
 {
 	if (is_connected()) {
 		std::cerr << "db connection not open\n";
@@ -101,19 +100,60 @@ SQLEngine::generate_member_service_reports(std::vector<MemberReport> &vector)
 		// Start a transaction
 		pqxx::work transaction(get_connection());
 
-		transaction.exec_params();
+		reports.clear();
+
+		auto result = transaction.exec(R"(
+                SELECT m.member_id, m.name, m.address, m.city, m.state, m.zip, sr.date_of_service,
+                            p.name AS provider_name, s.description AS service_name
+                FROM service_records sr
+                INNER JOIN members m ON sr.member_id = m.member_id
+                INNER JOIN providers p ON sr.provider_id = p.provider_id
+                INNER JOIN services s ON sr.service_code = s.service_code
+                ORDER BY m.member_id, sr.date_of_service
+        )");
+		// Condition to only have last 7 days
+		// WHERE sr.date_of_service >= CURRENT_DATE - INTERVAL '7 days'
+
+
+		// key_value pairing for each unique member_id
+		std::unordered_map<std::string, MemberReport> report_map;
+		for (const auto &row : result) {
+			std::string member_id = row["member_id"].as<std::string>();
+
+			// New Member ? Add to map
+			if (report_map.find(member_id) == report_map.end()) {
+				MemberReport report;
+				report.member_id = member_id;
+				report.member_name = row["name"].as<std::string>();
+				report.address = row["address"].as<std::string>();
+				report.city = row["city"].as<std::string>();
+				report.state = row["state"].as<std::string>();
+				report.zip = row["zip"].as<std::string>();
+				report_map[member_id] = std::move(report);
+			}
+
+			// Member_id seen before ? add to map
+			report_map[member_id].services.push_back({row["date_of_service"].as<std::string>(),
+													  row["provider_name"].as<std::string>(),
+													  row["service_name"].as<std::string>()});
+		}
+
+		// drop member_id key, only save value in reports
+		for (auto &[_, report] : report_map) {
+			reports.push_back(std::move(report));
+		}
 
 		transaction.commit();
 		return true;
 	}
 	catch (const std::exception &e) {
-		std::cerr << "Error inserting member: " << e.what() << "\n";
+		std::cerr << "Error Creating Member Reports: " << e.what() << "\n";
 		return false;
 	}
 }
 
-std::vector<ProviderReport>
-SQLEngine::generate_provider_service_reports()
+bool
+SQLEngine::generate_provider_service_reports(std::vector<ProviderReport> &reports)
 {
 	if (!conn || !conn->is_open()) {
 		std::cerr << "db connection not open\n";
@@ -122,9 +162,56 @@ SQLEngine::generate_provider_service_reports()
 
 	try {
 		// Start a transaction
-		pqxx::work transaction(*conn);
+		pqxx::work transaction(get_connection());
 
-		transaction.exec_params();
+		reports.clear();
+
+		auto result = transaction.exec(R"(
+                SELECT p.provider_id, p.name, p.address, p.city, p.state, p.zip, 
+                       m.name as member_name, sr.date_of_service, sr.timestamp_received,
+                       m.member_id, sr.service_code, s.description as service_name, s.fee
+                FROM service_records sr
+                JOIN providers p ON sr.provider_id = p.provider_id
+                JOIN members m ON sr.member_id = m.member_id
+                JOIN services s ON sr.service_code = s.service_code
+                ORDER BY p.provider_id, sr.timestamp_received
+        )");
+		// Condition to only have last 7 days
+		// WHERE sr.date_of_service >= CURRENT_DATE - INTERVAL '7 days'
+
+
+		// key_value pairing for each unique Provider_id
+		std::unordered_map<std::string, ProviderReport> report_map;
+		for (const auto &row : result) {
+			std::string provider_id = row["member_id"].as<std::string>();
+
+			// New Provider ? Add to map
+			if (report_map.find(provider_id) == report_map.end()) {
+				ProviderReport report;
+				report.provider_name = row["name"].as<std::string>();
+				report.provider_id = provider_id;
+				report.address = row["address"].as<std::string>();
+				report.city = row["city"].as<std::string>();
+				report.state = row["state"].as<std::string>();
+				report.zip = row["zip"].as<std::string>();
+				report.num_consultations = 0;
+				report.total_fee = 0.0F;
+
+				report_map[provider_id] = std::move(report);
+			}
+
+			// Provider_id seen before ? add to map
+			report_map[provider_id].services.push_back({row["date_of_service"].as<std::string>(),
+														row["member_name"].as<std::string>(),
+														row["service_name"].as<std::string>()});
+			report_map[provider_id].num_consultations++;
+			report_map[provider_id].total_fee += row["fee"].as<float>();
+		}
+
+		// drop provider_id key, only save value in reports
+		for (auto &[_, report] : report_map) {
+			reports.push_back(std::move(report));
+		}
 
 		transaction.commit();
 		return true;
@@ -135,32 +222,81 @@ SQLEngine::generate_provider_service_reports()
 	}
 }
 
-ManagerSummary
-SQLEngine::generate_manager_summary_reports()
+bool
+SQLEngine::generate_manager_summary_reports(std::vector<ManagerSummary> &summaries)
 {
-	if (!conn || !conn->is_open()) {
+	if (!is_connected()) {
 		std::cerr << "db connection not open\n";
 		return false;
 	}
 
 	try {
-		// Start a transaction
-		pqxx::work transaction(*conn);
+		pqxx::work transaction(get_connection());
 
-		transaction.exec_params();
+		summaries.clear();
 
+		auto res = transaction.exec(R"(
+            SELECT p.provider_id, p.name, p.address, p.city, p.state, p.zip,
+                   m.member_id, m.name, sr.date_of_service, sr.timestamp_received,
+                   sr.service_code, s.description
+            FROM service_records sr
+            JOIN providers p ON sr.provider_id = p.provider_id
+            JOIN members m ON sr.member_id = m.member_id
+            JOIN services s ON sr.service_code = s.service_code
+            ORDER BY p.provider_id, sr.timestamp_received
+        )");
+
+		std::map<std::string, ProviderSummary> provider_map;
+		int total_consultations = 0;
+		int total_fees = 0.0;
+
+		for (const auto &row : res) {
+			std::string provider_id = row["provider_id"].as<std::string>();
+
+			// check if provider_id in summary
+			if (provider_map.find(provider_id) == provider_map.end()) {
+				Provider provider(row["name"].as<std::string>(), row["address"].as<std::string>(),
+								  row["city"].as<std::string>(), row["state"].as<std::string>(),
+								  row["zip"].as<std::string>());
+
+
+				provider_map[provider_id] =
+					ProviderSummary{.provider = provider, .records = {}, .num_consultations = 0, .total_fee = 0.0};
+			}
+
+			ServiceRecord record(row["date_of_service"].as<std::string>(), row["timestamp_received"].as<std::string>(),
+								 row["provider_id"].as<std::string>(), row["member_id"].as<std::string>(),
+								 row["service_code"].as<std::string>(), row["description"].as<std::string>(),
+								 row["fee"].as<float>());
+
+			auto &summary = provider_map[provider_id];
+			summary.records.push_back(record);
+			summary.num_consultations += 1;
+			summary.total_fee += row["fee"].as<float>();
+
+			total_consultations += 1;
+			total_fees += row["fee"].as<float>();
+		}
+
+		ManagerSummary manager_summary;
+		manager_summary.total_consultations = total_consultations;
+		manager_summary.total_fees = total_fees;
+
+		for (auto &[id, summary] : provider_map) {
+			manager_summary.summaries.push_back(std::move(summary));
+		}
+
+		summaries.push_back(std::move(manager_summary));
 		transaction.commit();
 		return true;
 	}
 	catch (const std::exception &e) {
-		std::cerr << "Error inserting member: " << e.what() << "\n";
+		std::cerr << "Error generating manager summary: " << e.what() << "\n";
 		return false;
 	}
 }
 
-*/
 // MANAGER TERMINAL CRUD
-
 
 
 //-------------------------------------------------------------------------
@@ -181,17 +317,19 @@ SQLEngine::add_member(Member &member)
 		pqxx::work transaction(get_connection());
 
 		try {
-			auto exists = transaction.query_value<int>(pqxx::zview("SELECT 1 FROM chocan.members WHERE member_id = $1"), pqxx::params{member.get_ID()});
+			auto exists = transaction.query_value<int>(pqxx::zview("SELECT 1 FROM chocan.members WHERE member_id = $1"),
+													   pqxx::params{member.get_ID()});
 
 			std::cerr << "Member with ID: " << member.get_ID() << "already exists\n";
 			return false;
 		}
 		catch (const pqxx::unexpected_rows &) {
 			// member doesnt exist
-			std::string new_member_id =
-				transaction.query_value<std::string>(pqxx::zview("INSERT INTO chocan.MEMBERS (name, address, city, state_abbrev, zip, active_status) "
-																 "VALUES ($1, $2, $3, $4, $5, $6) RETURNING member_id"),
-													 pqxx::params{member.get_name(), member.get_address(), member.get_city(), member.get_state(), member.get_zip(), true});
+			std::string new_member_id = transaction.query_value<std::string>(
+				pqxx::zview("INSERT INTO chocan.MEMBERS (name, address, city, state_abbrev, zip, active_status) "
+							"VALUES ($1, $2, $3, $4, $5, $6) RETURNING member_id"),
+				pqxx::params{member.get_name(), member.get_address(), member.get_city(), member.get_state(),
+							 member.get_zip(), true});
 
 			member.set_ID(new_member_id);
 
@@ -230,7 +368,8 @@ SQLEngine::update_member(Member &member)
 						   WHERE member_id = $7)"),
 
 							 // variables being passed to $#
-							 pqxx::params{member.get_name(), member.get_address(), member.get_city(), member.get_zip(), member.get_state(), member.get_status(), member.get_ID()});
+							 pqxx::params{member.get_name(), member.get_address(), member.get_city(), member.get_zip(),
+										  member.get_state(), member.get_status(), member.get_ID()});
 
 		// Check if query modified a row
 		if (res.affected_rows() == 0) {
@@ -332,7 +471,8 @@ SQLEngine::validate_member(const std::string &id)
 		pqxx::work transaction(get_connection());
 
 		try {
-			bool status = transaction.query_value<bool>(pqxx::zview("SELECT active_status FROM chocan.members WHERE member_id = $1"), pqxx::params{id});
+			bool status = transaction.query_value<bool>(
+				pqxx::zview("SELECT active_status FROM chocan.members WHERE member_id = $1"), pqxx::params{id});
 			transaction.commit();
 			return status;
 		}
@@ -372,7 +512,8 @@ SQLEngine::add_provider(Provider &provider)
 		pqxx::work transaction(get_connection());
 
 		try {
-			auto exists = transaction.query_value<int>(pqxx::zview("SELECT 1 FROM chocan.providers WHERE provider_id = $1"), pqxx::params{provider.get_ID()});
+			auto exists = transaction.query_value<int>(
+				pqxx::zview("SELECT 1 FROM chocan.providers WHERE provider_id = $1"), pqxx::params{provider.get_ID()});
 
 			std::cerr << "Provider with ID: " << provider.get_ID() << "already exists\n";
 			return false;
@@ -381,10 +522,11 @@ SQLEngine::add_provider(Provider &provider)
 			// provider doesnt exist
 		}
 		// Run Query
-		std::string new_provider_id =
-			transaction.query_value<std::string>(pqxx::zview("INSERT INTO chocan.providers (name, address, city, state_abbrev, zip)"
-															 " VALUES ($1, $2, $3, $4, $5) RETURNING provider_id"),
-												 pqxx::params{provider.get_name(), provider.get_address(), provider.get_city(), provider.get_state(), provider.get_zip()});
+		std::string new_provider_id = transaction.query_value<std::string>(
+			pqxx::zview("INSERT INTO chocan.providers (name, address, city, state_abbrev, zip)"
+						" VALUES ($1, $2, $3, $4, $5) RETURNING provider_id"),
+			pqxx::params{provider.get_name(), provider.get_address(), provider.get_city(), provider.get_state(),
+						 provider.get_zip()});
 
 		provider.set_ID(new_provider_id);
 
@@ -418,7 +560,8 @@ SQLEngine::update_provider(Provider &provider)
                 			WHERE provider_id = $6)"),
 
 							 // variables being passed to $#
-							 pqxx::params{provider.get_name(), provider.get_address(), provider.get_city(), provider.get_zip(), provider.get_state(), provider.get_ID()});
+							 pqxx::params{provider.get_name(), provider.get_address(), provider.get_city(),
+										  provider.get_zip(), provider.get_state(), provider.get_ID()});
 
 		// Check if query modified a row
 		if (res.affected_rows() == 0) {
@@ -471,7 +614,7 @@ SQLEngine::delete_provider(const std::string &id)
 }
 
 bool
-SQLEngine::get_provider(Provider & provider)
+SQLEngine::get_provider(Provider &provider)
 
 {
 	if (!is_connected()) {
@@ -479,31 +622,31 @@ SQLEngine::get_provider(Provider & provider)
 		return false;
 	}
 	try {
-	pqxx::work transaction(*conn);
-	pqxx::result res = transaction.exec(pqxx::zview(R"(SELECT name, address, city, zip, state_abbrev
+		pqxx::work transaction(*conn);
+		pqxx::result res = transaction.exec(pqxx::zview(R"(SELECT name, address, city, zip, state_abbrev
 			FROM chocan.providers 
 			WHERE provider_id = $1)"),
-										pqxx::params{provider.get_ID()});
+											pqxx::params{provider.get_ID()});
 
-	if (res.empty()) {
-		std::cout << "No provider found with ID: " << provider.get_ID() << "\n";
-		return false;
-	}
-	
-	provider.set_name(res[0][0].c_str());
-	provider.set_address(res[0][1].c_str());
-	provider.set_city(res[0][2].c_str());
-	provider.set_zip(res[0][3].c_str());
-	provider.set_state(res[0][4].c_str());
+		if (res.empty()) {
+			std::cout << "No provider found with ID: " << provider.get_ID() << "\n";
+			return false;
+		}
 
-	std::cout << provider.get_name() << provider.get_address() << std::endl;
+		provider.set_name(res[0][0].c_str());
+		provider.set_address(res[0][1].c_str());
+		provider.set_city(res[0][2].c_str());
+		provider.set_zip(res[0][3].c_str());
+		provider.set_state(res[0][4].c_str());
+
+		std::cout << provider.get_name() << provider.get_address() << std::endl;
 
 
-	return true;
+		return true;
 	}
 	catch (const std::exception &e) {
-	std::cout << "Error retrieving member: " << e.what() << "\n";
-	return false;
+		std::cout << "Error retrieving member: " << e.what() << "\n";
+		return false;
 	}
 }
 
@@ -530,9 +673,8 @@ SQLEngine::get_service(const std::string &code)
 		pqxx::work transaction(get_connection());
 
 		// Run Query
-		auto [i_description, fee] = transaction.query1
-		<std::string, float>(pqxx::zview("SELECT description, fee FROM Services WHERE service_code = $1"), 
-		pqxx::params{code});
+		auto [i_description, fee] = transaction.query1<std::string, float>(
+			pqxx::zview("SELECT description, fee FROM Services WHERE service_code = $1"), pqxx::params{code});
 
 		return Service(code, fee, i_description);
 	}
@@ -559,7 +701,8 @@ SQLEngine::get_all_services(std::vector<Service> &services)
 		services.clear();
 
 		// Run Query
-		for (auto [code, description, fee] : transaction.query<std::string, std::string, float>("SELECT service_code, description, fee FROM Services ORDER BY service_code")) {
+		for (auto [code, description, fee] : transaction.query<std::string, std::string, float>(
+				 "SELECT service_code, description, fee FROM Services ORDER BY service_code")) {
 			services.emplace_back(code, fee, description);
 		}
 
@@ -601,11 +744,12 @@ SQLEngine::save_service_record(ServiceRecord &record)
 		pqxx::work transaction(get_connection());
 
 		// Attempt Query
-		std::string new_id =
-			transaction.query_value<std::string>(pqxx::zview(R"(INSERT INTO ServiceRecords
+		std::string new_id = transaction.query_value<std::string>(
+			pqxx::zview(R"(INSERT INTO ServiceRecords
 						  (date_of_service, provider_id, member_id, service_code, comments)
             			  VALUES($1, $2, $3, $4, $5) RETURNING service_code)"),
-												 pqxx::params{record.get_date(), record.get_provider(), record.get_member(), record.get_service_code(), record.get_comment()});
+			pqxx::params{record.get_date(), record.get_provider(), record.get_member(), record.get_service_code(),
+						 record.get_comment()});
 
 		record.set_service_code(new_id);
 
