@@ -204,7 +204,7 @@ void Manager::display_Provider_Menu(){
 			P_add_provider();
 		}
 		else if (check == 2) {
-			update_member();
+			P_update_provider();
 		}
 		else if (check == 3){
 			delete_member();
@@ -223,5 +223,42 @@ bool Manager::P_add_provider(){
 	return db.add_provider(provider);
 
 }
+
+
+
+bool Manager::P_update_provider(){
+	std::string input_id;
+	Provider provider;
+	try {
+
+		std::regex nine_digits("^\\d{9}$");
+		while (!(std::regex_match(input_id, nine_digits))) {
+			std::cout << "Enter a 9 digit provider ID: ";
+			std::cin >> input_id;
+			std::cin.ignore(100, '\n');
+		}
+		provider.set_ID(input_id);
+		std::cout << provider.get_ID() << "\n";
+
+		if (!db.get_provider(provider)) {
+			std::cerr << "No provider with given ID\n";
+			return false;
+		}
+	}
+	catch (const std::invalid_argument &e) {
+		std::cout << "Invalid argument: " << e.what() << "\n";
+		return false;
+	}
+
+	provider.Display_Provider_Info();
+
+	std::cout << "Enter new the updated values for the following\n\n";
+
+	get_valid_provider_input(provider);
+	return db.update_provider(provider);
+
+}
+
+
 
 

@@ -14,23 +14,6 @@ Provider::Provider(const std::string &passed_name, const std::string &passed_add
 {
 }
 
-bool
-Provider::add_provider()
-{
-	return false;
-}
-
-bool
-Provider::update_provider()
-{
-	return false;
-}
-
-bool
-delete_provider()
-{
-	return false;
-}
 
 std::string &
 Provider::get_name()
@@ -108,4 +91,16 @@ Provider::set_zip(const std::string &to_set)
 {
 	zip = to_set;
 	return zip;
+}
+
+
+void Provider::Display_Provider_Info(){
+	std::cout << "----------------------------------------------------" << std::endl;
+	std::cout << "	Member name: " << name << std::endl
+			<< "	Member ID: " << id << std::endl
+			<< "	Address: " << address << std::endl
+			<< "	City: " << city << std::endl
+			<< "	State: " << state << std::endl
+			<< "	Zip: " << zip << std::endl;
+	std::cout << "----------------------------------------------------" << std::endl;
 }

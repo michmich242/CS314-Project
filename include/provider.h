@@ -16,10 +16,6 @@ class Provider {
 	Provider(const std::string &passed_name, const std::string &passed_address, 
 			 const std::string &passed_city, const std::string &passed_state, const std::string &passed_zip);
 
-	bool add_provider();
-	bool update_provider();
-	bool delete_provider();
-
 	std::string &get_name();
 	std::string &set_name(const std::string &to_set);
 
@@ -38,6 +34,8 @@ class Provider {
 
 	std::string &get_zip();
 	std::string &set_zip(const std::string &to_set);
+	
+	void Display_Provider_Info();
 
   private:
 

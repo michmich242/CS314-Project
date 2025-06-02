@@ -107,7 +107,7 @@ class SQLEngine {
 	bool add_provider(Provider &provider);
 	bool update_provider(Provider &provider);
 	bool delete_provider(const std::string &id);
-	bool get_provider(std::string &id);
+	bool get_provider(Provider &provider);
 
 	// Service Directory Functions
 	Service get_service(const std::string &code);

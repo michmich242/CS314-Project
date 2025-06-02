@@ -266,7 +266,7 @@ SQLEngine::get_member(Member &member)
 			std::cout << "No member found with ID: " << member.get_ID() << "\n";
 			return false;
 		}
-		Member member;
+
 		member.set_name(res[0][0].c_str());
 		member.set_address(res[0][1].c_str());
 		member.set_city(res[0][2].c_str());
@@ -471,9 +471,40 @@ SQLEngine::delete_provider(const std::string &id)
 }
 
 bool
-SQLEngine::get_provider(std::string &id)
+SQLEngine::get_provider(Provider & provider)
+
 {
+	if (!is_connected()) {
+		std::cout << "DB connection failed\n";
+		return false;
+	}
+	try {
+	pqxx::work transaction(*conn);
+	pqxx::result res = transaction.exec(pqxx::zview(R"(SELECT name, address, city, zip, state_abbrev
+			FROM chocan.providers 
+			WHERE provider_id = $1)"),
+										pqxx::params{provider.get_ID()});
+
+	if (res.empty()) {
+		std::cout << "No member found with ID: " << provider.get_ID() << "\n";
+		return false;
+	}
+	
+	provider.set_name(res[0][0].c_str());
+	provider.set_address(res[0][1].c_str());
+	provider.set_city(res[0][2].c_str());
+	provider.set_zip(res[0][3].c_str());
+	provider.set_state(res[0][4].c_str());
+
+	std::cout << provider.get_name() << provider.get_address() << std::endl;
+
+
+	return true;
+	}
+	catch (const std::exception &e) {
+	std::cout << "Error retrieving member: " << e.what() << "\n";
 	return false;
+	}
 }
 
 //

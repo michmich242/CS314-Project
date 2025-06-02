@@ -31,40 +31,6 @@ Member::Display_Member_Info()
 }
 
 
-/*
-bool
-Member::delete_member()
-{
-
-	int member_id_test = 0;
-
-
-	if (!My_DB->validate_member(member_id)) {
-		return false;
-	}
-
-
-	if (id.length() != 9) {
-		return false;
-	}
-
-
-	try {
-		member_id_test = stoi(id);
-		std::cout << member_id_test << std::endl;
-	}
-	catch (const std::invalid_argument &e) {
-		std::cout << "Invalid argument: " << e.what() << std::endl;
-		return false;
-	}
-
-	// return My_DB->delete_member(member_id);
-
-	return false;
-}
-*/
-
-
 std::string &
 Member::get_name()
 {
