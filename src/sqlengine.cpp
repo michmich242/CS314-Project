@@ -238,7 +238,7 @@ SQLEngine::generate_manager_summary_reports(std::vector<ManagerSummary> &summari
 		auto res = transaction.exec(R"(
             SELECT p.provider_id, p.name, p.address, p.city, p.state, p.zip,
                    m.member_id, m.name, sr.date_of_service, sr.timestamp_received,
-                   sr.service_code, s.description
+                   sr.service_code, s.description, s.fee, sr.record_id
             FROM service_records sr
             JOIN providers p ON sr.provider_id = p.provider_id
             JOIN members m ON sr.member_id = m.member_id
@@ -248,7 +248,7 @@ SQLEngine::generate_manager_summary_reports(std::vector<ManagerSummary> &summari
 
 		std::map<std::string, ProviderSummary> provider_map;
 		int total_consultations = 0;
-		int total_fees = 0.0;
+		float total_fees = 0.0F;
 
 		for (const auto &row : res) {
 			std::string provider_id = row["provider_id"].as<std::string>();
@@ -266,8 +266,9 @@ SQLEngine::generate_manager_summary_reports(std::vector<ManagerSummary> &summari
 
 			ServiceRecord record(row["date_of_service"].as<std::string>(), row["timestamp_received"].as<std::string>(),
 								 row["provider_id"].as<std::string>(), row["member_id"].as<std::string>(),
-								 row["service_code"].as<std::string>(), row["description"].as<std::string>(),
-								 row["fee"].as<float>());
+								 row["service_code"].as<std::string>(), row["description"].as<std::string>());
+
+			record.set_ID(row["record_id"].as<std::string>());
 
 			auto &summary = provider_map[provider_id];
 			summary.records.push_back(record);
@@ -319,7 +320,6 @@ SQLEngine::add_member(Member &member)
 		try {
 			auto exists = transaction.query_value<int>(pqxx::zview("SELECT 1 FROM chocan.members WHERE member_id = $1"),
 													   pqxx::params{member.get_ID()});
-
 			std::cerr << "Member with ID: " << member.get_ID() << "already exists\n";
 			return false;
 		}
