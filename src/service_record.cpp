@@ -7,25 +7,18 @@
 
 /*ServiceRecord functions start*/
 
-ServiceRecord::ServiceRecord() : id(""), timestamp(""), date_of_service(""), provider_id(""), member_id(""), service_code(""), comment("")
+ServiceRecord::ServiceRecord()
+	: id(""), timestamp(""), date_of_service(""), provider_id(""), member_id(""), service_code(""), comment("")
 {
 	std::cout << "initializing ServiceRecord object..." << std::endl;
 }
 
-ServiceRecord::ServiceRecord(std::string date_of_service,
-                             std::string provider_id,
-                             std::string member_id,
-                             std::string service_code,
-                             std::string comment)
-    : id(""),
-	  timestamp(""),
-	  date_of_service(date_of_service),
-      provider_id(provider_id),
-      member_id(member_id),
-      service_code(service_code),
-      comment(comment) 
+ServiceRecord::ServiceRecord(std::string date_of_service, std::string provider_id, std::string member_id,
+							 std::string service_code, std::string comment)
+	: id(""), timestamp(""), date_of_service(date_of_service), provider_id(provider_id), member_id(member_id),
+	  service_code(service_code), comment(comment)
 {
-	std::cout << "initializing ServiceRecord object..." << std::endl;	
+	std::cout << "initializing ServiceRecord object..." << std::endl;
 }
 
 //
@@ -41,6 +34,12 @@ std::string &
 ServiceRecord::get_date()
 {
 	return date_of_service;
+}
+
+std::string &
+ServiceRecord::get_timestamp()
+{
+	return timestamp;
 }
 
 std::string &
@@ -80,8 +79,15 @@ ServiceRecord::set_ID(const std::string &id)
 std::string &
 ServiceRecord::set_date(const std::string &date)
 {
-	date_of_service = date;
-	return date_of_service;
+	this->date_of_service = date;
+	return this->date_of_service;
+}
+
+std::string &
+ServiceRecord::set_timestamp(const std::string &timestamp)
+{
+	this->timestamp = timestamp;
+	return this->timestamp;
 }
 
 std::string &
