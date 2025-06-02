@@ -457,7 +457,7 @@ SQLEngine::delete_provider(const std::string &id)
 
 		// Ensure a row was deleted
 		if (res.affected_rows() == 0) {
-			std::cerr << "No member found with ID: " << id << "\n";
+			std::cerr << "No provider found with ID: " << id << "\n";
 			return false;
 		}
 
@@ -486,7 +486,7 @@ SQLEngine::get_provider(Provider & provider)
 										pqxx::params{provider.get_ID()});
 
 	if (res.empty()) {
-		std::cout << "No member found with ID: " << provider.get_ID() << "\n";
+		std::cout << "No provider found with ID: " << provider.get_ID() << "\n";
 		return false;
 	}
 	

@@ -73,16 +73,15 @@ namespace utils {
 
 
     inline bool is_valid_date(const std::string &date) {
-        std::regex date_format(R"(^([0-2][0-9]|3[01])-(0[1-9]|1[0-2])-\d{4}$)");
+        std::regex date_format(R"(^(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])-\d{4}$)");
         if (!std::regex_match(date, date_format)) {
             return false;
         }
         
-        int day = std::stoi(date.substr(0, 2));
-        int month = std::stoi(date.substr(3, 2));
+        int month = std::stoi(date.substr(0, 2));
+        int day = std::stoi(date.substr(3, 2));
         int year = std::stoi(date.substr(6, 4));
 
-        // reasonable year bounds 
         if (year < 1900 || year > 2100) {
             return false;
         }
@@ -95,15 +94,15 @@ namespace utils {
         }
         
         return day >= 1 && day <= days_in_month[month - 1];
-    }
+}
 
     inline std::string get_date_of_service() {
         std::string date;
-        std::cout << "Enter the date of service (DD-MM-YYYY): ";
+        std::cout << "Enter the date of service (MM-DD-YYYY): ";
         std::getline(std::cin, date);
 
         while (!is_valid_date(date)) { // Match the function name
-            std::cout << "Invlid date. Please use DD-MM-YYYY: ";
+            std::cout << "Invlid date. Please use MM-DD-YYYY: ";
             std::getline(std::cin, date);
         } 
         return date;

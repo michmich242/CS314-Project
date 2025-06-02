@@ -20,6 +20,7 @@ Provider_User::start_provider() {
 		std::cin.ignore(100, '\n');
 		std::cout << std::endl;
 
+		//member validation
 		if (check == 1) {
 			if(member_validation_wrapper()) {
 				std::cout << "Member Status: Active" << std::endl;
@@ -27,8 +28,17 @@ Provider_User::start_provider() {
 				std::cout << "Member Status: Innactive" << std::endl;
 			}
 		}
+		//service record
 		if (check == 2) {
-			create_service_record();
+			if(create_service_record()) {
+				std::cout << "Service record successfully created!" << std::endl;
+			} else {
+				std::cout << "Service record creation failed." << std::endl;
+			}
+		}
+		//provider directory
+		if (check == 3) {
+			//display service directory
 		}
 	}
 	return true;
@@ -114,7 +124,6 @@ Provider_User::create_service_record()
 	Service service = db.get_service(service_code);
 
 	//std::cout << "Service name: " << service.get_name() << std::endl;
-	std::cout << "Service name: " << "not connected to db!!" << std::endl;
 
 	std::string comment = utils::get_comments();
 
