@@ -131,7 +131,7 @@ Provider_User::create_service_record()
 	std::cout << "Total fee: " << service.get_fee() << std::endl;
 
 	//create service record object
-	ServiceRecord record(date_of_service, user.get_ID(), member_number, service_code, comment);
+	ServiceRecord record(date_of_service, "", user.get_ID(), member_number, service_code, comment);
 	
 	//save record to db
 

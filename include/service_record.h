@@ -27,7 +27,11 @@ class ServiceRecord {
 
 	// Constructor and Destructor
 	ServiceRecord();
-	ServiceRecord(std::string date_of_service, std::string provider_id, std::string member_id, std::string service_code,
+	ServiceRecord(std::string date_of_service, 
+				  std::string timestamp,
+				  std::string provider_id, 
+				  std::string member_id, 
+				  std::string service_code,
 				  std::string comment);
 
 	std::string &get_ID();
