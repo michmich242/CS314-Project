@@ -730,6 +730,7 @@ SQLEngine::get_all_services(std::vector<Service> &services)
 // @PARAMS: const ServiceRecord &record - Service Record populated with new db
 // info
 // **SERVICE CODE AND TIMESTAMP OVERWRITTEN**
+// **CURRENT DATE is handled automatically by db **
 bool
 SQLEngine::save_service_record(ServiceRecord &record)
 {

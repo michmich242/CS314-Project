@@ -11,7 +11,7 @@ Provider_User::start_provider() {
 		
 		std::cout << "1. member validation" << std::endl;
 		std::cout << "2. service billing" << std::endl;
-		std::cout << "3. provider directory" << std::endl;
+		std::cout << "3. write service directory to file" << std::endl;
 		std::cout << "4. quit" << std::endl;
 		std::cout << "Enter your option (1 - 4): ";
 
@@ -130,11 +130,49 @@ Provider_User::create_service_record()
 	// std::cout << "Total fee: " << service.get_fee() << std::endl;
 	std::cout << "Total fee: " << service.get_fee() << std::endl;
 
+	//create service record object
+	ServiceRecord record(date_of_service, user.get_ID(), member_number, service_code, comment);
+	
+	//save record to db
 
-	return false;
+	return db.save_service_record(record);
 }
 
-// call db.get_all_services(std::vector<Services> &services)
+bool
+Provider_User::generate_service_directory() {
+	std::vector<Service> services;
+
+	if(!db.get_all_services(services)) {
+		std::cerr << "Error: failed to get services from database" << std::endl;
+		return false;
+	}
+
+	std::ofstream file("../service_directory.txt");
+    if (!file.is_open()) {
+        std::cerr << "Error: Could not open service_directory.txt for writing" << std::endl;
+        return false;
+    }
+
+	// header
+	file << "+ - - - - - - - - - - - +" << std::endl;
+    file << "+   SERVICE DIRECTORY   +" << std::endl;
+    file << "+ - - - - - - - - - - - +\n" << std::endl;
+    file << std::left << std::setw(10) << "Code" 
+         << std::setw(10) << "Fee" 
+         << "Description\n";
+    file << std::string(50, '-') << "\n";
+    
+	//write to file
+    for (auto& service : services) {
+        file << std::left << std::setw(10) << service.get_code()
+             << std::setw(10) << std::fixed << std::setprecision(2) << service.get_fee()
+             << service.get_description() << "\n";
+    }
+    
+    file.close();
+
+}
+
 void
 Provider_User::display_service_directory()
 {
