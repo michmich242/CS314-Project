@@ -382,8 +382,8 @@ SQLEngine::add_provider(Provider &provider)
 		}
 		// Run Query
 		std::string new_provider_id =
-			transaction.query_value<std::string>(pqxx::zview("INSERT INTO chocan.providers (name, address, city, state_abbrev, zip))"
-															 "VALUES ($1, $2, $3, $4, $5)"),
+			transaction.query_value<std::string>(pqxx::zview("INSERT INTO chocan.providers (name, address, city, state_abbrev, zip)"
+															 " VALUES ($1, $2, $3, $4, $5) RETURNING provider_id"),
 												 pqxx::params{provider.get_name(), provider.get_address(), provider.get_city(), provider.get_state(), provider.get_zip()});
 
 		provider.set_ID(new_provider_id);

@@ -25,6 +25,9 @@ Manager::start_manager()
 		if (check == 1) {
 			display_Member_Menu();
 		}
+		else if(check == 2){
+			display_Provider_Menu();
+		}
 	}
 
 
@@ -159,3 +162,66 @@ bool Manager::delete_member(){
 
 
 }
+
+
+
+void Manager::get_valid_provider_input(Provider & provider){
+	
+	auto get_input = [](const std::string &prompt, const std::regex &pattern, int max_len = -1) {
+		std::string input;
+		while (true) {
+			std::cout << prompt;
+			std::getline(std::cin, input);
+			if ((max_len == -1 || input.length() <= static_cast<size_t>(max_len)) && std::regex_match(input, pattern)) {
+				return input;
+			}
+			std::cout << "Invalid input. Please try again.\n";
+		}
+	};
+
+	provider.set_name(get_input("Enter Provider name (max 25 characters): ", std::regex("^.{1,25}$")));
+	provider.set_address(get_input("Enter street address (max 25 characters): ", std::regex("^.{1,25}$")));
+	provider.set_city(get_input("Enter city (max 14 characters): ", std::regex("^.{1,14}$")));
+	provider.set_state(get_input("Enter state (2 letters): ", std::regex("^[A-Za-z]{2}$")));
+	provider.set_zip(get_input("Enter ZIP code (5 digits): ", std::regex("^\\d{5}$")));
+}
+
+
+
+void Manager::display_Provider_Menu(){
+	int check{0};
+	while (check != 4) {
+		std::cout << "1. Add Provider\n";
+		std::cout << "2. Update Provider\n";
+		std::cout << "3. Remove Provider\n";
+		std::cout << "4. Quit to Main Manager Menu\n";
+		std::cout << "Enter your option (1 - 4): ";
+
+		std::cin >> check;
+		std::cin.ignore(100, '\n');
+
+		if (check == 1) {
+			P_add_provider();
+		}
+		else if (check == 2) {
+			update_member();
+		}
+		else if (check == 3){
+			delete_member();
+		}
+	}
+
+}
+
+bool Manager::P_add_provider(){
+	if (!db.is_connected()) {
+		return false;
+	}
+
+	Provider provider;
+	get_valid_provider_input(provider);
+	return db.add_provider(provider);
+
+}
+
+

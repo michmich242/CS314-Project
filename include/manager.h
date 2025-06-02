@@ -20,6 +20,8 @@ class Manager {
 	// Member input functions
 	// Consider moving to util
 	void get_valid_member_input(Member &member);
+	void get_valid_provider_input(Provider & provider);
+
 
 
   public:
@@ -35,4 +37,11 @@ class Manager {
 	bool delete_member();
 
 	void display_Member_Menu();
+
+
+	bool P_add_provider();
+	bool P_update_provider();
+	bool P_delete_provider();
+
+	void display_Provider_Menu();
 };
