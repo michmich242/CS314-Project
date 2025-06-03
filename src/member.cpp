@@ -131,7 +131,7 @@ Member::get_subscription() const
 }
 
 bool
-Member::set_status(bool status)
+Member::set_subscription(bool status)
 {
 	this->subscription = subscription;
 	return this->subscription;
