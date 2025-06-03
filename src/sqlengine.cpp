@@ -622,7 +622,7 @@ SQLEngine::get_provider(Provider &provider)
 		return false;
 	}
 	try {
-		pqxx::work transaction(*conn);
+		pqxx::work transaction(get_connection());
 		pqxx::result res = transaction.exec(pqxx::zview(R"(SELECT name, address, city, zip, state_abbrev
 			FROM chocan.providers 
 			WHERE provider_id = $1)"),
@@ -654,29 +654,29 @@ bool
 SQLEngine::validate_provider(const std::string &provider_id)
 {
 	if (!is_connected()) {
-        std::cout << "DB connection failed\n";
-        return false;
-    }
-    
-    try {
-        pqxx::work transaction(*conn);
-        pqxx::result res = transaction.exec(pqxx::zview(R"(SELECT 1 
+		std::cout << "DB connection failed\n";
+		return false;
+	}
+
+	try {
+		pqxx::work transaction(*conn);
+		pqxx::result res = transaction.exec(pqxx::zview(R"(SELECT 1 
             FROM chocan.providers 
             WHERE provider_id = $1)"),
-                                          pqxx::params{provider_id});
-        
-        if (res.empty()) {
-            std::cout << "No provider found with ID: " << provider_id << "\n";
-            return false;
-        }
-        
-        transaction.commit();
-        return true;
-        
-    } catch (const std::exception& e) {
-        std::cerr << "Database error in verify_provider_exists: " << e.what() << "\n";
-        return false;
-    }
+											pqxx::params{provider_id});
+
+		if (res.empty()) {
+			std::cout << "No provider found with ID: " << provider_id << "\n";
+			return false;
+		}
+
+		transaction.commit();
+		return true;
+	}
+	catch (const std::exception &e) {
+		std::cerr << "Database error in verify_provider_exists: " << e.what() << "\n";
+		return false;
+	}
 }
 
 //
@@ -692,7 +692,7 @@ Service
 SQLEngine::get_service(const std::string &code)
 {
 	// Check My_DBection
-	if (is_connected()) {
+	if (!is_connected()) {
 		std::cerr << "db not open\n";
 		return Service{};
 	}
@@ -703,12 +703,12 @@ SQLEngine::get_service(const std::string &code)
 
 		// Run Query
 		auto [i_description, fee] = transaction.query1<std::string, float>(
-			pqxx::zview("SELECT description, fee FROM Services WHERE service_code = $1"), pqxx::params{code});
+			pqxx::zview("SELECT description, fee FROM chocan.Services WHERE service_code = $1"), pqxx::params{code});
 
 		return Service(code, fee, i_description);
 	}
 	catch (const std::exception &e) {
-		std::cerr << "Error inserting member: " << e.what() << "\n";
+		std::cerr << "Error retrieving service: " << e.what() << "\n";
 		return Service{};
 	}
 }
@@ -775,7 +775,7 @@ SQLEngine::save_service_record(ServiceRecord &record)
 
 		// Attempt Query
 		std::string new_id = transaction.query_value<std::string>(
-			pqxx::zview(R"(INSERT INTO ServiceRecords
+			pqxx::zview(R"(INSERT INTO chocan.Service_Records
 						  (date_of_service, provider_id, member_id, service_code, comments)
             			  VALUES($1, $2, $3, $4, $5) RETURNING service_code)"),
 			pqxx::params{record.get_date(), record.get_provider(), record.get_member(), record.get_service_code(),
@@ -793,14 +793,9 @@ SQLEngine::save_service_record(ServiceRecord &record)
 	}
 }
 
-
-
-
-
-
-
-
-bool SQLEngine::add_service(Service & service){
+bool
+SQLEngine::add_service(Service &service)
+{
 	// Ensure My_DBection
 	if (!is_connected()) {
 		std::cerr << "db not open\n";
@@ -816,7 +811,7 @@ bool SQLEngine::add_service(Service & service){
 			pqxx::zview(R"(INSERT INTO chocan.services
 						  (code, fee, description)
             			  VALUES($1, $2, $3))"),
-			pqxx::params{service.get_code(), service.get_fee(), service.get_description()}); 
+			pqxx::params{service.get_code(), service.get_fee(), service.get_description()});
 
 		// Finalize transaction
 		transaction.commit();
@@ -828,10 +823,12 @@ bool SQLEngine::add_service(Service & service){
 	}
 }
 
-bool update_service(Service & service){
-
+bool
+update_service(Service &service)
+{
 }
 
-bool delete_service(const std::string & code){
-	
+bool
+delete_service(const std::string &code)
+{
 }
