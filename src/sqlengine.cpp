@@ -763,3 +763,22 @@ SQLEngine::save_service_record(ServiceRecord &record)
 		return false;
 	}
 }
+
+
+
+
+
+
+
+
+bool add_service(Service & service){
+
+}
+
+bool update_service(Service & service){
+
+}
+
+bool delete_service(const std::string & code){
+	
+}

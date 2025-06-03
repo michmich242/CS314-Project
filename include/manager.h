@@ -21,6 +21,8 @@ class Manager {
 	// Consider moving to util
 	void get_valid_member_input(Member &member);
 	void get_valid_provider_input(Provider & provider);
+	void get_valid_service_input(Service & service);
+
 
 
 
@@ -44,4 +46,11 @@ class Manager {
 	bool P_delete_provider();
 
 	void display_Provider_Menu();
+
+
+	bool S_add_service();
+	bool S_update_service();
+	bool S_delete_service();
+
+	void display_Service_Menu();
 };

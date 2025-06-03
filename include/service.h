@@ -15,15 +15,18 @@ class Service {
 	Service();
 	Service(const std::string &code, float fee, const std::string &description);
 
-	const std::string &get_code();
-	const float &get_fee();
-	const std::string &get_description();
+	std::string & get_code();
+	std::string & set_code(const std::string & to_set);
 
-	std::string &set_code(std::string &code);
-	float &set_fee(float &fee);
-	std::string &set_description(std::string &description);
+	float & get_fee();
+	float & set_fee(const float & to_set);
+
+	std::string & get_description();
+	std::string & set_description(const std::string & to_set);
 
 	bool get_service();
+
+	void Display_Service_Info();
 
   private:
 

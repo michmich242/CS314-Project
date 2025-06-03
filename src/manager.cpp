@@ -1,5 +1,6 @@
 #include "../include/manager.h"
 #include "../include/sqlengine.h"
+#include "../include/service.h"
 #include "../include/utils.h"
 #include <regex>
 
@@ -11,11 +12,12 @@ Manager::start_manager()
 {
 	int check{0};
 
-	while (check != 3) {
+	while (check != 4) {
 		std::cout << "1. Member Manager Terminal" << std::endl;
 		std::cout << "2. Provider Manager Terminal" << std::endl;
-		std::cout << "3. Exit Program" << std::endl;
-		std::cout << "Enter your option (1 - 3): ";
+		std::cout << "3. Service Manager Terminal" << std::endl;
+		std::cout << "4. Exit Program" << std::endl;
+		std::cout << "Enter your option (1 - 4): ";
 
 
 		std::cin >> check;
@@ -283,6 +285,31 @@ bool Manager::P_delete_provider(){
 	return db.delete_provider(input_id);
 
 }
+
+
+void Manager::get_valid_service_input(Service & service){
+	std::string fee_string;
+	auto get_input = [](const std::string &prompt, const std::regex &pattern, int max_len = -1) {
+		std::string input;
+		while (true) {
+			std::cout << prompt;
+			std::getline(std::cin, input);
+			if ((max_len == -1 || input.length() <= static_cast<size_t>(max_len)) && std::regex_match(input, pattern)) {
+				return input;
+			}
+			std::cout << "Invalid input. Please try again.\n";
+		}
+	};
+
+	service.set_description(get_input("Enter service description (max 100 characters): ", std::regex("^.{1,100}$")));
+	service.set_code(get_input("Enter service code (6 digits): ", std::regex("^\\d{6}$")));
+
+	fee_string = get_input("Enter service fee (0 to 99999): ", std::regex ("^\\d{1,5}$"));
+	service.set_fee(std::stof(fee_string));
+
+}
+
+
 
 
 

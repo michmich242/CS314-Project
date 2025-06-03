@@ -15,41 +15,39 @@ Service::Service(const std::string &code, float fee, const std::string &descript
 {
 }
 
-const std::string &
-Service::get_code()
-{
+
+std::string & Service::get_code(){
 	return code;
 }
 
-std::string &
-Service::set_code(std::string &code)
-{
-	this->code = code;
-	return this->code;
+
+std::string & Service::set_code(const std::string & to_set){
+	code = to_set;
+	return code;
 }
 
-const float &
-Service::get_fee()
-{
+float & Service::get_fee(){
 	return fee;
 }
 
-float &
-Service::set_fee(float &fee)
-{
-	this->fee = fee;
-	return this->fee;
+float & Service::set_fee(const float & to_set){
+	fee = to_set;
+	return fee;
 }
 
-const std::string &
-Service::get_description()
-{
+std::string & Service::get_description(){
+	return description;
+}
+std::string & Service::set_description(const std::string & to_set){
+	description = to_set;
 	return description;
 }
 
-std::string &
-Service::set_description(std::string &description)
-{
-	this->description = description;
-	return this->description;
+
+
+void Service::Display_Service_Info(){
+	std::cout << "----------------------------------------------------\n";
+	std::cout << "	Service Description: " << description << "\n"
+			  << "	Service Code: " << code << "\n"
+			  << "	Fee: " << fee << "\n";
 }

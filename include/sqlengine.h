@@ -120,6 +120,11 @@ class SQLEngine {
 
 	// Service Directory Functions
 	Service get_service(const std::string &code);
+
+	bool add_service(Service & service);
+	bool update_service(Service & service);
+	bool delete_service(const std::string & code);
+
 	bool get_all_services(std::vector<Service> &services);
 
 
