@@ -12,9 +12,10 @@ Member::~Member()
 }
 
 Member::Member(const std::string &passed_member_name, const std::string &passed_address, const std::string &passed_city,
-			   const std::string &passed_state, const std::string &passed_zip, const bool &passed_status)
+			   const std::string &passed_state, const std::string &passed_zip, const bool &passed_status,
+			   const bool &passed_subscription)
 	: name(passed_member_name), id(""), address(passed_address), city(passed_city), state(passed_state),
-	  zip(passed_zip), status(passed_status)
+	  zip(passed_zip), status(passed_status), subscription(passed_subscription)
 {
 }
 
@@ -121,4 +122,17 @@ Member::set_status(bool status)
 {
 	this->status = status;
 	return this->status;
+}
+
+bool
+Member::get_subscription() const
+{
+	return subscription;
+}
+
+bool
+Member::set_status(bool status)
+{
+	this->subscription = subscription;
+	return this->subscription;
 }

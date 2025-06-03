@@ -318,10 +318,11 @@ SQLEngine::add_member(Member &member)
 		pqxx::work transaction(get_connection());
 
 		std::string new_member_id = transaction.query_value<std::string>(
-			pqxx::zview("INSERT INTO chocan.MEMBERS (name, address, city, state_abbrev, zip, active_status) "
-						"VALUES ($1, $2, $3, $4, $5, $6) RETURNING member_id"),
+			pqxx::zview("INSERT INTO chocan.MEMBERS (name, address, city, state_abbrev, zip, active_status, "
+						"active_sub) "
+						"VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING member_id"),
 			pqxx::params{member.get_name(), member.get_address(), member.get_city(), member.get_state(),
-							member.get_zip(), true});
+						 member.get_zip(), true, true});
 
 		member.set_ID(new_member_id);
 
@@ -387,10 +388,11 @@ SQLEngine::get_member(Member &member)
 	}
 	try {
 		pqxx::work transaction(*conn);
-		pqxx::result res = transaction.exec(pqxx::zview(R"(SELECT name, address, city, zip, state_abbrev, active_status
+		pqxx::result res =
+			transaction.exec(pqxx::zview(R"(SELECT name, address, city, zip, state_abbrev, active_status, active_sub
 			 FROM chocan.members 
 			 WHERE member_id = $1)"),
-											pqxx::params{member.get_ID()});
+							 pqxx::params{member.get_ID()});
 
 		if (res.empty()) {
 			std::cout << "No member found with ID: " << member.get_ID() << "\n";
@@ -403,6 +405,7 @@ SQLEngine::get_member(Member &member)
 		member.set_zip(res[0][3].c_str());
 		member.set_state(res[0][4].c_str());
 		member.set_status(res[0][5].as<bool>());
+		member.set_subscription(res[0][6].as<bool>());
 
 
 		return true;
@@ -429,7 +432,8 @@ SQLEngine::delete_member(const std::string &id)
 		pqxx::work transaction(get_connection());
 
 		// Run Query
-		auto res = transaction.exec(pqxx::zview("DELETE FROM chocan.members WHERE member_id = $1"), pqxx::params{id});
+		auto res = transaction.exec(pqxx::zview("UPDATE chocan.members SET active_sub = $1 WHERE member_id = $2"),
+									pqxx::params{false, id});
 
 		// Ensure a row was deleted
 		if (res.affected_rows() == 0) {
@@ -463,7 +467,7 @@ SQLEngine::validate_member(const std::string &id)
 
 		try {
 			bool status = transaction.query_value<bool>(
-				pqxx::zview("SELECT active_status FROM chocan.members WHERE member_id = $1"), pqxx::params{id});
+				pqxx::zview("SELECT active_sub FROM chocan.members WHERE member_id = $1"), pqxx::params{id});
 			transaction.commit();
 			return status;
 		}
@@ -668,7 +672,9 @@ SQLEngine::validate_provider(const std::string &provider_id)
 // Retrieves a specific service via service_code and returns new object
 // @PARAMS: const std::string &code - 6-digit service_code
 
-bool SQLEngine::validate_service(const std::string & code){
+bool
+SQLEngine::validate_service(const std::string &code)
+{
 	if (!is_connected()) {
 		std::cout << "DB connection failed\n";
 		return false;
@@ -695,11 +701,8 @@ bool SQLEngine::validate_service(const std::string & code){
 	}
 }
 
-
-
-
 bool
-SQLEngine::get_service(Service & service)
+SQLEngine::get_service(Service &service)
 {
 	if (!is_connected()) {
 		std::cout << "DB connection failed\n";
@@ -823,11 +826,11 @@ SQLEngine::add_service(Service &service)
 		pqxx::work transaction(get_connection());
 
 		// Attempt Query
-		std::string returning_code =  transaction.query_value<std::string>(
-			pqxx::zview(R"(INSERT INTO chocan.services
+		std::string returning_code =
+			transaction.query_value<std::string>(pqxx::zview(R"(INSERT INTO chocan.services
 						  (description, fee, active_status)
             			  VALUES($1, $2, $3) RETURNING service_code)"),
-			pqxx::params{service.get_description(), service.get_fee(), true});
+												 pqxx::params{service.get_description(), service.get_fee(), true});
 
 		// Finalize transaction
 		service.set_code(returning_code);
@@ -843,27 +846,24 @@ SQLEngine::add_service(Service &service)
 bool
 SQLEngine::update_service(Service &service)
 {
-		if (!is_connected()) {
+	if (!is_connected()) {
 		std::cerr << "DB connection failed\n";
 		return false;
 	}
 
-	
 
 	try {
 		// Start a transaction
 		pqxx::work transaction(get_connection());
 
 
+		bool returning_code = transaction.query_value<bool>(pqxx::zview(R"(SELECT active_status
+                                                                           FROM chocan.services
+                                                                           WHERE service_code = $1)"),
+															pqxx::params{service.get_code()});
 
-		bool returning_code =  transaction.query_value<bool>(
-			pqxx::zview(R"(SELECT active_status
-							FROM chocan.services
-							WHERE service_code = $1)"),
-			pqxx::params{service.get_code()});
 
-		
-		if(!returning_code){
+		if (!returning_code) {
 			std::cout << "The current service is deleted." << std::endl;
 			return false;
 		}
@@ -893,10 +893,9 @@ SQLEngine::update_service(Service &service)
 	}
 }
 
-
-
 bool
-SQLEngine::delete_service(const std::string &code){
+SQLEngine::delete_service(const std::string &code)
+{
 	// Double check if My_DBection is open
 	if (!is_connected()) {
 		std::cerr << "DB connection failed\n";
@@ -909,13 +908,12 @@ SQLEngine::delete_service(const std::string &code){
 		pqxx::work transaction(get_connection());
 
 		// Attempt to Update
-		pqxx::result res =
-			transaction.exec(pqxx::zview(R"(UPDATE chocan.services
+		pqxx::result res = transaction.exec(pqxx::zview(R"(UPDATE chocan.services
 						   SET active_status = $1 
 						   WHERE service_code = $2)"),
 
-							 // variables being passed to $#
-							 pqxx::params{set_stat, code});
+											// variables being passed to $#
+											pqxx::params{set_stat, code});
 
 		// Check if query modified a row
 		if (res.affected_rows() == 0) {
@@ -931,5 +929,4 @@ SQLEngine::delete_service(const std::string &code){
 		std::cerr << "Error deleting service: " << e.what() << "\n";
 		return false;
 	}
-
 }
