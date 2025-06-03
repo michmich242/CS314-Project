@@ -30,6 +30,9 @@ Manager::start_manager()
 		else if(check == 2){
 			display_Provider_Menu();
 		}
+		else if(check == 3){
+			display_Service_Menu();
+		}
 	}
 
 
@@ -287,7 +290,36 @@ bool Manager::P_delete_provider(){
 }
 
 
-void Manager::get_valid_service_input(Service & service){
+
+void Manager::display_Service_Menu(){
+	int check{0};
+	while (check != 4) {
+		std::cout << "1. Add Service\n";
+		std::cout << "2. Update Service\n";
+		std::cout << "3. Remove Service\n";
+		std::cout << "4. Quit to Main Manager Menu\n";
+		std::cout << "Enter your option (1 - 4): ";
+
+		std::cin >> check;
+		std::cin.ignore(100, '\n');
+
+		if (check == 1) {
+			S_add_service();
+		}
+		else if (check == 2) {
+			P_update_provider();
+		}
+		else if (check == 3){
+			P_delete_provider();
+		}
+	}
+
+}
+
+
+
+
+void Manager::get_valid_service_input(Service & service, int A_P){
 	std::string fee_string;
 	auto get_input = [](const std::string &prompt, const std::regex &pattern, int max_len = -1) {
 		std::string input;
@@ -302,8 +334,11 @@ void Manager::get_valid_service_input(Service & service){
 	};
 
 	service.set_description(get_input("Enter service description (max 100 characters): ", std::regex("^.{1,100}$")));
-	service.set_code(get_input("Enter service code (6 digits): ", std::regex("^\\d{6}$")));
 
+	if(A_P == 1){
+		service.set_code(get_input("Enter service code (6 digits): ", std::regex("^\\d{6}$")));
+	}
+	
 	fee_string = get_input("Enter service fee (0 to 99999): ", std::regex ("^\\d{1,5}$"));
 	service.set_fee(std::stof(fee_string));
 
@@ -311,6 +346,27 @@ void Manager::get_valid_service_input(Service & service){
 
 
 
+
+
+bool Manager::S_add_service(){
+	
+	if (!db.is_connected()) {
+		return false;
+	}
+
+	Service service;
+	get_valid_service_input(service, 0);
+	return db.add_service(service);
+
+}
+
+bool Manager::S_update_service(){
+
+}
+
+bool Manager::S_delete_service(){
+
+}
 
 
 

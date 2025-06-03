@@ -317,25 +317,16 @@ SQLEngine::add_member(Member &member)
 		// Start a transaction, typical read/write My_DBection
 		pqxx::work transaction(get_connection());
 
-		try {
-			auto exists = transaction.query_value<int>(pqxx::zview("SELECT 1 FROM chocan.members WHERE member_id = $1"),
-													   pqxx::params{member.get_ID()});
-			std::cerr << "Member with ID: " << member.get_ID() << "already exists\n";
-			return false;
-		}
-		catch (const pqxx::unexpected_rows &) {
-			// member doesnt exist
-			std::string new_member_id = transaction.query_value<std::string>(
-				pqxx::zview("INSERT INTO chocan.MEMBERS (name, address, city, state_abbrev, zip, active_status) "
-							"VALUES ($1, $2, $3, $4, $5, $6) RETURNING member_id"),
-				pqxx::params{member.get_name(), member.get_address(), member.get_city(), member.get_state(),
-							 member.get_zip(), true});
+		std::string new_member_id = transaction.query_value<std::string>(
+			pqxx::zview("INSERT INTO chocan.MEMBERS (name, address, city, state_abbrev, zip, active_status) "
+						"VALUES ($1, $2, $3, $4, $5, $6) RETURNING member_id"),
+			pqxx::params{member.get_name(), member.get_address(), member.get_city(), member.get_state(),
+							member.get_zip(), true});
 
-			member.set_ID(new_member_id);
+		member.set_ID(new_member_id);
 
-			transaction.commit();
-			return true;
-		}
+		transaction.commit();
+		return true;
 	}
 	catch (const std::exception &e) {
 		std::cerr << "Error Inserting Member: " << e.what() << "\n";
@@ -511,16 +502,6 @@ SQLEngine::add_provider(Provider &provider)
 		// Start a transaction
 		pqxx::work transaction(get_connection());
 
-		try {
-			auto exists = transaction.query_value<int>(
-				pqxx::zview("SELECT 1 FROM chocan.providers WHERE provider_id = $1"), pqxx::params{provider.get_ID()});
-
-			std::cerr << "Provider with ID: " << provider.get_ID() << "already exists\n";
-			return false;
-		}
-		catch (const pqxx::unexpected_rows &) {
-			// provider doesnt exist
-		}
 		// Run Query
 		std::string new_provider_id = transaction.query_value<std::string>(
 			pqxx::zview("INSERT INTO chocan.providers (name, address, city, state_abbrev, zip)"
@@ -807,13 +788,14 @@ SQLEngine::add_service(Service &service)
 		pqxx::work transaction(get_connection());
 
 		// Attempt Query
-		transaction.query_value<std::string>(
+		std::string returning_code =  transaction.query_value<std::string>(
 			pqxx::zview(R"(INSERT INTO chocan.services
-						  (code, fee, description)
-            			  VALUES($1, $2, $3))"),
-			pqxx::params{service.get_code(), service.get_fee(), service.get_description()});
+						  (description, fee)
+            			  VALUES($1, $2) RETURNING service_code)"),
+			pqxx::params{service.get_description(), service.get_fee()});
 
 		// Finalize transaction
+		service.set_code(returning_code);
 		transaction.commit();
 		return true;
 	}
@@ -824,8 +806,38 @@ SQLEngine::add_service(Service &service)
 }
 
 bool
-update_service(Service &service)
+SQLEngine::update_service(Service &service)
 {
+		if (!is_connected()) {
+		std::cerr << "db My_DBection not open\n";
+		return false;
+	}
+
+	try {
+		// Start a transaction
+		pqxx::work transaction(get_connection());
+		pqxx::result res =
+			transaction.exec(pqxx::zview(R"(UPDATE chocan.providers 
+			                SET description = $1, fee = $2
+                			WHERE service_code = $3)"),
+
+							 // variables being passed to $#
+							 pqxx::params{service.get_description(), service.get_fee(), service.get_code()});
+
+		// Check if query modified a row
+		if (res.affected_rows() == 0) {
+			std::cerr << "No service code found with: " << service.get_code() << "\n";
+			return false;
+		}
+
+		// Finalize Transaction
+		transaction.commit();
+		return true;
+	}
+	catch (const std::exception &e) {
+		std::cerr << "Error Updating service: " << e.what() << "\n";
+		return false;
+	}
 }
 
 bool

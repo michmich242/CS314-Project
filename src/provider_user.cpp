@@ -170,11 +170,10 @@ Provider_User::generate_service_directory()
 	file << std::string(50, '-') << "\n";
 
 	// write to file
+	std::cout << "generating file..." << std::endl;
 	for (auto &service : services) {
 		file << std::left << std::setw(10) << service.get_code() << std::setw(10) << std::fixed << std::setprecision(2)
 			 << service.get_fee() << service.get_description() << "\n";
-
-		std::cout << "generating file..." << std::endl;
 	}
 
 	file.close();

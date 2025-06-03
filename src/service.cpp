@@ -7,7 +7,6 @@
 
 Service::Service() : code(""), fee(0.0), description("")
 {
-	std::cout << "initializing Service object..." << std::endl;
 }
 
 Service::Service(const std::string &code, float fee, const std::string &description)
@@ -50,4 +49,5 @@ void Service::Display_Service_Info(){
 	std::cout << "	Service Description: " << description << "\n"
 			  << "	Service Code: " << code << "\n"
 			  << "	Fee: " << fee << "\n";
+	std::cout << "----------------------------------------------------\n";
 }

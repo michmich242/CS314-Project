@@ -21,7 +21,7 @@ class Manager {
 	// Consider moving to util
 	void get_valid_member_input(Member &member);
 	void get_valid_provider_input(Provider & provider);
-	void get_valid_service_input(Service & service);
+	void get_valid_service_input(Service & service, int A_P);
 
 
 
