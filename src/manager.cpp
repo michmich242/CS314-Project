@@ -310,7 +310,7 @@ void Manager::display_Service_Menu(){
 			S_update_service();
 		}
 		else if (check == 3){
-			P_delete_provider();
+			S_delete_service();
 		}
 	}
 
@@ -392,6 +392,25 @@ bool Manager::S_update_service(){
 }
 
 bool Manager::S_delete_service(){
+	
+	std::string input_id;
+
+	try {
+
+		std::regex six_digits("^\\d{6}$");
+		while (!(std::regex_match(input_id, six_digits))) {
+			std::cout << "Enter a 6 digit service code: ";
+			std::cin >> input_id;
+			std::cin.ignore(100, '\n');
+		}
+
+	}
+	catch (const std::invalid_argument &e) {
+		std::cout << "Invalid argument: " << e.what() << "\n";
+		return false;
+	}
+
+	return db.delete_service(input_id);
 
 }
 

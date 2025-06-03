@@ -309,7 +309,7 @@ SQLEngine::add_member(Member &member)
 {
 	// Confirm Connection
 	if (!is_connected()) {
-		std::cerr << "db not open\n";
+		std::cerr << "DB connection failed\n";
 		return false;
 	}
 
@@ -344,7 +344,7 @@ SQLEngine::update_member(Member &member)
 {
 	// Double check if My_DBection is open
 	if (!is_connected()) {
-		std::cerr << "db not open\n";
+		std::cerr << "DB connection failed\n";
 		return false;
 	}
 
@@ -735,7 +735,7 @@ SQLEngine::get_all_services(std::vector<Service> &services)
 {
 	// Check Conn
 	if (!is_connected()) {
-		std::cerr << "db not open\n";
+		std::cerr << "DB connection failed\n";
 		return false;
 	}
 
@@ -781,7 +781,7 @@ SQLEngine::save_service_record(ServiceRecord &record)
 {
 	// Ensure My_DBection
 	if (!is_connected()) {
-		std::cerr << "db not open\n";
+		std::cerr << "DB connection failed\n";
 		return false;
 	}
 
@@ -814,7 +814,7 @@ SQLEngine::add_service(Service &service)
 {
 	// Ensure My_DBection
 	if (!is_connected()) {
-		std::cerr << "db not open\n";
+		std::cerr << "DB connection failed\n";
 		return false;
 	}
 
@@ -844,7 +844,7 @@ bool
 SQLEngine::update_service(Service &service)
 {
 		if (!is_connected()) {
-		std::cerr << "db My_DBection not open\n";
+		std::cerr << "DB connection failed\n";
 		return false;
 	}
 
@@ -876,6 +876,32 @@ SQLEngine::update_service(Service &service)
 }
 
 bool
-delete_service(const std::string &code)
+SQLEngine::delete_service(const std::string &code)
 {
+	if (!is_connected()) {
+		std::cerr << "DB connection failed\n";
+		return false;
+	}
+
+	try {
+		// Start a transaction
+		pqxx::work transaction(get_connection());
+		pqxx::result res;
+
+		// Run Query
+		res = transaction.exec(pqxx::zview("DELETE FROM chocan.services WHERE service_code = $1"), pqxx::params{code});
+
+		// Ensure a row was deleted
+		if (res.affected_rows() == 0) {
+			std::cerr << "No service code found with: " << code << "\n";
+			return false;
+		}
+
+		transaction.commit();
+		return true;
+	}
+	catch (const std::exception &e) {
+		std::cerr << "Error Deleting service: " << e.what() << "\n";
+		return false;
+	}
 }
