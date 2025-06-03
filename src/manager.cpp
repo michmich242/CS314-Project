@@ -207,7 +207,7 @@ void Manager::display_Provider_Menu(){
 			P_update_provider();
 		}
 		else if (check == 3){
-			delete_member();
+			P_delete_provider();
 		}
 	}
 
@@ -258,6 +258,32 @@ bool Manager::P_update_provider(){
 	return db.update_provider(provider);
 
 }
+
+
+bool Manager::P_delete_provider(){
+
+
+	std::string input_id;
+
+	try {
+
+		std::regex nine_digits("^\\d{9}$");
+		while (!(std::regex_match(input_id, nine_digits))) {
+			std::cout << "Enter a 9 digit member ID: ";
+			std::cin >> input_id;
+			std::cin.ignore(100, '\n');
+		}
+
+	}
+	catch (const std::invalid_argument &e) {
+		std::cout << "Invalid argument: " << e.what() << "\n";
+		return false;
+	}
+
+	return db.delete_provider(input_id);
+
+}
+
 
 
 
