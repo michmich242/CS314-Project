@@ -99,11 +99,7 @@ Provider_User::member_validation_wrapper()
 	std::cout << "enter 9-digit member number: " << std::endl;
 	std::getline(std::cin, member_ID);
 
-	if (!member_validation(member_ID)) {
-		return false;
-	}
-
-	return true;
+	return member_validation(member_ID);
 }
 
 // Calls db.save_service_record(record)

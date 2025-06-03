@@ -508,10 +508,10 @@ SQLEngine::add_provider(Provider &provider)
 
 		// Run Query
 		std::string new_provider_id = transaction.query_value<std::string>(
-			pqxx::zview("INSERT INTO chocan.providers (name, address, city, state_abbrev, zip)"
-						" VALUES ($1, $2, $3, $4, $5) RETURNING provider_id"),
+			pqxx::zview("INSERT INTO chocan.providers (name, address, city, state_abbrev, zip, active_status)"
+						" VALUES ($1, $2, $3, $4, $5, $6) RETURNING provider_id"),
 			pqxx::params{provider.get_name(), provider.get_address(), provider.get_city(), provider.get_state(),
-						 provider.get_zip()});
+						 provider.get_zip(), true});
 
 		provider.set_ID(new_provider_id);
 
@@ -537,8 +537,21 @@ SQLEngine::update_provider(Provider &provider)
 	}
 
 	try {
-		// Start a transaction
+		
 		pqxx::work transaction(get_connection());
+		bool returning_code = transaction.query_value<bool>(pqxx::zview(R"(SELECT active_status
+					FROM chocan.providers
+					WHERE provider_id = $1)"),
+					pqxx::params{provider.get_ID()});
+
+
+		if (!returning_code) {
+			std::cout << "The current service is deleted." << std::endl;
+			return false;
+		}
+
+
+		// Start a transaction
 		pqxx::result res =
 			transaction.exec(pqxx::zview(R"(UPDATE chocan.providers 
 			                SET name = $1, address = $2, city = $3, zip = $4, state_abbrev = $5 
@@ -570,30 +583,37 @@ SQLEngine::update_provider(Provider &provider)
 bool
 SQLEngine::delete_provider(const std::string &id)
 {
+	// Double check if My_DBection is open
 	if (!is_connected()) {
-		std::cerr << "db My_DBection not open\n";
+		std::cerr << "DB connection failed\n";
 		return false;
 	}
 
 	try {
 		// Start a transaction
+		bool set_stat = false;
 		pqxx::work transaction(get_connection());
-		pqxx::result res;
 
-		// Run Query
-		res = transaction.exec(pqxx::zview("DELETE FROM chocan.providers WHERE provider_id = $1"), pqxx::params{id});
+		// Attempt to Update
+		pqxx::result res = transaction.exec(pqxx::zview(R"(UPDATE chocan.providers
+						   SET active_status = $1 
+						   WHERE provider_id = $2)"),
 
-		// Ensure a row was deleted
+											// variables being passed to $#
+											pqxx::params{set_stat, id});
+
+		// Check if query modified a row
 		if (res.affected_rows() == 0) {
-			std::cerr << "No provider found with ID: " << id << "\n";
+			std::cerr << "No Provider ID found with: " << id << "\n";
 			return false;
 		}
 
+		// Finalize Transaction
 		transaction.commit();
 		return true;
 	}
 	catch (const std::exception &e) {
-		std::cerr << "Error Deleting Member: " << e.what() << "\n";
+		std::cerr << "Error deleting service: " << e.what() << "\n";
 		return false;
 	}
 }

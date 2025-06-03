@@ -34,6 +34,11 @@ class Provider {
 
 	std::string &get_zip();
 	std::string &set_zip(const std::string &to_set);
+
+	bool & get_status(const bool & to_set);
+	bool & set_status(const bool & to_set);
+
+
 	
 	void Display_Provider_Info();
 
@@ -46,5 +51,6 @@ class Provider {
 	std::string city;
 	std::string state;
 	std::string zip;
+	bool active_status;
 
 };

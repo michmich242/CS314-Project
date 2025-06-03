@@ -93,6 +93,15 @@ Provider::set_zip(const std::string &to_set)
 	return zip;
 }
 
+bool & Provider::set_status(const bool & to_set){
+	active_status = to_set;
+	return active_status;
+}
+
+bool & Provider::get_status(const bool & to_set){
+	return active_status;
+}
+
 
 void Provider::Display_Provider_Info(){
 	std::cout << "----------------------------------------------------" << std::endl;
