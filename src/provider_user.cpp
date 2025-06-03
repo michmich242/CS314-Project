@@ -6,14 +6,14 @@ Provider_User::start_provider()
 {
 
 	int check{0};
-	std::cout << "Welcome to the provider terminal!" << std::endl;
+	std::cout << "Welcome to the provider terminal!\n";
 
 	while (check != 4) {
 
-		std::cout << "1. member validation" << std::endl;
-		std::cout << "2. service billing" << std::endl;
-		std::cout << "3. write service directory to file" << std::endl;
-		std::cout << "4. quit" << std::endl;
+		std::cout << "1. Member Validation\n";
+		std::cout << "2. Service Billing" << std::endl;
+		std::cout << "3. Write Service Directory To File" << std::endl;
+		std::cout << "4. Quit" << std::endl;
 		std::cout << "Enter your option (1 - 4): ";
 
 
@@ -24,19 +24,19 @@ Provider_User::start_provider()
 		// member validation
 		if (check == 1) {
 			if (member_validation_wrapper()) {
-				std::cout << "Member Status: Active" << std::endl;
+				std::cout << "Member Status: Active\n";
 			}
 			else {
-				std::cout << "Member Status: Innactive" << std::endl;
+				std::cout << "Member Status: SUSPENDED\n";
 			}
 		}
 		// service record
 		if (check == 2) {
 			if (create_service_record()) {
-				std::cout << "Service record successfully created!" << std::endl;
+				std::cout << "Service record successfully created!\n";
 			}
 			else {
-				std::cout << "Service record creation failed." << std::endl;
+				std::cout << "Service record creation failed.\n";
 			}
 		}
 		// provider directory
@@ -51,7 +51,7 @@ Provider_User::start_provider()
 Provider_User::Provider_User(SQLEngine &db_ref) : db(db_ref)
 {
 
-	std::cout << "Provider_User initialized..." << std::endl;
+	std::cout << "Provider_User initialized..\n";
 }
 
 bool
@@ -84,7 +84,7 @@ bool
 Provider_User::member_validation(std::string &member_ID)
 {
 	while (!utils::is_valid_num(member_ID)) {
-		std::cout << "Invalid input. Please try again: ";
+		std::cout << "Invalid Input. Please try again: ";
 		std::getline(std::cin, member_ID);
 	}
 
@@ -96,7 +96,7 @@ Provider_User::member_validation_wrapper()
 {
 	std::string member_ID;
 
-	std::cout << "enter 9-digit member number: " << std::endl;
+	std::cout << "Enter 9-Digit Member Number: ";
 	std::getline(std::cin, member_ID);
 
 	return member_validation(member_ID);
@@ -107,7 +107,6 @@ Provider_User::member_validation_wrapper()
 bool
 Provider_User::create_service_record()
 {
-
 	/*
 	 This builds a Provider Class Object and passes it to another function to save the information
 
@@ -122,7 +121,7 @@ Provider_User::create_service_record()
 
 	std::string member_number = utils::get_member_number();
 
-	if(!db.validate_member(member_number)){
+	if (!db.validate_member(member_number)) {
 		std::cout << '\n';
 		return false;
 	}
@@ -133,7 +132,7 @@ Provider_User::create_service_record()
 	std::string service_code = utils::get_service_code();
 	Service service;
 
-	if(!db.validate_service(service_code)){
+	if (!db.validate_service(service_code)) {
 		std::cout << '\n';
 		return false;
 	}
@@ -141,8 +140,7 @@ Provider_User::create_service_record()
 	service.set_code(service_code);
 
 
-
-	if(!db.get_service(service)){
+	if (!db.get_service(service)) {
 		return false;
 	}
 
@@ -151,7 +149,7 @@ Provider_User::create_service_record()
 	std::string comment = utils::get_comments();
 
 	// std::cout << "Total fee: " << service.get_fee() << std::endl;
-	std::cout << "Total fee: " << service.get_fee() << std::endl;
+	std::cout << "Total Fee: " << service.get_fee() << "\n";
 
 	// create service record object
 	ServiceRecord record(date_of_service, "", user.get_ID(), member_number, service_code, comment);
@@ -167,26 +165,26 @@ Provider_User::generate_service_directory()
 	std::vector<Service> services;
 
 	if (!db.get_all_services(services)) {
-		std::cerr << "Error: failed to get services from database" << std::endl;
+		std::cerr << "Error: failed to get services from database\n";
 		return false;
 	}
 
 	std::ofstream file("../service_directory.txt");
 	if (!file.is_open()) {
-		std::cerr << "Error: Could not open service_directory.txt for writing" << std::endl;
+		std::cerr << "Error: Could not open service_directory.txt for writing\n";
 		return false;
 	}
 
 	// header
-	file << "+ - - - - - - - - - - - +" << std::endl;
-	file << "+   SERVICE DIRECTORY   +" << std::endl;
-	file << "+ - - - - - - - - - - - +\n" << std::endl;
+	file << "+ - - - - - - - - - - - +\n";
+	file << "+   SERVICE DIRECTORY   +\n";
+	file << "+ - - - - - - - - - - - +\n\n";
 	file << std::left << std::setw(10) << "Code" << std::setw(10) << "Fee"
 		 << "Description\n";
 	file << std::string(50, '-') << "\n";
 
 	// write to file
-	std::cout << "generating file..." << std::endl;
+	std::cout << "generating file...\n";
 	for (auto &service : services) {
 		file << std::left << std::setw(10) << service.get_code() << std::setw(10) << std::fixed << std::setprecision(2)
 			 << service.get_fee() << service.get_description() << "\n";
