@@ -120,8 +120,7 @@ class SQLEngine {
 	bool validate_provider(const std::string &provider_id);
 
 	// Service Directory Functions
-	Service get_service(const std::string &code);
-
+	bool get_service(Service & service);
 	bool add_service(Service & service);
 	bool update_service(Service & service);
 	bool delete_service(const std::string & code);

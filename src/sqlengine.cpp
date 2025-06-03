@@ -620,8 +620,6 @@ SQLEngine::get_provider(Provider &provider)
 		provider.set_zip(res[0][3].c_str());
 		provider.set_state(res[0][4].c_str());
 
-		std::cout << provider.get_name() << provider.get_address() << std::endl;
-
 
 		return true;
 	}
@@ -669,28 +667,34 @@ SQLEngine::validate_provider(const std::string &provider_id)
 //
 // Retrieves a specific service via service_code and returns new object
 // @PARAMS: const std::string &code - 6-digit service_code
-Service
-SQLEngine::get_service(const std::string &code)
+bool
+SQLEngine::get_service(Service & service)
 {
-	// Check My_DBection
 	if (!is_connected()) {
-		std::cerr << "db not open\n";
-		return Service{};
+		std::cout << "DB connection failed\n";
+		return false;
 	}
-
 	try {
-		// Start a transaction
 		pqxx::work transaction(get_connection());
+		pqxx::result res = transaction.exec(pqxx::zview(R"(SELECT description, fee
+			FROM chocan.services 
+			WHERE service_code = $1)"),
+											pqxx::params{service.get_code()});
 
-		// Run Query
-		auto [i_description, fee] = transaction.query1<std::string, float>(
-			pqxx::zview("SELECT description, fee FROM chocan.Services WHERE service_code = $1"), pqxx::params{code});
+		if (res.empty()) {
+			std::cout << "No service code found with: " << service.get_code() << "\n";
+			return false;
+		}
 
-		return Service(code, fee, i_description);
+		service.set_description(res[0][0].c_str());
+		service.set_fee(std::stof(res[0][1].c_str()));
+
+
+		return true;
 	}
 	catch (const std::exception &e) {
-		std::cerr << "Error retrieving service: " << e.what() << "\n";
-		return Service{};
+		std::cout << "Error retrieving member: " << e.what() << "\n";
+		return false;
 	}
 }
 
@@ -817,7 +821,7 @@ SQLEngine::update_service(Service &service)
 		// Start a transaction
 		pqxx::work transaction(get_connection());
 		pqxx::result res =
-			transaction.exec(pqxx::zview(R"(UPDATE chocan.providers 
+			transaction.exec(pqxx::zview(R"(UPDATE chocan.services 
 			                SET description = $1, fee = $2
                 			WHERE service_code = $3)"),
 

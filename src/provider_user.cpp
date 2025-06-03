@@ -128,7 +128,12 @@ Provider_User::create_service_record()
 	std::string date_of_service = utils::get_date_of_service();
 	std::string service_code = utils::get_service_code();
 
-	Service service = db.get_service(service_code);
+	Service service;
+	service.set_code(utils::get_service_code());
+	if(!db.get_service(service)){
+		std::cout << "Invalid service code, returning to Main Menu" << std::endl;
+		return false;
+	}
 
 	// std::cout << "Service name: " << service.get_name() << std::endl;
 
@@ -177,9 +182,5 @@ Provider_User::generate_service_directory()
 	}
 
 	file.close();
-}
-
-void
-Provider_User::display_service_directory()
-{
+	return true;
 }

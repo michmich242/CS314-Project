@@ -307,7 +307,7 @@ void Manager::display_Service_Menu(){
 			S_add_service();
 		}
 		else if (check == 2) {
-			P_update_provider();
+			S_update_service();
 		}
 		else if (check == 3){
 			P_delete_provider();
@@ -319,7 +319,7 @@ void Manager::display_Service_Menu(){
 
 
 
-void Manager::get_valid_service_input(Service & service, int A_P){
+void Manager::get_valid_service_input(Service & service){
 	std::string fee_string;
 	auto get_input = [](const std::string &prompt, const std::regex &pattern, int max_len = -1) {
 		std::string input;
@@ -335,10 +335,7 @@ void Manager::get_valid_service_input(Service & service, int A_P){
 
 	service.set_description(get_input("Enter service description (max 100 characters): ", std::regex("^.{1,100}$")));
 
-	if(A_P == 1){
-		service.set_code(get_input("Enter service code (6 digits): ", std::regex("^\\d{6}$")));
-	}
-	
+
 	fee_string = get_input("Enter service fee (0 to 99999): ", std::regex ("^\\d{1,5}$"));
 	service.set_fee(std::stof(fee_string));
 
@@ -355,12 +352,42 @@ bool Manager::S_add_service(){
 	}
 
 	Service service;
-	get_valid_service_input(service, 0);
+	get_valid_service_input(service);
 	return db.add_service(service);
 
 }
 
 bool Manager::S_update_service(){
+
+	std::string input_id;
+	Service service;
+	try {
+
+		std::regex nine_digits("^\\d{6}$");
+		while (!(std::regex_match(input_id, nine_digits))) {
+			std::cout << "Enter a 6 digit service code: ";
+			std::cin >> input_id;
+			std::cin.ignore(100, '\n');
+		}
+		service.set_code(input_id);
+		std::cout << service.get_code() << "\n";
+
+		if (!db.get_service(service)) {
+			std::cerr << "No service with given code\n";
+			return false;
+		}
+	}
+	catch (const std::invalid_argument &e) {
+		std::cout << "Invalid argument: " << e.what() << "\n";
+		return false;
+	}
+
+	service.Display_Service_Info();
+
+	std::cout << "Enter new the updated values for the following\n\n";
+
+	get_valid_service_input(service);
+	return db.update_service(service);
 
 }
 
