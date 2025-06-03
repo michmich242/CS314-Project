@@ -124,6 +124,8 @@ class SQLEngine {
 	bool add_service(Service & service);
 	bool update_service(Service & service);
 	bool delete_service(const std::string & code);
+	bool validate_service(const std::string & code);
+
 
 	bool get_all_services(std::vector<Service> &services);
 

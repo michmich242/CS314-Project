@@ -667,6 +667,37 @@ SQLEngine::validate_provider(const std::string &provider_id)
 //
 // Retrieves a specific service via service_code and returns new object
 // @PARAMS: const std::string &code - 6-digit service_code
+
+bool SQLEngine::validate_service(const std::string & code){
+	if (!is_connected()) {
+		std::cout << "DB connection failed\n";
+		return false;
+	}
+
+	try {
+		pqxx::work transaction(*conn);
+		pqxx::result res = transaction.exec(pqxx::zview(R"(SELECT 1 
+            FROM chocan.services 
+            WHERE service_code = $1)"),
+											pqxx::params{code});
+
+		if (res.empty()) {
+			std::cout << "No services found with code: " << code << "\n";
+			return false;
+		}
+
+		transaction.commit();
+		return true;
+	}
+	catch (const std::exception &e) {
+		std::cerr << "Database error in verifying service code exists: " << e.what() << "\n";
+		return false;
+	}
+}
+
+
+
+
 bool
 SQLEngine::get_service(Service & service)
 {

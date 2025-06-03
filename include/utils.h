@@ -52,7 +52,7 @@ is_valid_num(const std::string &num)
 
 	// check for correct length
 	if (num.length() != 9) {
-		std::cout << "Member number must be 9 digits. ";
+		std::cout << "Member number must be 9 digits.\n";
 		return false;
 	}
 	return true;
@@ -64,11 +64,11 @@ get_member_number()
 	// prompt user for 9 digit member number
 	std::string num;
 
-	std::cout << "enter your 9 digit member number" << std::endl;
+	std::cout << "enter your 9 digit member number: ";
 	std::getline(std::cin, num);
 
 	while (!is_valid_num(num)) {
-		std::cout << "invalid: please enter a 9 digit number" << std::endl;
+		std::cout << "invalid: please enter a 9 digit number: ";
 		std::getline(std::cin, num);
 	}
 

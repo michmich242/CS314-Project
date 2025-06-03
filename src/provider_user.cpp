@@ -125,13 +125,28 @@ Provider_User::create_service_record()
 	*/
 
 	std::string member_number = utils::get_member_number();
-	std::string date_of_service = utils::get_date_of_service();
-	std::string service_code = utils::get_service_code();
 
+	if(!db.validate_member(member_number)){
+		std::cout << '\n';
+		return false;
+	}
+
+	std::string date_of_service = utils::get_date_of_service();
+
+
+	std::string service_code = utils::get_service_code();
 	Service service;
-	service.set_code(utils::get_service_code());
+
+	if(!db.validate_service(service_code)){
+		std::cout << '\n';
+		return false;
+	}
+
+	service.set_code(service_code);
+
+
+
 	if(!db.get_service(service)){
-		std::cout << "Invalid service code, returning to Main Menu" << std::endl;
 		return false;
 	}
 
