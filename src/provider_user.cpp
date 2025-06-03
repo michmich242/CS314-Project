@@ -38,7 +38,8 @@ Provider_User::start_provider() {
 		}
 		//provider directory
 		if (check == 3) {
-			//display service directory
+			//write service directory to file
+			generate_service_directory();
 		}
 	}
 	return true;
@@ -53,26 +54,23 @@ Provider_User::Provider_User(SQLEngine &db_ref) : db(db_ref)
 	std::cout << "Provider_User initialized..." << std::endl;
 }
 
+bool Provider_User::login_wrapper() {
 
+	std::string input;
+	std::cout << "Please enter your 9 digit provider number: ";
+	std::getline(std::cin, input);
 
-// Default login, we setup provider user in demo so login is not necessary
+	return login(input);
+}
+
 bool
 Provider_User::login(std::string &input)
 {
-	//  std::cout << "Please enter your 9 digit provider number: ";
-	//  std::getline(std::cin, input);
-
 	while (!utils::is_valid_num(input)) {
 		std::cout << "Please try again: ";
 		std::getline(std::cin, input);
 	}
-
-	// check if provider exists in db
-	// if(db->validate_provider(num_as_string)) { return true; };
-
-	// std::cout << "setting provider id: " << provider.set_id(num_as_string) << std::endl;
-
-	return true;
+	return db.validate_provider(input);
 }
 
 // Member Validation using utils
@@ -167,6 +165,8 @@ Provider_User::generate_service_directory() {
         file << std::left << std::setw(10) << service.get_code()
              << std::setw(10) << std::fixed << std::setprecision(2) << service.get_fee()
              << service.get_description() << "\n";
+		
+		std::cout << "generating file..." << std::endl;
     }
     
     file.close();

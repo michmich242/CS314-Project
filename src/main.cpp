@@ -15,7 +15,9 @@ int main(int argc, char *argv[])
 	if (argv[1][0] == '0') {
         SQLEngine db;
         Provider_User user(db);
-		user.start_provider();
+		if(user.login_wrapper()) {
+			user.start_provider();
+		} 
 	}
 	else if (argv[1][0] == '1') {
         SQLEngine db;

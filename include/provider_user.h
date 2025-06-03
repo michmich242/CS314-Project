@@ -22,10 +22,12 @@ class Provider_User {
 
 	bool start_provider();
 
+	bool login_wrapper();
 	bool login(std::string &);
 	bool member_validation_wrapper();
 	bool member_validation(std::string &member_ID);
 	bool create_service_record();
 	bool generate_service_directory();
 	void display_service_directory();
+
 };

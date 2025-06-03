@@ -650,6 +650,35 @@ SQLEngine::get_provider(Provider &provider)
 	}
 }
 
+bool
+SQLEngine::validate_provider(const std::string &provider_id)
+{
+	if (!is_connected()) {
+        std::cout << "DB connection failed\n";
+        return false;
+    }
+    
+    try {
+        pqxx::work transaction(*conn);
+        pqxx::result res = transaction.exec(pqxx::zview(R"(SELECT 1 
+            FROM chocan.providers 
+            WHERE provider_id = $1)"),
+                                          pqxx::params{provider_id});
+        
+        if (res.empty()) {
+            std::cout << "No provider found with ID: " << provider_id << "\n";
+            return false;
+        }
+        
+        transaction.commit();
+        return true;
+        
+    } catch (const std::exception& e) {
+        std::cerr << "Database error in verify_provider_exists: " << e.what() << "\n";
+        return false;
+    }
+}
+
 //
 // End of Provider CRUD
 //
@@ -689,7 +718,7 @@ bool
 SQLEngine::get_all_services(std::vector<Service> &services)
 {
 	// Check Conn
-	if (is_connected()) {
+	if (!is_connected()) {
 		std::cerr << "db not open\n";
 		return false;
 	}
@@ -702,7 +731,7 @@ SQLEngine::get_all_services(std::vector<Service> &services)
 
 		// Run Query
 		for (auto [code, description, fee] : transaction.query<std::string, std::string, float>(
-				 "SELECT service_code, description, fee FROM Services ORDER BY service_code")) {
+				 "SELECT service_code, description, fee FROM chocan.services ORDER BY service_code")) {
 			services.emplace_back(code, fee, description);
 		}
 
@@ -771,8 +800,32 @@ SQLEngine::save_service_record(ServiceRecord &record)
 
 
 
-bool add_service(Service & service){
+bool SQLEngine::add_service(Service & service){
+	// Ensure My_DBection
+	if (!is_connected()) {
+		std::cerr << "db not open\n";
+		return false;
+	}
 
+	try {
+		// Start a transaction
+		pqxx::work transaction(get_connection());
+
+		// Attempt Query
+		transaction.query_value<std::string>(
+			pqxx::zview(R"(INSERT INTO chocan.services
+						  (code, fee, description)
+            			  VALUES($1, $2, $3))"),
+			pqxx::params{service.get_code(), service.get_fee(), service.get_description()}); 
+
+		// Finalize transaction
+		transaction.commit();
+		return true;
+	}
+	catch (const std::exception &e) {
+		std::cerr << "Error adding service: " << e.what() << "\n";
+		return false;
+	}
 }
 
 bool update_service(Service & service){
