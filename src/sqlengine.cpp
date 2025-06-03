@@ -825,9 +825,9 @@ SQLEngine::add_service(Service &service)
 		// Attempt Query
 		std::string returning_code =  transaction.query_value<std::string>(
 			pqxx::zview(R"(INSERT INTO chocan.services
-						  (description, fee)
-            			  VALUES($1, $2) RETURNING service_code)"),
-			pqxx::params{service.get_description(), service.get_fee()});
+						  (description, fee, active_status)
+            			  VALUES($1, $2, $3) RETURNING service_code)"),
+			pqxx::params{service.get_description(), service.get_fee(), true});
 
 		// Finalize transaction
 		service.set_code(returning_code);
@@ -848,9 +848,27 @@ SQLEngine::update_service(Service &service)
 		return false;
 	}
 
+	
+
 	try {
 		// Start a transaction
 		pqxx::work transaction(get_connection());
+
+
+
+		bool returning_code =  transaction.query_value<bool>(
+			pqxx::zview(R"(SELECT active_status
+							FROM chocan.services
+							WHERE service_code = $1)"),
+			pqxx::params{service.get_code()});
+
+		
+		if(!returning_code){
+			std::cout << "The current service is deleted." << std::endl;
+			return false;
+		}
+
+
 		pqxx::result res =
 			transaction.exec(pqxx::zview(R"(UPDATE chocan.services 
 			                SET description = $1, fee = $2
@@ -875,9 +893,11 @@ SQLEngine::update_service(Service &service)
 	}
 }
 
+
+
 bool
-SQLEngine::delete_service(const std::string &code)
-{
+SQLEngine::delete_service(const std::string &code){
+	// Double check if My_DBection is open
 	if (!is_connected()) {
 		std::cerr << "DB connection failed\n";
 		return false;
@@ -885,23 +905,31 @@ SQLEngine::delete_service(const std::string &code)
 
 	try {
 		// Start a transaction
+		bool set_stat = false;
 		pqxx::work transaction(get_connection());
-		pqxx::result res;
 
-		// Run Query
-		res = transaction.exec(pqxx::zview("DELETE FROM chocan.services WHERE service_code = $1"), pqxx::params{code});
+		// Attempt to Update
+		pqxx::result res =
+			transaction.exec(pqxx::zview(R"(UPDATE chocan.services
+						   SET active_status = $1 
+						   WHERE service_code = $2)"),
 
-		// Ensure a row was deleted
+							 // variables being passed to $#
+							 pqxx::params{set_stat, code});
+
+		// Check if query modified a row
 		if (res.affected_rows() == 0) {
 			std::cerr << "No service code found with: " << code << "\n";
 			return false;
 		}
 
+		// Finalize Transaction
 		transaction.commit();
 		return true;
 	}
 	catch (const std::exception &e) {
-		std::cerr << "Error Deleting service: " << e.what() << "\n";
+		std::cerr << "Error deleting service: " << e.what() << "\n";
 		return false;
 	}
+
 }

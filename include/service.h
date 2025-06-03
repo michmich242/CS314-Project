@@ -27,10 +27,15 @@ class Service {
 	bool get_service();
 
 	void Display_Service_Info();
+	bool & set_active_status(const bool & to_set);
+	bool & get_active_status();
+
+
 
   private:
 
 	std::string code;
 	float fee;
 	std::string description;
+	bool active_status;
 };

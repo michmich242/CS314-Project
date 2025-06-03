@@ -42,6 +42,16 @@ std::string & Service::set_description(const std::string & to_set){
 	return description;
 }
 
+bool & Service::set_active_status(const bool & to_set){
+	active_status = to_set;
+	return active_status;
+}
+
+bool & Service::get_active_status(){
+	return active_status;
+}
+
+
 
 
 void Service::Display_Service_Info(){
