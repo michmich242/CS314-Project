@@ -169,7 +169,7 @@ Provider_User::generate_service_directory()
 		return false;
 	}
 
-	std::ofstream file("../service_directory.txt");
+	std::ofstream file("service_directory.txt");
 	if (!file.is_open()) {
 		std::cerr << "Error: Could not open service_directory.txt for writing\n";
 		return false;
