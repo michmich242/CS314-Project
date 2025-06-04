@@ -86,7 +86,7 @@ struct ProviderSummary {
 
 struct ManagerSummary {
 	std::vector<ProviderSummary> summaries;
-	int total_consultations;
+	int num_consultations;
 	float total_fees;
 };
 
@@ -101,7 +101,7 @@ class SQLEngine {
 	// Weekly Reporting
 	bool generate_member_service_reports(std::vector<MemberReport> &);
 	bool generate_provider_service_reports(std::vector<ProviderReport> &);
-	bool generate_manager_summary_reports(std::vector<ManagerSummary> &);
+	bool generate_manager_summary_reports(ManagerSummary &);
 
 
 	// Member Class Functions
@@ -120,11 +120,11 @@ class SQLEngine {
 	bool validate_provider(const std::string &provider_id);
 
 	// Service Directory Functions
-	bool get_service(Service & service);
-	bool add_service(Service & service);
-	bool update_service(Service & service);
-	bool delete_service(const std::string & code);
-	bool validate_service(const std::string & code);
+	bool get_service(Service &service);
+	bool add_service(Service &service);
+	bool update_service(Service &service);
+	bool delete_service(const std::string &code);
+	bool validate_service(const std::string &code);
 
 
 	bool get_all_services(std::vector<Service> &services);

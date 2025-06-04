@@ -103,12 +103,12 @@ SQLEngine::generate_member_service_reports(std::vector<MemberReport> &reports)
 		reports.clear();
 
 		auto result = transaction.exec(R"(
-                SELECT m.member_id, m.name, m.address, m.city, m.state, m.zip, sr.date_of_service,
-                            p.name AS provider_name, s.description AS service_name
-                FROM service_records sr
-                INNER JOIN members m ON sr.member_id = m.member_id
-                INNER JOIN providers p ON sr.provider_id = p.provider_id
-                INNER JOIN services s ON sr.service_code = s.service_code
+                SELECT m.member_id, m.name, m.address, m.city, m.state_abbrev, m.zip,
+                        sr.date_of_service, p.name AS provider_name, s.description AS service_name
+                FROM chocan.service_records sr
+                INNER JOIN chocan.members m ON sr.member_id = m.member_id
+                INNER JOIN chocan.providers p ON sr.provider_id = p.provider_id
+                INNER JOIN chocan.services s ON sr.service_code = s.service_code
                 ORDER BY m.member_id, sr.date_of_service
         )");
 		// Condition to only have last 7 days
@@ -127,7 +127,7 @@ SQLEngine::generate_member_service_reports(std::vector<MemberReport> &reports)
 				report.member_name = row["name"].as<std::string>();
 				report.address = row["address"].as<std::string>();
 				report.city = row["city"].as<std::string>();
-				report.state = row["state"].as<std::string>();
+				report.state = row["state_abbrev"].as<std::string>();
 				report.zip = row["zip"].as<std::string>();
 				report_map[member_id] = std::move(report);
 			}
@@ -167,13 +167,13 @@ SQLEngine::generate_provider_service_reports(std::vector<ProviderReport> &report
 		reports.clear();
 
 		auto result = transaction.exec(R"(
-                SELECT p.provider_id, p.name, p.address, p.city, p.state, p.zip, 
+                SELECT p.provider_id, p.name, p.address, p.city, p.state_abbrev, p.zip, 
                        m.name as member_name, sr.date_of_service, sr.timestamp_received,
                        m.member_id, sr.service_code, s.description as service_name, s.fee
-                FROM service_records sr
-                JOIN providers p ON sr.provider_id = p.provider_id
-                JOIN members m ON sr.member_id = m.member_id
-                JOIN services s ON sr.service_code = s.service_code
+                FROM chocan.service_records sr
+                JOIN chocan.providers p ON sr.provider_id = p.provider_id
+                JOIN chocan.members m ON sr.member_id = m.member_id
+                JOIN chocan.services s ON sr.service_code = s.service_code
                 ORDER BY p.provider_id, sr.timestamp_received
         )");
 		// Condition to only have last 7 days
@@ -223,7 +223,7 @@ SQLEngine::generate_provider_service_reports(std::vector<ProviderReport> &report
 }
 
 bool
-SQLEngine::generate_manager_summary_reports(std::vector<ManagerSummary> &summaries)
+SQLEngine::generate_manager_summary_reports(ManagerSummary &msummary)
 {
 	if (!is_connected()) {
 		std::cerr << "db connection not open\n";
@@ -233,16 +233,16 @@ SQLEngine::generate_manager_summary_reports(std::vector<ManagerSummary> &summari
 	try {
 		pqxx::work transaction(get_connection());
 
-		summaries.clear();
+		msummary.summaries.clear();
 
 		auto res = transaction.exec(R"(
-            SELECT p.provider_id, p.name, p.address, p.city, p.state, p.zip,
+            SELECT p.provider_id, p.name, p.address, p.city, p.state_abbrev, p.zip,
                    m.member_id, m.name, sr.date_of_service, sr.timestamp_received,
                    sr.service_code, s.description, s.fee, sr.record_id
-            FROM service_records sr
-            JOIN providers p ON sr.provider_id = p.provider_id
-            JOIN members m ON sr.member_id = m.member_id
-            JOIN services s ON sr.service_code = s.service_code
+            FROM chocan.service_records sr
+            JOIN chocan.providers p ON sr.provider_id = p.provider_id
+            JOIN chocan.members m ON sr.member_id = m.member_id
+            JOIN chocan.services s ON sr.service_code = s.service_code
             ORDER BY p.provider_id, sr.timestamp_received
         )");
 
@@ -256,7 +256,7 @@ SQLEngine::generate_manager_summary_reports(std::vector<ManagerSummary> &summari
 			// check if provider_id in summary
 			if (provider_map.find(provider_id) == provider_map.end()) {
 				Provider provider(row["name"].as<std::string>(), row["address"].as<std::string>(),
-								  row["city"].as<std::string>(), row["state"].as<std::string>(),
+								  row["city"].as<std::string>(), row["state_abbrev"].as<std::string>(),
 								  row["zip"].as<std::string>());
 
 
@@ -279,15 +279,13 @@ SQLEngine::generate_manager_summary_reports(std::vector<ManagerSummary> &summari
 			total_fees += row["fee"].as<float>();
 		}
 
-		ManagerSummary manager_summary;
-		manager_summary.total_consultations = total_consultations;
-		manager_summary.total_fees = total_fees;
+		msummary.num_consultations = total_consultations;
+		msummary.total_fees = total_fees;
 
 		for (auto &[id, summary] : provider_map) {
-			manager_summary.summaries.push_back(std::move(summary));
+			msummary.summaries.push_back(std::move(summary));
 		}
 
-		summaries.push_back(std::move(manager_summary));
 		transaction.commit();
 		return true;
 	}
@@ -537,12 +535,12 @@ SQLEngine::update_provider(Provider &provider)
 	}
 
 	try {
-		
+
 		pqxx::work transaction(get_connection());
 		bool returning_code = transaction.query_value<bool>(pqxx::zview(R"(SELECT active_status
 					FROM chocan.providers
 					WHERE provider_id = $1)"),
-					pqxx::params{provider.get_ID()});
+															pqxx::params{provider.get_ID()});
 
 
 		if (!returning_code) {

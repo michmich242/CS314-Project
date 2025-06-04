@@ -1,6 +1,6 @@
 #include "../include/manager.h"
-#include "../include/sqlengine.h"
 #include "../include/service.h"
+#include "../include/sqlengine.h"
 #include "../include/utils.h"
 #include <regex>
 
@@ -12,12 +12,13 @@ Manager::start_manager()
 {
 	int check{0};
 
-	while (check != 4) {
-		std::cout << "1. Member Manager Terminal" << std::endl;
-		std::cout << "2. Provider Manager Terminal" << std::endl;
-		std::cout << "3. Service Manager Terminal" << std::endl;
-		std::cout << "4. Exit Program" << std::endl;
-		std::cout << "Enter your option (1 - 4): ";
+	while (check != 5) {
+		std::cout << "1. Member Manager Terminal\n";
+		std::cout << "2. Provider Manager Terminal\n";
+		std::cout << "3. Service Manager Terminal\n";
+		std::cout << "4. Generate Reports\n";
+		std::cout << "5. Exit Program\n";
+		std::cout << "Enter your option (1 - 5): ";
 
 
 		std::cin >> check;
@@ -27,11 +28,14 @@ Manager::start_manager()
 		if (check == 1) {
 			display_Member_Menu();
 		}
-		else if(check == 2){
+		else if (check == 2) {
 			display_Provider_Menu();
 		}
-		else if(check == 3){
+		else if (check == 3) {
 			display_Service_Menu();
+		}
+		else if (check == 4) {
+			display_Report_Menu();
 		}
 	}
 
@@ -59,7 +63,7 @@ Manager::display_Member_Menu()
 		else if (check == 2) {
 			update_member();
 		}
-		else if (check == 3){
+		else if (check == 3) {
 			delete_member();
 		}
 	}
@@ -143,8 +147,9 @@ Manager::get_valid_member_input(Member &member)
 	member.set_zip(get_input("Enter ZIP code (5 digits): ", std::regex("^\\d{5}$")));
 }
 
-
-bool Manager::delete_member(){
+bool
+Manager::delete_member()
+{
 
 	std::string input_id;
 
@@ -156,7 +161,6 @@ bool Manager::delete_member(){
 			std::cin >> input_id;
 			std::cin.ignore(100, '\n');
 		}
-
 	}
 	catch (const std::invalid_argument &e) {
 		std::cout << "Invalid argument: " << e.what() << "\n";
@@ -164,14 +168,12 @@ bool Manager::delete_member(){
 	}
 
 	return db.delete_member(input_id);
-
-
 }
 
+void
+Manager::get_valid_provider_input(Provider &provider)
+{
 
-
-void Manager::get_valid_provider_input(Provider & provider){
-	
 	auto get_input = [](const std::string &prompt, const std::regex &pattern, int max_len = -1) {
 		std::string input;
 		while (true) {
@@ -191,9 +193,9 @@ void Manager::get_valid_provider_input(Provider & provider){
 	provider.set_zip(get_input("Enter ZIP code (5 digits): ", std::regex("^\\d{5}$")));
 }
 
-
-
-void Manager::display_Provider_Menu(){
+void
+Manager::display_Provider_Menu()
+{
 	int check{0};
 	while (check != 4) {
 		std::cout << "1. Add Provider\n";
@@ -211,14 +213,15 @@ void Manager::display_Provider_Menu(){
 		else if (check == 2) {
 			P_update_provider();
 		}
-		else if (check == 3){
+		else if (check == 3) {
 			P_delete_provider();
 		}
 	}
-
 }
 
-bool Manager::P_add_provider(){
+bool
+Manager::P_add_provider()
+{
 	if (!db.is_connected()) {
 		return false;
 	}
@@ -226,12 +229,11 @@ bool Manager::P_add_provider(){
 	Provider provider;
 	get_valid_provider_input(provider);
 	return db.add_provider(provider);
-
 }
 
-
-
-bool Manager::P_update_provider(){
+bool
+Manager::P_update_provider()
+{
 	std::string input_id;
 	Provider provider;
 	try {
@@ -261,11 +263,11 @@ bool Manager::P_update_provider(){
 
 	get_valid_provider_input(provider);
 	return db.update_provider(provider);
-
 }
 
-
-bool Manager::P_delete_provider(){
+bool
+Manager::P_delete_provider()
+{
 
 
 	std::string input_id;
@@ -278,7 +280,6 @@ bool Manager::P_delete_provider(){
 			std::cin >> input_id;
 			std::cin.ignore(100, '\n');
 		}
-
 	}
 	catch (const std::invalid_argument &e) {
 		std::cout << "Invalid argument: " << e.what() << "\n";
@@ -286,12 +287,11 @@ bool Manager::P_delete_provider(){
 	}
 
 	return db.delete_provider(input_id);
-
 }
 
-
-
-void Manager::display_Service_Menu(){
+void
+Manager::display_Service_Menu()
+{
 	int check{0};
 	while (check != 4) {
 		std::cout << "1. Add Service\n";
@@ -309,17 +309,15 @@ void Manager::display_Service_Menu(){
 		else if (check == 2) {
 			S_update_service();
 		}
-		else if (check == 3){
+		else if (check == 3) {
 			S_delete_service();
 		}
 	}
-
 }
 
-
-
-
-void Manager::get_valid_service_input(Service & service){
+void
+Manager::get_valid_service_input(Service &service)
+{
 	std::string fee_string;
 	auto get_input = [](const std::string &prompt, const std::regex &pattern, int max_len = -1) {
 		std::string input;
@@ -336,17 +334,14 @@ void Manager::get_valid_service_input(Service & service){
 	service.set_description(get_input("Enter service description (max 100 characters): ", std::regex("^.{1,100}$")));
 
 
-	fee_string = get_input("Enter service fee (0 to 99999): ", std::regex ("^\\d{1,5}$"));
+	fee_string = get_input("Enter service fee (0 to 99999): ", std::regex("^\\d{1,5}$"));
 	service.set_fee(std::stof(fee_string));
-
 }
 
+bool
+Manager::S_add_service()
+{
 
-
-
-
-bool Manager::S_add_service(){
-	
 	if (!db.is_connected()) {
 		return false;
 	}
@@ -354,10 +349,11 @@ bool Manager::S_add_service(){
 	Service service;
 	get_valid_service_input(service);
 	return db.add_service(service);
-
 }
 
-bool Manager::S_update_service(){
+bool
+Manager::S_update_service()
+{
 
 	std::string input_id;
 	Service service;
@@ -388,11 +384,12 @@ bool Manager::S_update_service(){
 
 	get_valid_service_input(service);
 	return db.update_service(service);
-
 }
 
-bool Manager::S_delete_service(){
-	
+bool
+Manager::S_delete_service()
+{
+
 	std::string input_id;
 
 	try {
@@ -403,7 +400,6 @@ bool Manager::S_delete_service(){
 			std::cin >> input_id;
 			std::cin.ignore(100, '\n');
 		}
-
 	}
 	catch (const std::invalid_argument &e) {
 		std::cout << "Invalid argument: " << e.what() << "\n";
@@ -411,9 +407,112 @@ bool Manager::S_delete_service(){
 	}
 
 	return db.delete_service(input_id);
-
 }
 
+bool
+Manager::generate_manager_summary()
+{
+	ManagerSummary msum{.num_consultations = 0, .total_fees = 0.0};
+	if (!db.generate_manager_summary_reports(msum)) {
+		std::cerr << "\n**Error, failed to generate Manager Summary**\n";
+		return false;
+	}
+	std::string timestamp = gen_timestamp();
+	std::ofstream file("./Reports/ManagerSummary/Manager_Summary_" + timestamp + ".txt");
+	if (!file.is_open()) {
+		std::cerr << "\n**Error could not open file for writing**\n";
+		return false;
+	}
+
+	file << "+ - - - - - - - - - - - +\n";
+	file << "+    Manager Summary    +\n";
+	file << "+ - - - - - - - - - - - +\n\n";
+
+	file << std::left << std::setw(20) << "Provider";
+	file << std::right << std::setw(15) << "Consultations" << std::setw(12) << "Fees\n";
+
+	file << std::left << std::string(60, '-') << "\n";
+
+	file << std::fixed << std::setprecision(2);
+	for (auto &summary : msum.summaries) {
+		file << std::left << std::setw(20) << summary.provider.get_name() << std::right << std::setw(15)
+			 << summary.num_consultations << std::setw(12) << summary.total_fee << "\n";
+	}
+
+	file << std::left << "\n\n";
+	file << std::left << "Total Providers: " << msum.summaries.size() << "\n";
+	file << std::left << "Total Consultations: " << msum.num_consultations << "\n";
+	file << std::left << "Total Fee: " << msum.total_fees << "\n\n";
 
 
+	file.close();
+	return true;
+}
 
+bool
+Manager::generate_provider_report()
+{
+	return true;
+}
+
+bool
+Manager::generate_member_report()
+{
+	return true;
+}
+
+bool
+Manager::generate_EFT_Data()
+{
+	return true;
+}
+
+void
+Manager::display_Report_Menu()
+{
+	int check{0};
+	while (check != 6) {
+		std::cout << "1. Generate All Reports\n";
+		std::cout << "2. Generate Manager Summary\n";
+		std::cout << "3. Generate Provider Report\n";
+		std::cout << "4. Generate Member Report\n";
+		std::cout << "5. Generate EFT Data\n";
+		std::cout << "6. Return to Main Menu\n";
+		std::cout << "Enter your option (1 - 6): ";
+
+		std::cin >> check;
+		std::cin.ignore(100, '\n');
+		std::cout << "\n\n";
+
+		if (check == 1) {
+			generate_manager_summary();
+			generate_provider_report();
+			generate_member_report();
+			generate_EFT_Data();
+		}
+		else if (check == 2) {
+			generate_manager_summary();
+		}
+		else if (check == 3) {
+			generate_provider_report();
+		}
+		else if (check == 4) {
+			generate_member_report();
+		}
+		else if (check == 5) {
+			generate_EFT_Data();
+		}
+	}
+}
+
+std::string
+Manager::gen_timestamp()
+{
+	auto now = std::chrono::system_clock::now();
+	std::time_t now_time = std::chrono::system_clock::to_time_t(now);
+	std::tm *time_pointer = std::localtime(&now_time);
+
+	std::ostringstream oss;
+	oss << std::put_time(time_pointer, "%Y%m%d_%H%M%S");
+	return oss.str();
+}

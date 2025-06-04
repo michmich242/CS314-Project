@@ -1,3 +1,4 @@
+# Compiler and Platform Detection
 COMP = g++
 
 UNAME_S := $(shell uname -s)
@@ -25,17 +26,13 @@ endif
 
 $(info Detected platform: $(PLATFORM))
 
-$(shell mkdir -p bin)
-
+# Directories and Sources
 SRC_DIR = src
 INCLUDE_DIR = include
 TEST_DIR = tests
 BIN = bin
 
-TEST_BIN = runtests
-TEST_SRC = $(wildcard $(TEST_DIR)/*.cpp)
-TEST_OBJ = $(patsubst $(TEST_DIR)/%.cpp,$(BIN)/%.o,$(TEST_SRC))
-
+# Source File Groups
 MAIN = main
 PROV = provider
 PROV_USER = provider_user
@@ -46,15 +43,23 @@ UTILS = utils
 SERVICE = service
 SERVICE_RECORD = service_record
 
-all: $(MAIN)
+# Binaries
+TEST_BIN = runtests
+TEST_SRC = $(wildcard $(TEST_DIR)/*.cpp)
+TEST_OBJ = $(patsubst $(TEST_DIR)/%.cpp,$(BIN)/%.o,$(TEST_SRC))
 
-# Linkers
-$(MAIN): $(BIN)/$(MAIN).o $(BIN)/$(PROV).o $(BIN)/$(PROV_USER).o $(BIN)/$(MAN).o \
-         $(BIN)/$(SQL).o $(BIN)/$(UTILS).o $(BIN)/$(MEMBER).o \
-         $(BIN)/$(SERVICE).o $(BIN)/$(SERVICE_RECORD).o
+# Ensure bin/ exists
+$(shell mkdir -p $(BIN))
+
+# Targets
+all: report_dirs main
+
+main: $(BIN)/$(MAIN).o $(BIN)/$(PROV).o $(BIN)/$(PROV_USER).o $(BIN)/$(MAN).o \
+      $(BIN)/$(SQL).o $(BIN)/$(UTILS).o $(BIN)/$(MEMBER).o \
+      $(BIN)/$(SERVICE).o $(BIN)/$(SERVICE_RECORD).o
 	$(COMP) $(CFLAGS) -o $@ $^ $(LDFLAGS)
 
-# Rules
+# Compile Rules
 $(BIN)/$(MAIN).o: $(SRC_DIR)/$(MAIN).cpp $(INCLUDE_DIR)/$(MAIN).h
 	$(COMP) $(CFLAGS) -c $< -o $@
 
@@ -92,14 +97,25 @@ $(TEST_BIN): $(TEST_OBJ) $(BIN)/$(PROV).o $(BIN)/$(PROV_USER).o $(BIN)/$(MAN).o 
 $(BIN)/%.o: $(TEST_DIR)/%.cpp
 	$(COMP) $(CFLAGS) -I$(INCLUDE_DIR) -c $< -o $@
 
-# Utilities
+# Utility Targets
 clean cls:
 	rm -rf $(BIN)/*.o main $(TEST_BIN)
 
 git:
-	git add *.cpp *.h Makefile .gitignore
-	git commit
+	git add src/*.cpp include/*.h tests/*.cpp Makefile .gitignore
+	@read -p "Commit message: " msg; git commit -m "$$msg"
 
 test: $(TEST_BIN)
 	./$(TEST_BIN)
 
+# Directory Setup
+report_dirs: Reports/EFTData Reports/ManagerSummary Reports/MemberReports Reports/ProviderReports
+	@echo "Report directories checked/created."
+
+Reports:
+	mkdir -p $@
+
+Reports/%: Reports
+	mkdir -p $@
+
+.PHONY: clean cls git test report_dirs Reports Reports/EFTData Reports/ManagerSummary Reports/MemberReports Reports/ProviderReports

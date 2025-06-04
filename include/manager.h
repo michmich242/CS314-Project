@@ -5,11 +5,12 @@
 //      - Manager Terminal
 //
 #pragma once
+#include <chrono>
+
 #include "member.h"
 #include "provider.h"
 #include "service.h"
 #include "service_record.h"
-
 #include "sqlengine.h"
 
 class Manager {
@@ -20,10 +21,8 @@ class Manager {
 	// Member input functions
 	// Consider moving to util
 	void get_valid_member_input(Member &member);
-	void get_valid_provider_input(Provider & provider);
-	void get_valid_service_input(Service & service);
-
-
+	void get_valid_provider_input(Provider &provider);
+	void get_valid_service_input(Service &service);
 
 
   public:
@@ -53,4 +52,14 @@ class Manager {
 	bool S_delete_service();
 
 	void display_Service_Menu();
+
+
+	bool generate_manager_summary();
+	bool generate_provider_report();
+	bool generate_member_report();
+	bool generate_EFT_Data();
+
+	void display_Report_Menu();
+
+	std::string gen_timestamp();
 };

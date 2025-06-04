@@ -10,19 +10,13 @@
 ServiceRecord::ServiceRecord()
 	: id(""), timestamp(""), date_of_service(""), provider_id(""), member_id(""), service_code(""), comment("")
 {
-	std::cout << "initializing ServiceRecord object..." << std::endl;
 }
 
-ServiceRecord::ServiceRecord(std::string date_of_service, 
-							 std::string timestamp,
-							 std::string provider_id, 
-							 std::string member_id,
-							 std::string service_code, 
-							 std::string comment)
+ServiceRecord::ServiceRecord(std::string date_of_service, std::string timestamp, std::string provider_id,
+							 std::string member_id, std::string service_code, std::string comment)
 	: id(""), timestamp(timestamp), date_of_service(date_of_service), provider_id(provider_id), member_id(member_id),
 	  service_code(service_code), comment(comment)
 {
-	std::cout << "initializing ServiceRecord object..." << std::endl;
 }
 
 //
