@@ -8,6 +8,7 @@
 #include <memory>
 #include <pqxx/params>
 #include <pqxx/pqxx>
+#include <regex>
 #include <sstream>
 
 #include "member.h"

@@ -200,11 +200,14 @@ SQLEngine::generate_provider_service_reports(std::vector<ProviderReport> &report
 				report_map[provider_id] = std::move(report);
 			}
 
+
+			std::string raw_ts = row["timestamp_received"].as<std::string>();
+			std::string clean_ts = std::regex_replace(raw_ts, std::regex("\\.[0-9]+$"), "");
+
 			// Provider_id seen before ? add to map
 			report_map[provider_id].services.push_back(
-				{row["date_of_service"].as<std::string>(), row["timestamp_received"].as<std::string>(),
-				 row["member_name"].as<std::string>(), row["member_id"].as<std::string>(),
-				 row["service_code"].as<std::string>(), row["fee"].as<float>()});
+				{row["date_of_service"].as<std::string>(), clean_ts, row["member_name"].as<std::string>(),
+				 row["member_id"].as<std::string>(), row["service_code"].as<std::string>(), row["fee"].as<float>()});
 
 			report_map[provider_id].num_consultations++;
 			report_map[provider_id].total_fee += row["fee"].as<float>();

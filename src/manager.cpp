@@ -13,9 +13,9 @@ Manager::start_manager()
 	int check{0};
 
 	while (check != 5) {
-		std::cout << "1. Member Manager Terminal\n";
-		std::cout << "2. Provider Manager Terminal\n";
-		std::cout << "3. Service Manager Terminal\n";
+		std::cout << "1. Member Managment\n";
+		std::cout << "2. Provider Managment\n";
+		std::cout << "3. Service Managnment\n";
 		std::cout << "4. Generate Reports\n";
 		std::cout << "5. Exit Program\n";
 		std::cout << "Enter your option (1 - 5): ";
@@ -440,7 +440,7 @@ Manager::generate_manager_summary()
 	}
 
 	file << std::left << "\n\n";
-	file << std::left << "Total Providers:      " << msum.summaries.size();
+	file << std::left << "Total Providers:     " << msum.summaries.size();
 	file << std::left << "\nTotal Consultations: " << msum.num_consultations;
 	file << std::left << "\nTotal Fee:           " << msum.total_fees << "\n\n";
 
@@ -478,13 +478,14 @@ Manager::generate_provider_report()
 			 << "Zip:     " << provider.zip << "\n\n";
 
 		file << "Services Provided\n";
-		file << std::setw(15) << "Date of Service" << std::setw(15) << "Timestamp" << std::setw(25) << "Member"
-			 << std::setw(10) << "ID" << std::setw(8) << "Service" << std::setw(8) << "Fee\n";
-		file << std::string(81, '-') << "\n";
+		file << std::left << std::setw(22) << "Date of Service" << std::setw(22) << "Timestamp" << std::setw(22)
+			 << "Member" << std::setw(12) << "ID" << std::setw(12) << "Service" << std::setw(12) << "Fee" << " "
+			 << "\n";
+		file << std::string(100, '-') << "\n";
 		for (auto &service : provider.services) {
-			file << std::left << std::setw(15) << service.date_of_service << std::setw(15) << service.system_timestamp
-				 << std::setw(25) << service.member_name << std::setw(10) << service.member_id << std::setw(8)
-				 << service.service_code << std::setw(8) << service.fee << "\n";
+			file << std::left << std::setw(22) << service.date_of_service << std::setw(22) << service.system_timestamp
+				 << std::setw(22) << service.member_name << std::setw(12) << service.member_id << std::setw(12)
+				 << service.service_code << std::setw(12) << service.fee << " " << "\n";
 
 			provider.num_consultations++;
 			provider.total_fee += service.fee;
