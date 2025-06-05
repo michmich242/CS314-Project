@@ -15,6 +15,8 @@
 #include "service.h"
 #include "service_record.h"
 
+#define MAX_FEE 999.99F
+
 /*
 • Member name (25 characters).
 • Member number (9 digits).
@@ -27,7 +29,7 @@
 	o Provider name (25 characters).
 	o Service name (20 characters).
 */
-struct ServiceSummary {
+struct MemberServiceSummary {
 	std::string date_of_service;
 	std::string provider_name;
 	std::string service_name;
@@ -41,7 +43,7 @@ struct MemberReport {
 	std::string state;
 	std::string zip;
 
-	std::vector<ServiceSummary> services;
+	std::vector<MemberServiceSummary> services;
 };
 
 // Struct to pass back provider summaries
@@ -63,6 +65,15 @@ struct MemberReport {
 • Total number of consultations with members (3 digits).
 • Total fee for the week (up to $99,999.99).
 */
+struct ProviderServiceSummary {
+	std::string date_of_service;
+	std::string system_timestamp;
+	std::string member_name;
+	std::string member_id;
+	std::string service_code;
+	float fee;
+};
+
 struct ProviderReport {
 	std::string provider_name;
 	std::string provider_id;
@@ -71,7 +82,7 @@ struct ProviderReport {
 	std::string state;
 	std::string zip;
 
-	std::vector<ServiceSummary> services;
+	std::vector<ProviderServiceSummary> services;
 	int num_consultations;
 	float total_fee;
 };

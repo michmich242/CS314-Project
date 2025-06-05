@@ -31,6 +31,11 @@ SRC_DIR = src
 INCLUDE_DIR = include
 TEST_DIR = tests
 BIN = bin
+REPORT = Reports 
+PR = Reports/ProviderReports
+MR = Reports/MemberReports
+MS = Reports/ManagerSummary 
+EFT = Reports/EFTData 
 
 # Source File Groups
 MAIN = main
@@ -50,9 +55,10 @@ TEST_OBJ = $(patsubst $(TEST_DIR)/%.cpp,$(BIN)/%.o,$(TEST_SRC))
 
 # Ensure bin/ exists
 $(shell mkdir -p $(BIN))
+$(shell mkdir -p $(REPORT) $(PR) $(MR) $(MS) $(EFT))
 
 # Targets
-all: report_dirs main
+all: main
 
 main: $(BIN)/$(MAIN).o $(BIN)/$(PROV).o $(BIN)/$(PROV_USER).o $(BIN)/$(MAN).o \
       $(BIN)/$(SQL).o $(BIN)/$(UTILS).o $(BIN)/$(MEMBER).o \
@@ -108,14 +114,4 @@ git:
 test: $(TEST_BIN)
 	./$(TEST_BIN)
 
-# Directory Setup
-report_dirs: Reports/EFTData Reports/ManagerSummary Reports/MemberReports Reports/ProviderReports
-	@echo "Report directories checked/created."
-
-Reports:
-	mkdir -p $@
-
-Reports/%: Reports
-	mkdir -p $@
-
-.PHONY: clean cls git test report_dirs Reports Reports/EFTData Reports/ManagerSummary Reports/MemberReports Reports/ProviderReports
+.PHONY: clean cls git test

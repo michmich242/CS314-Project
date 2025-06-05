@@ -440,9 +440,9 @@ Manager::generate_manager_summary()
 	}
 
 	file << std::left << "\n\n";
-	file << std::left << "Total Providers: " << msum.summaries.size() << "\n";
-	file << std::left << "Total Consultations: " << msum.num_consultations << "\n";
-	file << std::left << "Total Fee: " << msum.total_fees << "\n\n";
+	file << std::left << "Total Providers:      " << msum.summaries.size();
+	file << std::left << "\nTotal Consultations: " << msum.num_consultations;
+	file << std::left << "\nTotal Fee:           " << msum.total_fees << "\n\n";
 
 
 	file.close();
@@ -452,6 +452,50 @@ Manager::generate_manager_summary()
 bool
 Manager::generate_provider_report()
 {
+	std::vector<ProviderReport> reports;
+
+	if (!db.generate_provider_service_reports(reports)) {
+		std::cerr << "\n**Error, failed to generate Manager Summary**\n";
+		return false;
+	}
+	for (auto &provider : reports) {
+		std::string timestamp = gen_timestamp();
+		std::ofstream file("./Reports/ProviderReports/" + provider.provider_name + "_" + timestamp + ".txt");
+		if (!file.is_open()) {
+			std::cerr << "\n**Error could not open file for writing**\n";
+			return false;
+		}
+
+		file << "+ - - - - - - - - - - - +\n";
+		file << "+    Provider Summary   +\n";
+		file << "+ - - - - - - - - - - - +\n\n";
+
+		file << "Name:    " << provider.provider_name << "\n"
+			 << "ID:      " << provider.provider_id << "\n"
+			 << "Address: " << provider.address << "\n"
+			 << "City:    " << provider.city << "\n"
+			 << "State:   " << provider.state << "\n"
+			 << "Zip:     " << provider.zip << "\n\n";
+
+		file << "Services Provided\n";
+		file << std::setw(15) << "Date of Service" << std::setw(15) << "Timestamp" << std::setw(25) << "Member"
+			 << std::setw(10) << "ID" << std::setw(8) << "Service" << std::setw(8) << "Fee\n";
+		file << std::string(81, '-') << "\n";
+		for (auto &service : provider.services) {
+			file << std::left << std::setw(15) << service.date_of_service << std::setw(15) << service.system_timestamp
+				 << std::setw(25) << service.member_name << std::setw(10) << service.member_id << std::setw(8)
+				 << service.service_code << std::setw(8) << service.fee << "\n";
+
+			provider.num_consultations++;
+			provider.total_fee += service.fee;
+		}
+
+		file << "\n\n";
+		file << "Total Consultations: " << provider.num_consultations;
+		file << "\nTotal Fee:           " << provider.total_fee;
+		file << "\n";
+		file.close();
+	}
 	return true;
 }
 
@@ -513,6 +557,6 @@ Manager::gen_timestamp()
 	std::tm *time_pointer = std::localtime(&now_time);
 
 	std::ostringstream oss;
-	oss << std::put_time(time_pointer, "%Y%m%d_%H%M%S");
+	oss << std::put_time(time_pointer, "%m%d%Y");
 	return oss.str();
 }

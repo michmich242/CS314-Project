@@ -91,7 +91,7 @@ SQLEngine::is_connected() const
 bool
 SQLEngine::generate_member_service_reports(std::vector<MemberReport> &reports)
 {
-	if (is_connected()) {
+	if (!is_connected()) {
 		std::cerr << "db connection not open\n";
 		return false;
 	}
@@ -155,7 +155,7 @@ SQLEngine::generate_member_service_reports(std::vector<MemberReport> &reports)
 bool
 SQLEngine::generate_provider_service_reports(std::vector<ProviderReport> &reports)
 {
-	if (!conn || !conn->is_open()) {
+	if (!is_connected()) {
 		std::cerr << "db connection not open\n";
 		return false;
 	}
@@ -192,7 +192,7 @@ SQLEngine::generate_provider_service_reports(std::vector<ProviderReport> &report
 				report.provider_id = provider_id;
 				report.address = row["address"].as<std::string>();
 				report.city = row["city"].as<std::string>();
-				report.state = row["state"].as<std::string>();
+				report.state = row["state_abbrev"].as<std::string>();
 				report.zip = row["zip"].as<std::string>();
 				report.num_consultations = 0;
 				report.total_fee = 0.0F;
@@ -201,11 +201,15 @@ SQLEngine::generate_provider_service_reports(std::vector<ProviderReport> &report
 			}
 
 			// Provider_id seen before ? add to map
-			report_map[provider_id].services.push_back({row["date_of_service"].as<std::string>(),
-														row["member_name"].as<std::string>(),
-														row["service_name"].as<std::string>()});
+			report_map[provider_id].services.push_back(
+				{row["date_of_service"].as<std::string>(), row["timestamp_received"].as<std::string>(),
+				 row["member_name"].as<std::string>(), row["member_id"].as<std::string>(),
+				 row["service_code"].as<std::string>(), row["fee"].as<float>()});
+
 			report_map[provider_id].num_consultations++;
 			report_map[provider_id].total_fee += row["fee"].as<float>();
+
+			report_map[provider_id].total_fee = std::min(report_map[provider_id].total_fee, MAX_FEE);
 		}
 
 		// drop provider_id key, only save value in reports
