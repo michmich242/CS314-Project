@@ -183,7 +183,7 @@ SQLEngine::generate_provider_service_reports(std::vector<ProviderReport> &report
 		// key_value pairing for each unique Provider_id
 		std::unordered_map<std::string, ProviderReport> report_map;
 		for (const auto &row : result) {
-			std::string provider_id = row["member_id"].as<std::string>();
+			std::string provider_id = row["provider_id"].as<std::string>();
 
 			// New Provider ? Add to map
 			if (report_map.find(provider_id) == report_map.end()) {
@@ -301,6 +301,47 @@ SQLEngine::generate_manager_summary_reports(ManagerSummary &msummary)
 		return false;
 	}
 }
+
+
+
+bool SQLEngine::generate_eft_reports(std::vector<EFTSummary> & EFT_Providers){
+	if (!is_connected()) {
+		std::cerr << "db connection not open\n";
+		return false;
+	}
+
+	try {
+		pqxx::work transaction(get_connection());
+
+
+		auto res = transaction.exec(R"(
+            SELECT p.provider_id, p.name, SUM(s.fee)
+            FROM chocan.service_records sr
+            JOIN chocan.providers p ON sr.provider_id = p.provider_id
+            JOIN chocan.members m ON sr.member_id = m.member_id
+            JOIN chocan.services s ON sr.service_code = s.service_code
+            group by (p.provider_id, p.name)
+            ORDER BY p.provider_id;
+        )");
+		
+		EFT_Providers.resize(res.size());
+		for (int i = 0; i < res.size(); ++i){
+			EFT_Providers[i].provider_name = res[i][0].c_str();
+			EFT_Providers[i].provider_id = res[i][1].c_str();
+			EFT_Providers[i].total_fee = res[i][2].as<float>();
+		}
+
+		transaction.commit();
+
+		return true;
+	}
+	catch (const std::exception &e) {
+		std::cerr << "Error generating EFT summary: " << e.what() << "\n";
+		return false;
+	}
+}
+
+
 
 // MANAGER TERMINAL CRUD
 

@@ -75,6 +75,7 @@ struct ProviderServiceSummary {
 	float fee;
 };
 
+
 struct ProviderReport {
 	std::string provider_name;
 	std::string provider_id;
@@ -96,6 +97,12 @@ struct ProviderSummary {
 	float total_fee;
 };
 
+struct EFTSummary{
+	std::string provider_name;
+	std::string provider_id;
+	float total_fee;
+};
+
 struct ManagerSummary {
 	std::vector<ProviderSummary> summaries;
 	int num_consultations;
@@ -114,6 +121,7 @@ class SQLEngine {
 	bool generate_member_service_reports(std::vector<MemberReport> &);
 	bool generate_provider_service_reports(std::vector<ProviderReport> &);
 	bool generate_manager_summary_reports(ManagerSummary &);
+	bool generate_eft_reports(std::vector<EFTSummary> &);
 
 
 	// Member Class Functions

@@ -13,9 +13,9 @@ Manager::start_manager()
 	int check{0};
 
 	while (check != 5) {
-		std::cout << "1. Member Managment\n";
-		std::cout << "2. Provider Managment\n";
-		std::cout << "3. Service Managnment\n";
+		std::cout << "1. Member Management\n";
+		std::cout << "2. Provider Management\n";
+		std::cout << "3. Service Management\n";
 		std::cout << "4. Generate Reports\n";
 		std::cout << "5. Exit Program\n";
 		std::cout << "Enter your option (1 - 5): ";
@@ -487,8 +487,6 @@ Manager::generate_provider_report()
 				 << std::setw(22) << service.member_name << std::setw(12) << service.member_id << std::setw(12)
 				 << service.service_code << std::setw(12) << service.fee << " " << "\n";
 
-			provider.num_consultations++;
-			provider.total_fee += service.fee;
 		}
 
 		file << "\n\n";
@@ -546,6 +544,40 @@ Manager::generate_member_report()
 bool
 Manager::generate_EFT_Data()
 {
+	std::vector<EFTSummary> providers;
+	if (!db.generate_eft_reports(providers)) {
+		std::cerr << "\n**Error, failed to generate EFT Summary**\n";
+		return false;
+	}
+
+	std::ofstream file("./Reports/EFTData/EFTSummary.txt");
+	if (!file.is_open()) {
+		std::cerr << "\n**Error could not open file for writing**\n";
+		return false;
+	}
+
+	file << "+ - - - - - - - - - - - +\n";
+	file << "+     	EFT Summary      +\n";
+	file << "+ - - - - - - - - - - - +\n\n";
+
+	file << std::left << std::setw(20) << "Provider ID";
+	file << std::right << std::setw(15) << "Provider name" << std::setw(12) << "Fees\n";
+
+	file << std::left << std::string(60, '-') << "\n";
+
+	for(int i = 0; i < providers.size(); ++i){
+		file << std::fixed << std::setprecision(2) << std::left << std::setw(20) << providers[i].provider_name << std::setw(20) << providers[i].provider_id
+			<< std::setw(20) << providers[i].total_fee << "\n";
+	}
+
+
+
+	file.close();
+	return true;
+
+
+
+
 	return true;
 }
 
@@ -598,3 +630,6 @@ Manager::gen_timestamp()
 	oss << std::put_time(time_pointer, "%m%d%Y");
 	return oss.str();
 }
+
+
+
