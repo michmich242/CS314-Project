@@ -528,13 +528,14 @@ Manager::generate_member_report()
 			 << "State:   " << member.state << "\n"
 			 << "Zip:     " << member.zip << "\n\n";
 
-		file << "Services Provided\n";
-		file << std::setw(15) << "Date of Service" << std::setw(15) << "Timestamp" << std::setw(25) << "Member"
-			 << std::setw(10) << "ID" << std::setw(8) << "Service" << std::setw(8) << "Fee\n";
-		file << std::string(81, '-') << "\n";
+		file << "Services Received\n";
+		file << std::left << std::setw(20) << "Date of Service" << std::setw(20) << "Provider" << std::setw(20)
+			 << "Service" << " " << "\n"
+			 << std::string(80, '-') << "\n";
+
 		for (auto &service : member.services) {
-			file << std::left << std::setw(15) << service.date_of_service << std::setw(25) << service.provider_name
-				 << std::setw(10) << service.service_name << "\n";
+			file << std::left << std::setw(20) << service.date_of_service << std::setw(20) << service.provider_name
+				 << std::setw(20) << service.service_name << "\n";
 		}
 		file.close();
 	}
