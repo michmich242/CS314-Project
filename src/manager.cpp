@@ -455,7 +455,7 @@ Manager::generate_provider_report()
 	std::vector<ProviderReport> reports;
 
 	if (!db.generate_provider_service_reports(reports)) {
-		std::cerr << "\n**Error, failed to generate Manager Summary**\n";
+		std::cerr << "\n**Error, failed to generate Provider Reports**\n";
 		return false;
 	}
 	for (auto &provider : reports) {
@@ -502,6 +502,42 @@ Manager::generate_provider_report()
 bool
 Manager::generate_member_report()
 {
+	std::vector<MemberReport> reports;
+
+	if (!db.generate_member_service_reports(reports)) {
+		std::cerr << "\n**Error, failed to generate Memeber Reports**\n";
+		return false;
+	}
+
+	for (auto &member : reports) {
+		std::string timestamp = gen_timestamp();
+		std::ofstream file("./Reports/MemberReports/" + member.member_name + "_" + timestamp + ".txt");
+		if (!file.is_open()) {
+			std::cerr << "\n**Error could not open file for writing**\n";
+			return false;
+		}
+
+		file << "+ - - - - - - - - - - - +\n";
+		file << "+     Member Summary    +\n";
+		file << "+ - - - - - - - - - - - +\n\n";
+
+		file << "Name:    " << member.member_name << "\n"
+			 << "ID:      " << member.member_id << "\n"
+			 << "Address: " << member.address << "\n"
+			 << "City:    " << member.city << "\n"
+			 << "State:   " << member.state << "\n"
+			 << "Zip:     " << member.zip << "\n\n";
+
+		file << "Services Provided\n";
+		file << std::setw(15) << "Date of Service" << std::setw(15) << "Timestamp" << std::setw(25) << "Member"
+			 << std::setw(10) << "ID" << std::setw(8) << "Service" << std::setw(8) << "Fee\n";
+		file << std::string(81, '-') << "\n";
+		for (auto &service : member.services) {
+			file << std::left << std::setw(15) << service.date_of_service << std::setw(25) << service.provider_name
+				 << std::setw(10) << service.service_name << "\n";
+		}
+		file.close();
+	}
 	return true;
 }
 
