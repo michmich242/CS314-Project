@@ -7,7 +7,7 @@ TEST(ProviderUserTest, LoginAcceptsValidInputImmediately) {
     SQLEngine eng;
     Provider_User provider(eng);
 
-    std::string input = "123456789";
+    std::string input = "200000000";
     bool result = provider.login(input);
 
     EXPECT_TRUE(result);
