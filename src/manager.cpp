@@ -565,7 +565,7 @@ Manager::generate_EFT_Data()
 
 	file << std::left << std::string(60, '-') << "\n";
 
-	for(int i = 0; i < providers.size(); ++i){
+	for(long long unsigned int i = 0; i < providers.size(); ++i){
 		file << std::fixed << std::setprecision(2) << std::left << std::setw(20) << providers[i].provider_name << std::setw(20) << providers[i].provider_id
 			<< std::setw(20) << providers[i].total_fee << "\n";
 	}
